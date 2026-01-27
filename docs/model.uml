@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>/Users/nick/Development/sandbox/pjs/pjs-core/src/main/java/io/github/iamnicknack/pjs/model/port</OriginalElement>
+  <nodes>
+    <node x="-595.5" y="305.0">io.github.iamnicknack.pjs.model.port.SerialPort</node>
+    <node x="9.5" y="202.0">io.github.iamnicknack.pjs.model.WriteOperation</node>
+    <node x="-137.77168448840382" y="678.2721998426331">io.github.iamnicknack.pjs.device.gpio.GpioPort</node>
+    <node x="58.5" y="682.139958029031">io.github.iamnicknack.pjs.device.pwm.Pwm</node>
+    <node x="-771.5" y="129.00000000000003">io.github.iamnicknack.pjs.model.SerialWriteOperation</node>
+    <node x="-67.5" y="512.0948136142626">io.github.iamnicknack.pjs.model.pin.Pin</node>
+    <node x="-493.5" y="105.0">io.github.iamnicknack.pjs.model.SerialReadOperation</node>
+    <node x="-771.5" y="864.2814589128884">io.github.iamnicknack.pjs.device.i2c.I2C</node>
+    <node x="-229.5" y="202.0">io.github.iamnicknack.pjs.model.ReadOperation</node>
+    <node x="-221.0" y="305.0">io.github.iamnicknack.pjs.model.port.Port</node>
+    <node x="-493.1358422442019" y="678.2721998426331">io.github.iamnicknack.pjs.device.spi.Spi</node>
+    <node x="-771.5" y="678.2721998426331">io.github.iamnicknack.pjs.model.device.Device</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="io.github.iamnicknack.pjs.device.spi.Spi" target="io.github.iamnicknack.pjs.model.port.Port" relationship="INTERFACE_GENERALIZATION">
+      <point x="-1.577557981136124E-4" y="-91.50019984263304" />
+      <point x="-354.636" y="489.0" />
+      <point x="-9.5" y="489.0" />
+      <point x="0.0" y="79.5" />
+    </edge>
+    <edge source="io.github.iamnicknack.pjs.device.spi.Spi" target="io.github.iamnicknack.pjs.model.port.SerialPort" relationship="INTERFACE_GENERALIZATION">
+      <point x="-138.5" y="-38.50019984263304" />
+      <point x="-530.0" y="731.272" />
+      <point x="-16.5" y="67.5" />
+    </edge>
+    <edge source="io.github.iamnicknack.pjs.model.port.Port" target="io.github.iamnicknack.pjs.model.WriteOperation" relationship="INTERFACE_GENERALIZATION">
+      <point x="119.5" y="-79.5" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="io.github.iamnicknack.pjs.model.port.SerialPort" target="io.github.iamnicknack.pjs.model.port.Port" relationship="INTERFACE_GENERALIZATION">
+      <point x="82.0" y="12.0" />
+      <point x="-211.5" y="0.0" />
+    </edge>
+    <edge source="io.github.iamnicknack.pjs.device.gpio.GpioPort" target="io.github.iamnicknack.pjs.model.port.Port" relationship="INTERFACE_GENERALIZATION">
+      <point x="-7.228315511596179" y="-31.500199842633037" />
+      <point x="-85.0" y="489.0" />
+      <point x="-9.5" y="489.0" />
+      <point x="0.0" y="79.5" />
+    </edge>
+    <edge source="io.github.iamnicknack.pjs.device.pwm.Pwm" target="io.github.iamnicknack.pjs.model.device.Device" relationship="INTERFACE_GENERALIZATION">
+      <point x="-76.0" y="80.632041970969" />
+      <point x="-530.0" y="878.772" />
+      <point x="-530.0" y="746.272" />
+      <point x="100.0" y="-1.998426330374059E-4" />
+    </edge>
+    <edge source="io.github.iamnicknack.pjs.device.pwm.Pwm" target="io.github.iamnicknack.pjs.model.pin.Pin" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-116.0" />
+      <point x="134.5" y="555.5948136142626" />
+      <point x="58.0" y="0.0" />
+    </edge>
+    <edge source="io.github.iamnicknack.pjs.model.pin.Pin" target="io.github.iamnicknack.pjs.model.port.Port" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-43.49981361426262" />
+      <point x="0.0" y="79.5" />
+    </edge>
+    <edge source="io.github.iamnicknack.pjs.model.port.Port" target="io.github.iamnicknack.pjs.model.ReadOperation" relationship="INTERFACE_GENERALIZATION">
+      <point x="-120.5" y="-79.5" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="io.github.iamnicknack.pjs.device.gpio.GpioPort" target="io.github.iamnicknack.pjs.model.device.Device" relationship="INTERFACE_GENERALIZATION">
+      <point x="-3.1551159618459224E-4" y="31.499800157366963" />
+      <point x="-77.772" y="878.772" />
+      <point x="-530.0" y="878.772" />
+      <point x="-530.0" y="746.272" />
+      <point x="100.0" y="-1.998426330374059E-4" />
+    </edge>
+    <edge source="io.github.iamnicknack.pjs.model.port.SerialPort" target="io.github.iamnicknack.pjs.model.SerialWriteOperation" relationship="INTERFACE_GENERALIZATION">
+      <point x="-27.5" y="-67.5" />
+      <point x="111.5" y="67.99999999999997" />
+    </edge>
+    <edge source="io.github.iamnicknack.pjs.device.i2c.I2C" target="io.github.iamnicknack.pjs.model.device.Device" relationship="INTERFACE_GENERALIZATION">
+      <point x="102.0" y="-4.5891288846178213E-4" />
+      <point x="-530.0" y="895.781" />
+      <point x="-530.0" y="746.272" />
+      <point x="100.0" y="-1.998426330374059E-4" />
+    </edge>
+    <edge source="io.github.iamnicknack.pjs.model.port.SerialPort" target="io.github.iamnicknack.pjs.model.SerialReadOperation" relationship="INTERFACE_GENERALIZATION">
+      <point x="27.5" y="-67.5" />
+      <point x="-104.5" y="80.0" />
+    </edge>
+    <edge source="io.github.iamnicknack.pjs.device.spi.Spi" target="io.github.iamnicknack.pjs.model.device.Device" relationship="INTERFACE_GENERALIZATION">
+      <point x="-138.5001577557981" y="-1.998426330374059E-4" />
+      <point x="-530.0" y="769.772" />
+      <point x="-530.0" y="746.272" />
+      <point x="100.0" y="-1.998426330374059E-4" />
+    </edge>
+  </edges>
+  <settings layout="Series Parallel" zoom="1.4128113879003559" showDependencies="false" x="-270.5000000000001" y="526.5" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.github.iamnicknack.pjs.grpc.gen.v1.spi";
+
+package pjs.v1.spi;
+
+import "pjs/v1/pjs.types.proto";
+
+service SpiService {
+  rpc transfer(types.DataRequest) returns (types.DataResponse);
+}
+
+service SpiTransferService {
+  rpc transfer(SpiTransferMessageList) returns (SpiTransferMessageList);
+}
+
+message SpiTransferMessageList {
+  string deviceId = 1;
+  repeated SpiTransferMessage message = 2;
+}
+
+message SpiTransferMessage {
+  bytes payload = 1;
+  int32 length = 2;
+  optional uint32 delayUs = 3;
+  optional bool csChange = 4;
+}
+
+service SpiConfigService {
+  rpc create(SpiConfigPayload) returns (SpiConfigPayload);
+  rpc fetchConfig(types.DeviceRequest) returns (SpiConfigPayload);
+  rpc fetchDevices(types.Empty) returns (SpiConfigListResponse);
+  rpc remove(types.DeviceRequest) returns (types.Empty);
+}
+
+message SpiConfigPayload {
+  optional string deviceId = 1;
+  int32 baudRate = 2;
+  int32 bus = 3;
+  int32 chipSelect = 4;
+  int32 mode = 5;
+  int32 bitsPerWord = 6;
+  bool lsbFirst = 7;
+}
+
+message SpiConfigListResponse {
+  repeated SpiConfigPayload config = 1;
+}

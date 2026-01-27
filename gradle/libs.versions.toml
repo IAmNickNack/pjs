@@ -1,0 +1,76 @@
+[versions]
+
+assertj = "3.27.7"
+assertk = "0.28.1"
+gradle-test-retry = "1.6.4"
+jackson = "2.21.0"
+junit = "6.0.2"
+jspecify = "1.0.0"
+kotlin = "2.3.0"
+kotlin-coroutines = "1.10.2"
+logback = "1.5.26"
+slf4j = "2.0.17"
+
+grpc-core = "1.78.0"
+grpc-kotlin = "1.5.0"
+protobuf = "4.33.4"
+protobuf-plugin = "0.9.5"
+
+pi4j = "4.0.0-SNAPSHOT"
+
+ktor = "3.4.0"
+koin = "4.1.1"
+
+[libraries]
+
+assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assertk" }
+gradle-test-retry = { module = "org.gradle.test-retry:org.gradle.test-retry.gradle.plugin", version.ref = "gradle-test-retry" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
+kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
+kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+
+# Pi4J
+pi4j-core = { module = "com.pi4j:pi4j-core", version.ref = "pi4j" }
+pi4j-plugin-ffm = { module = "com.pi4j:pi4j-plugin-ffm", version.ref = "pi4j" }
+pi4j-plugin-mock = { module = "com.pi4j:pi4j-plugin-mock", version.ref = "pi4j" }
+
+# gRPC
+grpc-protobuf = { group = "io.grpc", name = "grpc-protobuf", version.ref = "grpc-core" }
+grpc-netty = { group = "io.grpc", name = "grpc-netty", version.ref = "grpc-core" }
+grpc-testing = { group = "io.grpc", name = "grpc-testing", version.ref = "grpc-core" }
+grpc-services = { group = "io.grpc", name = "grpc-services", version.ref = "grpc-core" }
+grpc-stub = { group = "io.grpc", name = "grpc-stub", version.ref = "grpc-core" }
+grpc-kotlin-stub = { group = "io.grpc", name = "grpc-kotlin-stub", version.ref = "grpc-kotlin" }
+grpc-inprocess = { group = "io.grpc", name = "grpc-inprocess", version.ref = "grpc-core" }
+
+protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "protobuf" }
+protobuf-java = { group = "com.google.protobuf", name = "protobuf-java", version.ref = "protobuf" }
+protobuf-kotlin = { group = "com.google.protobuf", name = "protobuf-kotlin", version.ref = "protobuf" }
+protobuf-plugin = {group = "com.google.protobuf", name = "protobuf-gradle-plugin", version.ref = "protobuf-plugin" }
+
+protoc-gen-grpc-java = { group = "io.grpc", name = "protoc-gen-grpc-java", version.ref = "grpc-core" }
+protoc-gen-grpc-kotlin = { group = "io.grpc", name = "protoc-gen-grpc-kotlin", version.ref = "grpc-kotlin" }
+
+# Ktor
+ktor-bom = { module = "io.ktor:ktor-bom", version.ref = "ktor" }
+
+# Koin
+koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
+
+[bundles]
+
+logging = ["logback-classic", "slf4j-api"]
+pi4j = ["pi4j-core", "pi4j-plugin-ffm"]
+
+[plugins]
+

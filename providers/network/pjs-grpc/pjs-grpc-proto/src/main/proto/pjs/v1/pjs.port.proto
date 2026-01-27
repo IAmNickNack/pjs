@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.github.iamnicknack.pjs.grpc.gen.v1.port";
+
+package pjs.v1.port;
+
+import "pjs/v1/pjs.types.proto";
+
+service PortService {
+  rpc read(types.DeviceRequest) returns (types.IntegerResponse);
+  rpc write(types.IntegerRequest) returns (Empty);
+  rpc addListener(types.DeviceRequest) returns (stream StateChangeEvent);
+  rpc removeListener(RemoveListenerRequest) returns (Empty);
+}
+
+service PortConfigService {
+  rpc create(PortConfigPayload) returns (PortConfigPayload);
+  rpc fetchConfig(types.DeviceRequest) returns (PortConfigPayload);
+  rpc fetchDevices(Empty) returns (PortConfigListResponse);
+  rpc remove(types.DeviceRequest) returns (Empty);
+}
+
+message PortConfigPayload {
+  optional string deviceId = 1;
+  repeated int32 pinNumber = 2;
+  PortMode mode = 3;
+  int32 defaultValue = 4;
+}
+
+message PortConfigListResponse {
+  repeated PortConfigPayload config = 1;
+}
+
+message StateChangeEvent {
+  string deviceId = 1;
+  string listenerId = 2;
+  EventType eventType = 3;
+  int32 value = 4;
+}
+
+message RemoveListenerRequest {
+  string listenerId = 1;
+}
+
+enum PortMode {
+  NOT_SET = 0;
+  INPUT = 1;
+  OUTPUT = 2;
+  INPUT_PULLUP = 5;
+  INPUT_PULDOWN = 9;
+  OUTPUT_OPENDRAIN = 10;
+  OUTPUT_OPENSOURCE = 6;
+}
+
+enum EventType {
+  NONE = 0;
+  RISING = 1;
+  FALLING = 2;
+}
+
+message Empty {}

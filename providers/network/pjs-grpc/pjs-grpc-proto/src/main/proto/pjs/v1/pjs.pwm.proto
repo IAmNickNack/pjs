@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.github.iamnicknack.pjs.grpc.gen.v1.pwm";
+
+package pjs.v1.pwm;
+
+import "pjs/v1/pjs.types.proto";
+
+service PwmService {
+  rpc on(types.DeviceRequest) returns (types.Empty);
+  rpc off(types.DeviceRequest) returns (types.Empty);
+  rpc setFrequency(types.IntegerRequest) returns (types.IntegerResponse);
+  rpc getFrequency(types.DeviceRequest) returns (types.IntegerResponse);
+  rpc setDutyCycle(types.IntegerRequest) returns (types.IntegerResponse);
+  rpc getDutyCycle(types.DeviceRequest) returns (types.IntegerResponse);
+  rpc setPolarity(PolarityRequest) returns (PolarityResponse);
+  rpc getPolarity(types.DeviceRequest) returns (PolarityResponse);
+}
+
+service PwmConfigService {
+  rpc create(PwmConfigPayload) returns (PwmConfigPayload);
+  rpc fetchConfig(types.DeviceRequest) returns (PwmConfigPayload);
+  rpc fetchDevices(types.Empty) returns (PwmConfigListResponse);
+  rpc remove(types.DeviceRequest) returns (types.Empty);
+}
+
+message PwmConfigPayload {
+  optional string deviceId = 1;
+  int32 chip = 2;
+  int32 channel = 3;
+  int32 frequency = 4;
+  int32 dutyCycle = 5;
+  bool enabled = 6;
+  PwmPolarity polarity = 7;
+}
+
+message PwmConfigListResponse {
+  repeated PwmConfigPayload config = 1;
+}
+
+message PolarityRequest {
+  string deviceId = 1;
+  PwmPolarity polarity = 2;
+}
+
+message PolarityResponse {
+  PwmPolarity polarity = 1;
+}
+
+enum PwmPolarity {
+  NORMAL = 0;
+  INVERTED = 1;
+}
+

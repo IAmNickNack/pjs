@@ -1,0 +1,669 @@
+openapi: "3.1.0"
+info:
+  title: "pjs API"
+  description: "pjs API"
+  version: "1.0.0"
+servers:
+  - url: "http://localhost:8080"
+paths:
+  /api/v1/gpio/{deviceId}:
+    get:
+      tags:
+        - GPIO
+      description: "Get the device configuration"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Configuration as set on the device"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/GpioPortConfig"
+        "404":
+          description: "Device not found"
+    post:
+      tags:
+        - GPIO
+      description: "Create a new device"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GpioPortConfigPayload"
+      responses:
+        "200":
+          description: "Configuration as set on the device"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/GpioPortConfig"
+        "409":
+          description: "Device already exists"
+    delete:
+      tags:
+        - GPIO
+      description: "Remove a device"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+
+  /api/v1/gpio/{deviceId}/events:
+    get:
+      tags:
+        - GPIO
+      description: "Subscribe to state change events from the device"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+    delete:
+      tags:
+        - GPIO
+      description: "Unsubscribe from state change events"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/v1/gpio/{deviceId}/value:
+    get:
+      tags:
+        - GPIO
+      description: "Read the current value of the port"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                type: "integer"
+                format: "int32"
+  /api/v1/gpio/{deviceId}/value/{value}:
+    put:
+      tags:
+        - GPIO
+      description: "Set the value of the port"
+      parameters:
+        - name: "value"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+
+  #############################################################################
+  # I2C
+  /api/v1/i2c/{deviceId}:
+    get:
+      tags:
+        - I2C
+      description: "Get the device configuration"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+    post:
+      tags:
+        - I2C
+      description: "Create a new device"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/I2CConfigPayload"
+      responses:
+        "200":
+          description: "Configuration as set on the device"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/I2CConfig"
+        "409":
+          description: "Device already exists"
+    delete:
+      tags:
+        - I2C
+      description: "Remove a device"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/v1/i2c/{deviceId}/transfer:
+    post:
+      tags:
+        - I2C
+      description: "Perform an I2C transfer"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/I2CTransferPayload"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/I2CTransferPayload"
+
+  #############################################################################
+  # PWM
+  /api/v1/pwm/{deviceId}:
+    get:
+      tags:
+        - PWM
+      description: "Get the device configuration"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+    post:
+      tags:
+        - PWM
+      description: "Create a new device"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PwmConfigPayload"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PwmConfig"
+        "409":
+          description: "Device already exists"
+    delete:
+      tags:
+        - PWM
+      description: "Remove a device"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/v1/pwm/{deviceId}/duty-cycle:
+    get:
+      tags:
+        - PWM
+      description: "Read the current duty cycle of the PWM pin"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "integer"
+                format: "int32"
+  /api/v1/pwm/{deviceId}/duty-cycle/{dutyCycle}:
+    put:
+      tags:
+        - PWM
+      description: "Set the duty cycle of the PWM pin"
+      parameters:
+        - name: "dutyCycle"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/v1/pwm/{deviceId}/frequency:
+    get:
+      tags:
+        - PWM
+      description: "Read the current frequency of the PWM pin"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "integer"
+                format: "int32"
+  /api/v1/pwm/{deviceId}/frequency/{frequency}:
+    put:
+      tags:
+        - PWM
+      description: "Set the frequency of the PWM pin"
+      parameters:
+        - name: "frequency"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/v1/pwm/{deviceId}/off:
+    put:
+      tags:
+        - PWM
+      description: "Turn the PWM pin off"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/v1/pwm/{deviceId}/on:
+    put:
+      tags:
+        - PWM
+      description: "Turn the PWM pin on"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/v1/pwm/{deviceId}/polarity:
+    get:
+      tags:
+        - PWM
+      description: "Read the current polarity of the PWM pin"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /api/v1/pwm/{deviceId}/polarity/{polarity}:
+    put:
+      tags:
+        - PWM
+      description: "Set the polarity of the PWM pin"
+      parameters:
+        - name: "polarity"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+
+  #############################################################################
+  # SPI
+  /api/v1/spi/{deviceId}:
+    get:
+      tags:
+        - SPI
+      description: "Get the device configuration"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+    post:
+      tags:
+        - SPI
+      description: "Create a new device"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpiConfigPayload"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpiConfig"
+        "409":
+          description: "Device already exists"
+    delete:
+      tags:
+        - SPI
+      description: "Remove a device"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/v1/spi/{deviceId}/transfer:
+    post:
+      tags:
+        - SPI
+      description: "Perform an SPI transfer"
+      parameters:
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransferPayload"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransferPayload"
+
+components:
+  schemas:
+    
+    DeviceId:
+      description: "Unique identifier for a device"
+      type: "object"
+      properties:
+        id:
+          type: "string"
+
+    GpioPortConfigPayload:
+      type: "object"
+      properties:
+        pinNumber:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int32"
+        mode:
+          type: "string"
+          enum:
+            - "INPUT"
+            - "OUTPUT"
+            - "INPUT_PULLUP"
+            - "INPUT_PULLDOWN"
+        defaultValue:
+          type: "integer"
+          format: "int32"
+      required:
+        - pinNumber
+        - mode
+
+    GpioPortConfig:
+      allOf:
+        - $ref: "#/components/schemas/GpioPortConfigPayload"
+        - $ref: "#/components/schemas/DeviceId"
+
+    I2CConfigPayload:
+      type: "object"
+      properties:
+        bus:
+          type: "integer"
+          format: "int32"
+
+    I2CConfig:
+      allOf:
+        - $ref: "#/components/schemas/I2CConfigPayload"
+        - $ref: "#/components/schemas/DeviceId"
+
+    SpiConfigPayload:
+      type: "object"
+      properties:
+        baudRate:
+          type: "integer"
+          format: "int32"
+          default: 1000000
+        bus:
+          type: "integer"
+          format: "int32"
+          default: 0
+        chipSelect:
+          type: "integer"
+          format: "int32"
+          default: 0
+        mode:
+          type: "integer"
+          format: "int32"
+          default: 0
+        bitsPerWord:
+          type: "integer"
+          format: "int32"
+        lsbFirst:
+          type: "boolean"
+
+    SpiConfig:
+      allOf:
+        - $ref: "#/components/schemas/SpiConfigPayload"
+        - $ref: "#/components/schemas/DeviceId"
+
+    PwmConfigPayload:
+      type: "object"
+      properties:
+        chip:
+          type: "integer"
+          format: "int32"
+          default: 0
+        channel:
+          type: "integer"
+          format: "int32"
+          default: 0
+        frequency:
+          type: "integer"
+          format: "int32"
+          default: 440
+        dutyCycle:
+          type: "integer"
+          format: "int32"
+          default: 50
+        polarity:
+          type: "string"
+          enum:
+            - NORMAL
+            - INVERTED
+    PwmConfig:
+      allOf:
+        - $ref: "#/components/schemas/PwmConfigPayload"
+        - $ref: "#/components/schemas/DeviceId"
+
+    I2CTransferMessage:
+      type: "object"
+      properties:
+        address:
+          type: "integer"
+          format: "int32"
+        payload:
+          type: "array"
+          items:
+            type: "string"
+            format: "byte"
+        type:
+          type: "string"
+          enum:
+            - "READ"
+            - "WRITE"
+      required:
+        - "address"
+        - "payload"
+        - "type"
+
+    I2CTransferPayload:
+      type: "object"
+      properties:
+        messages:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/I2CTransferMessage"
+      required:
+        - "messages"
+
+    TransferPayload:
+      type: "object"
+      properties:
+        data:
+          type: "array"
+          items:
+            type: "string"
+            format: "byte"
+      required:
+        - "data"

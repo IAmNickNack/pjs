@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="gRPC Server" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="io.github.iamnicknack.pjs.grpc.PjsGrpcServerKt" />
+    <module name="pjs.pjs-grpc-server.main" />
+    <option name="PROGRAM_PARAMETERS" value="--mode pi4j --proxy-host 10.0.0.2 --proxy-port 9090 --logging" />
+    <shortenClasspath name="NONE" />
+    <option name="VM_PARAMETERS" value="--enable-native-access=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

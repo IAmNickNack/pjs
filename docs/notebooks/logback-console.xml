@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{HH:mm:ss.SSS} %green(%-5level) [%cyan(%-36logger{36})] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="MOCK_SETUP" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%white(%d{HH:mm:ss.SSS} %-5level [%-36logger{36}]) %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="NOTEBOOK" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%highlight(%d{HH:mm:ss.SSS} %-5level [%-36logger{36}]) %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+    <logger name="io.github.iamnicknack" level="DEBUG" />
+    <logger name="device" level="DEBUG" />
+
+    <logger name="mock-setup" level="DEBUG" additivity="false">
+        <appender-ref ref="MOCK_SETUP" />
+    </logger>
+
+    <logger name="notebook" level="DEBUG" additivity="false">
+        <appender-ref ref="NOTEBOOK" />
+    </logger>
+
+</configuration>

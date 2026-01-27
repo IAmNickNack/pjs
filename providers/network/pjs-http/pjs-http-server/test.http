@@ -1,0 +1,56 @@
+### Create Port
+POST localhost:8080/api/v1/gpio/test-port
+Content-Type: application/json
+
+{
+  "pinNumber": [
+    1,
+    2,
+    3
+  ],
+  "mode": "OUTPUT"
+}
+
+### Remove Port
+DELETE localhost:8080/api/v1/gpio/test-port
+Content-Type: application/json
+
+### Set port value
+PUT localhost:8080/api/v1/gpio/test-port/value/123
+
+### Get port value
+GET localhost:8080/api/v1/gpio/test-port/value
+
+
+################################################################################################################
+### Create SPI
+POST localhost:8080/api/v1/spi/test-spi
+Content-Type: application/json
+
+{
+  "bus": 0,
+  "chipSelect": 0
+}
+
+### Transfer
+POST localhost:8080/api/v1/spi/test-spi/transfer
+Content-Type: application/json
+
+{
+  "data": "CQ=="
+}
+
+################################################################################################################
+### PWM
+POST localhost:8080/api/v1/pwm/test-pwm
+Content-Type: application/json
+
+{
+  "chip": 1,
+  "channel": 0
+}
+
+
+
+################################################################################################################
+### I2C

@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus";
+
+package pjs.v1.i2c.bus;
+
+import "pjs/v1/pjs.types.proto";
+
+service I2CBusService {
+  rpc transfer(TransferRequest) returns (TransferResponse);
+}
+
+service I2CBusConfigService {
+  rpc create(I2CBusConfigPayload) returns (I2CBusConfigPayload);
+  rpc fetchConfig(types.DeviceRequest) returns (I2CBusConfigPayload);
+  rpc fetchDevices(types.Empty) returns (I2CBusConfigListResponse);
+  rpc remove(types.DeviceRequest) returns (types.Empty);
+}
+
+message I2CBusConfigPayload {
+  optional string deviceId = 1;
+  int32 bus = 2;
+}
+
+message I2CBusConfigListResponse {
+  repeated I2CBusConfigPayload config = 1;
+}
+
+message TransferRequest {
+  string deviceId = 1;
+  repeated I2CBusMessage message = 2;
+}
+
+message TransferResponse {
+  repeated I2CBusMessage message = 1;
+}
+
+message I2CBusMessage {
+  int32 address = 1;
+  MessageType type = 2;
+  bytes data = 3;
+}
+
+enum MessageType {
+  READ = 0;
+  WRITE = 1;
+}

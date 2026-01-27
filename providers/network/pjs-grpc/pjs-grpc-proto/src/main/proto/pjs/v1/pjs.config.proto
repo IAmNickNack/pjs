@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.github.iamnicknack.pjs.grpc.gen.v1.config";
+
+package pjs.v1.config;
+
+import "pjs/v1/pjs.types.proto";
+
+///////////////////////////////////////////////////////////////////////////////////////
+/// Configuration
+///////////////////////////////////////////////////////////////////////////////////////
+
+service DeviceConfigService {
+  rpc removeDevice(types.DeviceRequest) returns (Empty) {}
+}
+
+message DeviceListResponse {
+  repeated DeviceConfigPayload device = 1;
+}
+
+message DeviceListRequest {
+  DeviceType deviceType = 1;
+}
+
+message DeviceConfigPayload {
+  DeviceType deviceType = 1;
+  map<string, string> config = 2;
+}
+
+message Empty {}
+
+enum DeviceType {
+  PORT = 0;
+  PWM = 1;
+  I2C = 2;
+  SPI = 3;
+}

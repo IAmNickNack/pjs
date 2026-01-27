@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Test Harness - SPI" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="io.github.iamnicknack.pjs.sandbox.Main" />
+    <module name="pjs-sandbox.pjs-examples.main" />
+    <option name="PROGRAM_PARAMETERS" value="--logging --plugin grpc --grpc-host 10.0.0.2 --grpc-port 9090 --spi" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="io.github.iamnicknack.pjs.sandbox.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

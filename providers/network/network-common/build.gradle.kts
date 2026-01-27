@@ -1,0 +1,13 @@
+plugins {
+    id("buildlogic.repositories")
+    id("buildlogic.kotlin-core")
+    id("buildlogic.test.test-kotlin")
+    `java-library`
+}
+
+dependencies {
+    implementation(project(":pjs-utils"))
+    implementation(project(":pjs-mock-device"))
+    implementation(libs.slf4j.api)
+}
+
