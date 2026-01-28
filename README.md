@@ -37,6 +37,9 @@ Applications would typically use these abstractions to interact with hardware di
  the underlying implementation details. Application logic would be written against these abstractions rather than the 
  underlying device adapters. 
 
+* [PORTS.md](docs/PORTS.md) - An overview and example usage of the PJs `Port<>` and `Pin` abstractions.
+* [SERIAL.md](docs/SERIAL.md) - An overview and example usage of the PJs `SerialPort`, `SPI` and `I2C` abstractions.
+
 ## Device Adapters
 
 Device adapters implement the transport layer used by the hardware abstractions. They are responsible for managing 
@@ -44,6 +47,17 @@ Device adapters implement the transport layer used by the hardware abstractions.
 
 Applications would typically only be aware of these specific types during construction when configuring 
  access to hardware. Runtime references to these instances would be via the hardware abstractions they implement.  
+
+Device adapters provided in this repository include:
+
+* [pjs-native-device](providers/pjs-native) - Adapters which communicate with hardware via Java FFM APIs
+* [pjs-mock-device](providers/pjs-mock-device) - Mock device adapters which can be used for testing
+* [pjs-grpc-device](providers/network/pjs-grpc) - Device adapters and server application which allow PJs to 
+communicate with a remote Pi via gRPC
+* [pjs-http-device](providers/network/pjs-http) - Device adapters and server application which allow PJs to
+  communicate with a remote Pi via REST
+* [pjs-pi4j-device](providers/pjs-pi4j-device) - Device adapter which uses [Pi4J](https://www.pi4j.com) providers to 
+communicate with hardware
 
 ## Examples
 
@@ -57,8 +71,3 @@ The implemented devices currently include:
 * [pjs-device-sh1106](pjs-sandbox/pjs-device-sh1106) - A PJs I2C implementation for the SH1106 OLED display.
 
 [pjs-examples](pjs-sandbox/pjs-examples) contains a number of examples that demonstrate how to use the PJs APIs.
-
-## Documentation
-
-* [PORTS.md](docs/PORTS.md) - An overview and example usage of the PJs `Port<>` and `Pin` abstractions.
-* [SERIAL.md](docs/SERIAL.md) - An overview and example usage of the PJs `SerialPort`, `SPI` and `I2C` abstractions.

@@ -6,13 +6,15 @@ package io.github.iamnicknack.pjs.model.device;
  *           This is used to ensure that only compatible device-configuration pairs are used in code
  */
 public interface Device<T> extends AutoCloseable {
+
+    /**
+     * Fetch the configuration of the device
+     */
     DeviceConfig<T> getConfig();
 
-//    @SuppressWarnings("unchecked")
-//    default T getDelegate() {
-//        return (T)this;
-//    }
-//
+    /**
+     * {@inheritDoc}
+     */
     @Override
     default void close() throws Exception {}
 }

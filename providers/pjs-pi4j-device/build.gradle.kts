@@ -5,6 +5,7 @@ plugins {
     id("buildlogic.kotlin-core")
     id("buildlogic.test.test-kotlin")
     id("buildlogic.java-library")
+    id("buildlogic.maven-publish")
 }
 
 dependencies {

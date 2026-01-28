@@ -10,6 +10,12 @@ import java.io.OutputStream;
  */
 public interface SerialWriteOperation {
 
+    /**
+     * Write `length` bytes from `buffer` starting at `offset`
+     * @param buffer the data to write
+     * @param offset the offset of the first byte to send
+     * @param length the number of bytes to send
+     */
     void writeBytes(byte[] buffer, int offset, int length);
 
     /**

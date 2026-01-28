@@ -20,6 +20,9 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
     private final Map<Class<?>, DeviceProvider<?, ?>> providers = new HashMap<>();
     private final Map<String, Device<?>> devices = new HashMap<>();
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T extends Device<T>, V extends DeviceConfig<T>> DeviceRegistry registerProvider(
             DeviceProvider<T, V> provider,
@@ -29,6 +32,9 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Device<T>, V extends DeviceConfig<T>> DeviceProvider<T, V> getProvider(Class<V> configType) {
@@ -38,6 +44,9 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
         throw new IllegalArgumentException("No provider registered for config type: " + configType);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Device<T>, V extends DeviceConfig<T>> T create(V config) {
@@ -59,11 +68,17 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void remove(Device<?> device) {
         remove(device.getConfig().getId());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void remove(String id) {
         var device = devices.remove(id);
@@ -77,6 +92,9 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Device<T>> T device(String id, Class<T> deviceType) {
@@ -87,16 +105,25 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean contains(String id) {
         return devices.containsKey(id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Iterator<Device<?>> iterator() {
         return devices.values().iterator();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() {
         providers.values().forEach(deviceProvider -> {

@@ -14,4 +14,10 @@ public interface DeviceProvider<T extends Device<T>, V extends DeviceConfig<T>> 
      */
     T create(V config);
 
+
+    /**
+     * Close the provider and dispose of any resources
+     */
+    @Override
+    void close() throws Exception;
 }

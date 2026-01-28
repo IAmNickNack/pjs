@@ -11,7 +11,7 @@ dependencies {
     implementation(libs.logback.classic)
     implementation(libs.koin.ktor)
 
-    implementation(project(":network-common"))
+    implementation(project(":pjs-network-common"))
     implementation(project(":pjs-http-common"))
     implementation(project(":pjs-native-device"))
     implementation(project(":pjs-grpc-device"))

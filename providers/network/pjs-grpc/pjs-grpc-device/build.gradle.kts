@@ -6,6 +6,7 @@ plugins {
     id("buildlogic.test.test-kotlin")
     id("buildlogic.kotlin-java-module-system")
     id("buildlogic.java-library")
+    id("buildlogic.maven-publish")
 }
 
 javaModuleSystem.moduleName = "pjs.grpc"

@@ -15,7 +15,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.groupElement;
  * Values of GPIO lines
  * @param bits a bitmap containing the value of the lines, set to 1 for active and 0 for inactive.
  * @param mask a bitmap identifying the lines to get or set, with each bit number corresponding to
- *             the index into &struct gpio_v2_line_request.offsets.
+ *             the index into struct gpio_v2_line_request.offsets.
  * @see <a href="https://github.com/torvalds/linux/blob/07d9df80082b8d1f37e05658371b087cb6738770/include/uapi/linux/gpio.h#L88-L99">linux/gpio.h</a>
  */
 @SerializeUsing(LineValues.Serializer.class)

@@ -2,9 +2,9 @@ plugins {
     base
 }
 
-val pjsVersion: String by project
+version = "0.0.1-SNAPSHOT"
 
 subprojects {
     group = "io.github.iamnicknack.pjs"
-    version = pjsVersion
+    version = rootProject.version
 }

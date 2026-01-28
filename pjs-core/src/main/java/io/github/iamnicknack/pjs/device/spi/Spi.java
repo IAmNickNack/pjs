@@ -31,21 +31,33 @@ public interface Spi extends SerialPort, Port<Integer>, Device<Spi> {
         return transfer(write, 0, read, 0, length);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     default void writeBytes(byte[] buffer, int offset, int length) {
         transfer(buffer, offset, new byte[length], 0, length);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     default int readBytes(byte[] buffer, int offset, int length) {
         return transfer(new byte[length], offset, buffer, offset, length);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     default void write(Integer value) {
         writeBytes(new byte[] { value.byteValue() }, 0, 1);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     default Integer read() {
         byte[] buffer = new byte[1];

@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 /**
  * An SPI transfer operation allows more complex SPI operations to be expressed as a sequence of messages,
- * where the purpose of each message serves a specific purpose.
+ * where each message serves a specific purpose.
  * <p>
  * For example, reading from and writing to a register on a device requires several distinct pieces of information
  * to be provided:
@@ -17,37 +17,75 @@ import java.util.Arrays;
  * </ul>
  * Breaking these out into individual segments is a benefit to the developer, as it allows each segment of the
  * transaction to be clearly defined in code.
- * </p>
  * <p>
  * Practically, such an approach may also be required by the peripheral device.
- * </p>
  * <p>
  * Isolating this ambiguity allows the API not to be opinionated about "what is best" and leaves the choice of
  * implementation to the developer, who is best placed to understand the application use-case.
- * </p>
  */
 @FunctionalInterface
 public interface SpiTransfer extends SerialPort {
 
+    /**
+     * Perform a transfer
+     * @param messages the messages to transfer
+     * @return the number of bytes transferred
+     */
     int transfer(Message... messages);
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     default int readBytes(byte[] buffer, int offset, int length) {
         return transfer(Message.read(buffer, offset, length));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     default void writeBytes(byte[] buffer, int offset, int length) {
         transfer(Message.write(buffer, offset, length));
     }
 
+    /**
+     * The message structure used for SPI transfer operations
+     */
     interface Message {
+        /**
+         * the write buffer
+         */
         byte[] write();
+
+        /**
+         * the offset in the write buffer at which to insert data
+         */
         int writeOffset();
+
+        /**
+         * the read buffer
+         */
         byte[] read();
+
+        /**
+         * the offset in the read buffer at which to start reading data
+         */
         int readOffset();
+
+        /**
+         * the number of bytes to transfer
+         */
         int length();
+
+        /**
+         * the delay between messages
+         */
         int delayUs();
+
+        /**
+         * whether to toggle the chip select after this message
+         */
         boolean csChange();
 
         /**
