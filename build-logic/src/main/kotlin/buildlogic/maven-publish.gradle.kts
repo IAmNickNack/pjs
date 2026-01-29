@@ -36,18 +36,6 @@ mavenPublishing {
         }
     }
 
-//    configure(
-//        JavaLibrary(
-//            javadocJar = JavadocJar.Dokka("dokkaGenerateJavadoc"),
-//            sourcesJar = SourcesJar.Sources()
-//        )
-//    )
-
     signAllPublications()
     publishToMavenCentral()
 }
-
-//tasks.register<Jar>("dokkaJavadocJar") {
-//    dependsOn("dokkaGenerateJavadoc")
-//    from("$buildDir/dokka/javadoc")
-//}
