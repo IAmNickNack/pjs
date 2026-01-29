@@ -10,6 +10,13 @@ import java.io.InputStream;
  */
 public interface SerialReadOperation {
 
+    /**
+     * Read `length` bytes into `buffer` starting at `offset`
+     * @param buffer the buffer to fill
+     * @param offset the offset at which to start setting bytes
+     * @param length the number of bytes to read
+     * @return the number of bytes read
+     */
     int readBytes(byte[] buffer, int offset, int length);
 
     /**

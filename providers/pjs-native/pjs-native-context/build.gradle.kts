@@ -3,4 +3,5 @@ plugins {
     id("buildlogic.java-core")
     id("buildlogic.test.test-java")
     id("buildlogic.java-library")
+    id("buildlogic.maven-publish")
 }

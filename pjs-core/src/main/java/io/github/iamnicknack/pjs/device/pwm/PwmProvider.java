@@ -6,6 +6,9 @@ import io.github.iamnicknack.pjs.model.device.DeviceProvider;
  * Factory for PWM devices.
  */
 public interface PwmProvider extends DeviceProvider<Pwm, PwmConfig> {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     default void close() {}
 }

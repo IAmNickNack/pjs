@@ -22,11 +22,17 @@ public class PwmBean implements Device<Pwm>, Pwm {
         this.isOn = false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DeviceConfig<Pwm> getConfig() {
         return config;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setDutyCycle(int dutyCycle) {
         if (dutyCycle < 0 || dutyCycle > 100) {
@@ -35,11 +41,17 @@ public class PwmBean implements Device<Pwm>, Pwm {
         this.dutyCycle = dutyCycle;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getDutyCycle() {
         return dutyCycle;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setFrequency(int frequency) {
         if (frequency <= 0) {
@@ -48,21 +60,33 @@ public class PwmBean implements Device<Pwm>, Pwm {
         this.frequency = frequency;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getFrequency() {
         return frequency;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setPolarity(Polarity polarity) {
         this.polarity = polarity;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Polarity getPolarity() {
         return polarity;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setEnabled(boolean enabled) {
         if (enabled) {
@@ -72,26 +96,41 @@ public class PwmBean implements Device<Pwm>, Pwm {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isEnabled() {
         return isOn;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void on() {
         this.isOn = true;
     }
 
     @Override
+    /**
+     * {@inheritDoc}
+     */
     public void off() {
         this.isOn = false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean read() {
         return isOn;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void write(Boolean value) {
         this.isOn = value;

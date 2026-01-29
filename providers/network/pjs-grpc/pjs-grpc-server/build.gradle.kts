@@ -7,7 +7,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":network-common"))
+    implementation(project(":pjs-network-common"))
     implementation(project(":pjs-native-device"))
     implementation(project(":pjs-grpc-device"))
     implementation(project(":pjs-pi4j-device"))

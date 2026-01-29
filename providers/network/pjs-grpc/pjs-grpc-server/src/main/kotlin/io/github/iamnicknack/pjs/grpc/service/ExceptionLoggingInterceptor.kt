@@ -26,7 +26,7 @@ class ExceptionLoggingInterceptor : ServerInterceptor {
                     logger.error("Unhandled exception making gRPC call", t)
                     val cause = t.cause?.cause ?: t.cause ?: t
                     call.close(
-                        Status.INTERNAL.withDescription(cause.message).withCause(cause ?: t),
+                        Status.INTERNAL.withDescription(cause.message).withCause(cause),
                         Metadata()
                     )
                 }

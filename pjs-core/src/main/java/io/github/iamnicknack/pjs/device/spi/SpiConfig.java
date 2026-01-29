@@ -23,6 +23,9 @@ public record SpiConfig(
         String id
 ) implements DeviceConfig<Spi> {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getId() {
         return id;

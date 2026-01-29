@@ -15,7 +15,6 @@ import java.util.Arrays;
  * <li>an addressed I2C device.</li>
  * <li>a register on an addressed I2C device.</li>
  * </ul>
- * </p>
  */
 public interface I2C extends Device<I2C> {
 

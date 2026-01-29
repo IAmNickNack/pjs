@@ -15,7 +15,7 @@ include(":pjs-pi4j-device")
 include(":pjs-http-common")
 include(":pjs-http-server")
 include(":pjs-http-device")
-include(":network-common")
+include(":pjs-network-common")
 
 project(":pjs-mock-device").projectDir = file("providers/pjs-mock-device")
 
@@ -32,4 +32,4 @@ project(":pjs-http-common").projectDir = file("providers/network/pjs-http/pjs-ht
 project(":pjs-http-server").projectDir = file("providers/network/pjs-http/pjs-http-server")
 project(":pjs-http-device").projectDir = file("providers/network/pjs-http/pjs-http-device")
 
-project(":network-common").projectDir = file("providers/network/network-common")
+project(":pjs-network-common").projectDir = file("providers/network/pjs-network-common")
