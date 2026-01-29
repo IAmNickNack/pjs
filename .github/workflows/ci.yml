@@ -35,7 +35,7 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          ./gradlew --configuration-cache build 
+          ./gradlew build 
 
       - name: Do Release
         if: github.ref == 'refs/heads/main' || github.event.inputs.manual_release == 'true'
