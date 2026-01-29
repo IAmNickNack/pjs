@@ -6,5 +6,5 @@ plugins {
 }
 
 dependencies {
-    api("io.github.iamnicknack.pjs:pjs-core:${properties["pjsVersion"]}")
+    api("io.github.iamnicknack.pjs:pjs-core:${properties["pjs.version"]}")
 }

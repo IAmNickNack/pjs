@@ -8,12 +8,12 @@ plugins {
 }
 
 dependencies {
-    api("io.github.iamnicknack.pjs:pjs-core:${properties["pjsVersion"]}")
-    implementation("io.github.iamnicknack.pjs:pjs-mock-device:${properties["pjsVersion"]}")
-    implementation("io.github.iamnicknack.pjs:pjs-native-device:${properties["pjsVersion"]}")
-    implementation("io.github.iamnicknack.pjs:pjs-grpc-device:${properties["pjsVersion"]}")
-    implementation("io.github.iamnicknack.pjs:pjs-http-device:${properties["pjsVersion"]}")
-    implementation("io.github.iamnicknack.pjs:pjs-pi4j-device:${properties["pjsVersion"]}")
+    api("io.github.iamnicknack.pjs:pjs-core:${properties["pjs.version"]}")
+    implementation("io.github.iamnicknack.pjs:pjs-mock-device:${properties["pjs.version"]}")
+    implementation("io.github.iamnicknack.pjs:pjs-native-device:${properties["pjs.version"]}")
+    implementation("io.github.iamnicknack.pjs:pjs-grpc-device:${properties["pjs.version"]}")
+    implementation("io.github.iamnicknack.pjs:pjs-http-device:${properties["pjs.version"]}")
+    implementation("io.github.iamnicknack.pjs:pjs-pi4j-device:${properties["pjs.version"]}")
 
     implementation(project(":pjs-hardware-25lc"))
     implementation(project(":pjs-hardware-mcp23x"))
