@@ -65,9 +65,9 @@ The [pjs-sandbox](pjs-sandbox) module contains a number of examples that demonst
  with examples of PJs abstractions used to implement specific hardware devices.
 
 The implemented devices currently include:
-* [pjs-device-eeprom](pjs-sandbox/pjs-device-eeprom) - A PJs SPI implementation for the 24LC256 EEPROM. 
-* [pjs-device-mcp23x](pjs-sandbox/pjs-device-mcp23x) - PJs SPI and I2C implementations for the MCP23008/S08 port
+* [pjs-hardware-25lc](pjs-sandbox/pjs-hardware-25lc) - A PJs SPI implementation for the 24LC256 EEPROM. 
+* [pjs-hardware-mcp23x](pjs-sandbox/pjs-hardware-mcp23x) - PJs SPI and I2C implementations for the MCP23008/S08 port
  expander.
-* [pjs-device-sh1106](pjs-sandbox/pjs-device-sh1106) - A PJs I2C implementation for the SH1106 OLED display.
+* [pjs-hardware-sh1106](pjs-sandbox/pjs-hardware-sh1106) - A PJs I2C implementation for the SH1106 OLED display.
 
 [pjs-examples](pjs-sandbox/pjs-examples) contains a number of examples that demonstrate how to use the PJs APIs.

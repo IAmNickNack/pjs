@@ -37,9 +37,9 @@ includeBuild("..") {
 }
 
 include(
-    "pjs-device-sh1106",
-    "pjs-device-mcp23x",
-    "pjs-device-eeprom",
+    "pjs-hardware-sh1106",
+    "pjs-hardware-mcp23x",
+    "pjs-hardware-25lc",
     "pjs-examples"
 )
 

@@ -15,9 +15,9 @@ dependencies {
     implementation("io.github.iamnicknack.pjs:pjs-http-device:${properties["pjsVersion"]}")
     implementation("io.github.iamnicknack.pjs:pjs-pi4j-device:${properties["pjsVersion"]}")
 
-    implementation(project(":pjs-device-eeprom"))
-    implementation(project(":pjs-device-mcp23x"))
-    implementation(project(":pjs-device-sh1106"))
+    implementation(project(":pjs-hardware-25lc"))
+    implementation(project(":pjs-hardware-mcp23x"))
+    implementation(project(":pjs-hardware-sh1106"))
 
     implementation(libs.pi4j.core)
     implementation(libs.pi4j.plugin.ffm)
