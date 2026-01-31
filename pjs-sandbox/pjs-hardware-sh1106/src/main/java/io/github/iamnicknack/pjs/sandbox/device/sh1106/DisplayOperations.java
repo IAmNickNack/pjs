@@ -2,15 +2,27 @@ package io.github.iamnicknack.pjs.sandbox.device.sh1106;
 
 public interface DisplayOperations {
 
+    int PAGE_SIZE = 128;
+    int PAGE_COUNT = 8;
+    int BUFFER_SIZE = PAGE_SIZE * PAGE_COUNT;
+    int BLOCK_SIZE = 16;
+    int BLOCK_COUNT = BUFFER_SIZE / BLOCK_SIZE;
+
     /**
      * Clear the entire display.
      */
-    void clear();
-
+    default void clear() {
+        for (int i = 0; i < 8; i++) {
+            clearPage(i);
+        }
+    }
     /**
      * Clear a single page of the display.
      */
-    void clearPage(int page);
+    default void clearPage(int page) {
+        setPosition(page, 0);
+        setData(new byte[PAGE_SIZE], 0, PAGE_SIZE);
+    }
 
     /**
      * Write to the display buffer at the specified location.
@@ -20,7 +32,31 @@ public interface DisplayOperations {
      * @param offset The offset within the data array to start writing from.
      * @param length The number of bytes to write.
      */
-    void setData(int page, int column, byte[] data, int offset, int length);
+    default void setData(int page, int column, byte[] data, int offset, int length) {
+        setPosition(page, column);
+        setData(data, offset, length);
+    }
+
+    /**
+     * Write to the display buffer at the specified position.
+     * @param position The position to write to.
+     * @param data The data to write.
+     * @param offset The offset within the data array to start writing from.
+     * @param length The number of bytes to write.
+     */
+    default void setData(int position, byte[] data, int offset, int length) {
+        var page = position / PAGE_SIZE;
+        var column = position % PAGE_SIZE;
+        setData(page, column, data, offset, length);
+    }
+
+    /**
+     * Write to the display buffer at the current location.
+     * @param data The data to write.
+     * @param offset The offset within the data array to start writing from.
+     * @param length The number of bytes to write.
+     */
+    void setData(byte[] data, int offset, int length);
 
     /**
      * Clear a section of the display buffer at the specified location.
@@ -29,8 +65,7 @@ public interface DisplayOperations {
      * @param length The number of bytes to clear.
      */
     default void clearData(int page, int column, int length) {
-        var data = new byte[length];
-        setData(page, column, data, 0, length);
+        setData(page, column, new byte[length], 0, length);
     }
 
     /**
@@ -41,34 +76,10 @@ public interface DisplayOperations {
     void setPosition(int page, int column);
 
     /**
-     * Write text to the display buffer.
-     * @param page The page to write to.
-     * @param column The column to write to.
-     * @param text The text to write.
+     * Copy the current display buffer contents into the given display.
+     * @param other The display to copy into.
      */
-    default void drawText(int page, int column, String text) {
-        setPosition(page, column);
-        drawText(text);
+    default void copyTo(DisplayOperations other) {
+        throw new UnsupportedOperationException();
     }
-
-    /**
-     * Write text to the display buffer at the current position.
-     * @param text The text to write.
-     */
-    void drawText(String text);
-
-    /**
-     * Clear text from the display buffer.
-     * @param page The page to clear.
-     * @param column The column to start clearing from.
-     * @param length The number of characters to clear.
-     */
-    void clearText(int page, int column, int length);
-
-    /**
-     * Append a character to the display buffer at the current position.
-     * @param c The character to append.
-     */
-    void appendChar(char c);
-
 }

@@ -184,6 +184,16 @@ public class Sh1106Driver {
         displayWriteOperation.writeBytes(data, offset, length);
     }
 
+    /**
+     * Send display data to the device
+     * @param data the data to write
+     * @param offset the offset into the data array to start writing from
+     * @param length the number of bytes to write
+     */
+    public void display(byte[] data, int offset, int length) {
+        displayWriteOperation.writeBytes(data, offset, length);
+    }
+
 
     /**
      * Builder for a sequence of commands to be sent to the OLED display.

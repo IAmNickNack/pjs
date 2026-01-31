@@ -2,8 +2,10 @@ package io.github.iamnicknack.pjs.sandbox.example;
 
 import io.github.iamnicknack.pjs.device.i2c.I2CConfig;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.DisplayBuffer;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Driver;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Operations;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.TextOperations;
 
 public class OledExample implements Runnable {
 
@@ -20,10 +22,17 @@ public class OledExample implements Runnable {
 
     @Override
     public void run() {
+
         deviceOperations.init();
         deviceOperations.clear();
         deviceOperations.displayOn();
-        deviceOperations.setPosition(0, 0);
-        deviceOperations.drawText("Hello World!");
+//        deviceOperations.setPosition(0, 0);
+//        deviceOperations.drawText("Hello World!");
+
+        var displayOperations = new DisplayBuffer();
+        var textOperations = TextOperations.create(displayOperations);
+        textOperations.drawText(4, 0, "012345678901234567890");
+
+        displayOperations.copyTo(deviceOperations);
     }
 }
