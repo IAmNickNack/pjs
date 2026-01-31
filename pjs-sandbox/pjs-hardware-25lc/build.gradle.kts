@@ -6,6 +6,6 @@ plugins {
 }
 
 dependencies {
-    api("io.github.iamnicknack.pjs:pjs-core:${properties["pjs.version"]}")
-    testImplementation("io.github.iamnicknack.pjs:pjs-mock-device:${properties["pjs.version"]}")
+    api("io.github.iamnicknack:pjs-core:${properties["pjs.version"]}")
+    testImplementation("io.github.iamnicknack:pjs-mock-device:${properties["pjs.version"]}")
 }
