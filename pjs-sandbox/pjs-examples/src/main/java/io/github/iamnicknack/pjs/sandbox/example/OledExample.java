@@ -6,6 +6,7 @@ import io.github.iamnicknack.pjs.sandbox.device.sh1106.BufferedDisplayOperations
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.DefaultDrawingOperations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Driver;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Operations;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.StackedDisplayBuffer;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.TextOperations;
 
 public class OledExample implements Runnable {
@@ -27,26 +28,38 @@ public class OledExample implements Runnable {
         deviceOperations.init();
         deviceOperations.clear();
         deviceOperations.displayOn();
-//        deviceOperations.setPosition(0, 0);
-//        deviceOperations.drawText("Hello World!");
 
-        var displayOperations = new BufferedDisplayOperations(8);
-        var textOperations = TextOperations.create(displayOperations);
+        var stackedBuffer = new StackedDisplayBuffer();
+        var additiveDisplayOperations = new BufferedDisplayOperations(stackedBuffer.additive(), 8);
+        var subtractiveDisplayOperations = new BufferedDisplayOperations(stackedBuffer.subtractive(), 8);
+
+        var textOperations = TextOperations.create(additiveDisplayOperations);
         textOperations.drawText(4, 0, "012345678901234567890");
 
-        var drawOperations = new DefaultDrawingOperations(displayOperations);
-//        drawOperations.drawCircle(10, 10, 8);
-//        drawOperations.drawEllipse(10, 50, 8, 4);
-//
-//        displayOperations.copyTo(deviceOperations);
+        additiveDisplayOperations.copyTo(deviceOperations);
 
         try {
-            Thread.sleep(2000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
-        drawOperations.drawEllipse(80, 50, 8, 4);
-        displayOperations.copyTo(deviceOperations);
+        var additiveDrawOperations = new DefaultDrawingOperations(additiveDisplayOperations);
+        additiveDrawOperations.drawEllipse(0, 40, 8, 4);
+        additiveDisplayOperations.copyTo(deviceOperations);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        var subtractiveDrawOperations = new DefaultDrawingOperations(subtractiveDisplayOperations);
+
+        for (int i = 0; i < 256; i++) {
+            subtractiveDrawOperations.drawEllipse(i, 40, 8, 4);
+            additiveDrawOperations.drawEllipse(i + 1, 40, 8, 4);
+            subtractiveDisplayOperations.copyTo(deviceOperations);
+        }
     }
 }

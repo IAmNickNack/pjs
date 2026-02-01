@@ -46,8 +46,8 @@ public class Sh1106Operations implements DisplayOperations, ControlOperations, T
     }
 
     @Override
-    public void setData(int position, byte[] data, int offset, int length) {
-        setPosition(position);
+    public void setData(int page, int column, byte[] data, int offset, int length) {
+        setPosition(page, column);
         display.display(data, offset, length);
     }
 
@@ -57,28 +57,18 @@ public class Sh1106Operations implements DisplayOperations, ControlOperations, T
     }
 
     @Override
-    public void getData(int position, byte[] buffer, int offset, int length) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public int getPointValue(int page, int column) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public int getPointValue(int position) {
-        throw new UnsupportedOperationException();
+    public void drawText(int page, int column, String text) {
+        textOperations.drawText(page, column, text);
     }
 
     @Override
-    public void drawText(int position, String text) {
-        textOperations.drawText(position, text);
-    }
-
-    @Override
-    public void clearText(int position, int length) {
-        textOperations.clearText(position, length);
+    public void clearText(int page, int column, int length) {
+        textOperations.clearText(page, column, length);
     }
 
     public void setPosition(int position) {

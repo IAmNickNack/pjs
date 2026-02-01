@@ -13,14 +13,14 @@ public class BufferedDisplayOperations implements DisplayOperations {
     /**
      * Flags indicating that a block is "dirty"
      */
-    private final DirtyBlock[] blocks;
+    private final DirtyBlock[][] blocks;
 
     /**
      * An index of dirty bits which allows not calculating the block index at runtime
      */
-    private final DirtyBlock[] blocksIndex = new DirtyBlock[BUFFER_SIZE];
+    private final DirtyBlock[][] blocksIndex = new DirtyBlock[PAGE_COUNT][PAGE_SIZE];
 
-    private final int blockCount;
+    private final int blocksPerPage;
 
     private final int blockSize;
 
@@ -33,16 +33,21 @@ public class BufferedDisplayOperations implements DisplayOperations {
     }
 
     public BufferedDisplayOperations(DisplayOperations delegate, int blockSize) {
-        this.blockSize = blockSize;
-        this.blockCount = BUFFER_SIZE / blockSize;
-        this.blocks = new DirtyBlock[blockCount];
         this.delegate = delegate;
+        this.blockSize = blockSize;
+        this.blocksPerPage = PAGE_SIZE / blockSize;
+        this.blocks = new DirtyBlock[PAGE_COUNT][];
 
-        for(int i = 0; i < blockCount; i++) {
-            blocks[i] = new DirtyBlock(new Range(i * blockSize, blockSize));
-        }
-        for (int i = 0; i < BUFFER_SIZE; i++) {
-            blocksIndex[i] = blocks[i / blockSize];
+        for (int p = 0; p < PAGE_COUNT; p++) {
+            this.blocks[p] = new DirtyBlock[blocksPerPage];
+            for (int i = 0; i < blocksPerPage; i++) {
+                this.blocks[p][i] = new DirtyBlock(new Range(p, i * blockSize, blockSize));
+            }
+
+            blocksIndex[p] = new DirtyBlock[PAGE_SIZE];
+            for (int i = 0; i < PAGE_SIZE; i++) {
+                blocksIndex[p][i] = blocks[p][i / blockSize];
+            }
         }
     }
 
@@ -53,28 +58,29 @@ public class BufferedDisplayOperations implements DisplayOperations {
      * @return true if the data at the given position is dirty, false otherwise
      */
     public boolean isDirty(int page, int column) {
-        return blocksIndex[(page * PAGE_SIZE) + column].dirty;
+        return blocksIndex[page][column].dirty;
     }
 
     @Override
-    public void setData(int position, byte[] data, int offset, int length) {
-        var off = offset;
+    public void setData(int page, int column, byte[] data, int offset, int length) {
+        int off = offset;
 
         while (off < length) {
-            this.delegate.setData(position + off, data, off, Math.min(blockSize, length - off));
-            blocksIndex[position + off].dirty = true;
+            int col = (column + off) % PAGE_SIZE;
+            this.delegate.setData(page, col, data, off, Math.min(blockSize, length - off));
+            blocksIndex[page][col].dirty = true;
             off += blockSize;
         }
     }
 
     @Override
-    public void getData(int position, byte[] buffer, int offset, int length) {
-        this.delegate.getData(position, buffer, offset, length);
+    public void getData(int page, int column, byte[] buffer, int offset, int length) {
+        this.delegate.getData(page, column, buffer, offset, length);
     }
 
     @Override
-    public int getPointValue(int position) {
-        return this.delegate.getPointValue(position);
+    public int getPointValue(int page, int column) {
+        return this.delegate.getPointValue(page, column);
     }
 
     /**
@@ -86,26 +92,30 @@ public class BufferedDisplayOperations implements DisplayOperations {
 
         List<DirtyBlock> dirtyBlocks = new ArrayList<>();
 
-        for (int i = 0; i < blockCount; i++) {
-            if (this.blocks[i].dirty) {
-                if (dirtyBlocks.isEmpty()) {
-                    dirtyBlocks.add(this.blocks[i]);
-                } else {
-                    var last = dirtyBlocks.getLast();
-                    if (this.blocks[i].follows(last)) {
-                        dirtyBlocks.set(dirtyBlocks.size() - 1, last.concat(this.blocks[i]));
+        for (int p = 0; p < PAGE_COUNT; p++) {
+            for (int i = 0; i < blocksPerPage; i++) {
+                var block = this.blocks[p][i];
+                if (block.dirty) {
+                    if (dirtyBlocks.isEmpty()) {
+                        dirtyBlocks.add(block);
                     } else {
-                        dirtyBlocks.add(this.blocks[i]);
+                        var last = dirtyBlocks.getLast();
+                        if (block.follows(last)) {
+                            var concat = last.concat(block);
+                            dirtyBlocks.set(dirtyBlocks.size() - 1, concat);
+                        } else {
+                            dirtyBlocks.add(block);
+                        }
                     }
+                    block.dirty = false;
                 }
-                this.blocks[i].dirty = false;
             }
         }
 
         for (var marker : dirtyBlocks) {
             var bytes = new byte[marker.range.length];
-            this.delegate.getData(marker.range.start, bytes, 0, marker.range.length);
-            other.setData(marker.range.start, bytes, 0, marker.range.length);
+            this.delegate.getData(marker.range.page, marker.range.column, bytes, 0, marker.range.length);
+            other.setData(marker.range.page, marker.range.column, bytes, 0, marker.range.length);
         }
     }
 
@@ -116,27 +126,26 @@ public class BufferedDisplayOperations implements DisplayOperations {
     private static class DirtyBlock {
         boolean dirty;
         final Range range;
-        final int page;
 
         public DirtyBlock(Range range) {
             this.range = range;
-            this.page = range.start / PAGE_SIZE;
         }
 
         public boolean follows(DirtyBlock other) {
-            return (this.page == other.page) &&
-                    (this.range.start == (other.range.start + other.range.length));
+            return (this.range.page == other.range.page) &&
+                    (this.range.column == (other.range.column + other.range.length));
         }
 
         public DirtyBlock concat(DirtyBlock other) {
-            return new DirtyBlock(new Range(this.range.start, this.range.length + other.range.length));
+            return new DirtyBlock(new Range(this.range.page, this.range.column, this.range.length + other.range.length));
         }
     }
 
     /**
      * Container to indicate a range of values
-     * @param start the start of the range
+     * @param page the starting page number
+     * @param column the starting column number
      * @param length the length of the range
      */
-    private record Range(int start, int length) {}
+    private record Range(int page, int column, int length) {}
 }
