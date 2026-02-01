@@ -2,7 +2,8 @@ package io.github.iamnicknack.pjs.sandbox.example;
 
 import io.github.iamnicknack.pjs.device.i2c.I2CConfig;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
-import io.github.iamnicknack.pjs.sandbox.device.sh1106.DisplayBuffer;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.BufferedDisplayOperations;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.DefaultDrawingOperations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Driver;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Operations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.TextOperations;
@@ -29,10 +30,23 @@ public class OledExample implements Runnable {
 //        deviceOperations.setPosition(0, 0);
 //        deviceOperations.drawText("Hello World!");
 
-        var displayOperations = new DisplayBuffer();
+        var displayOperations = new BufferedDisplayOperations(8);
         var textOperations = TextOperations.create(displayOperations);
         textOperations.drawText(4, 0, "012345678901234567890");
 
+        var drawOperations = new DefaultDrawingOperations(displayOperations);
+//        drawOperations.drawCircle(10, 10, 8);
+//        drawOperations.drawEllipse(10, 50, 8, 4);
+//
+//        displayOperations.copyTo(deviceOperations);
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        drawOperations.drawEllipse(80, 50, 8, 4);
         displayOperations.copyTo(deviceOperations);
     }
 }
