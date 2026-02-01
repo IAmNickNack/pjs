@@ -46,42 +46,50 @@ public class Sh1106Operations implements DisplayOperations, ControlOperations, T
     }
 
     @Override
-    public void setData(int page, int column, byte[] data, int offset, int length) {
-        setPosition(page, column);
+    public void setData(int position, byte[] data, int offset, int length) {
+        setPosition(position);
         display.display(data, offset, length);
     }
 
     @Override
-    public void setData(byte[] data, int offset, int length) {
-        display.display(data, offset, length);
+    public void getData(int page, int column, byte[] buffer, int offset, int length) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
+    public void getData(int position, byte[] buffer, int offset, int length) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getPointValue(int page, int column) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getPointValue(int position) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void drawText(int position, String text) {
+        textOperations.drawText(position, text);
+    }
+
+    @Override
+    public void clearText(int position, int length) {
+        textOperations.clearText(position, length);
+    }
+
+    public void setPosition(int position) {
+        setPosition(position / PAGE_SIZE, position % PAGE_SIZE);
+    }
+
     public void setPosition(int page, int column) {
         new CommandSequence()
                 .append(Sh1106Driver.Command.PAGE_ADDRESS, page)
                 .append(Sh1106Driver.Command.DISPLAY_COLUMN_HIGH, (column + 2) >> 4)
                 .append(Sh1106Driver.Command.DISPLAY_COLUMN_LOW, (column + 2) & 0x0f)
                 .writeTo(display.getCommandWriteOperation());
-    }
-
-    @Override
-    public void drawText(int page, int column, String text) {
-        textOperations.drawText(page, column, text);
-    }
-
-    @Override
-    public void drawText(String text) {
-        textOperations.drawText(text);
-    }
-
-    @Override
-    public void clearText(int page, int column, int length) {
-        textOperations.clearText(page, column, length);
-    }
-
-    @Override
-    public void appendChar(char c) {
-        textOperations.appendChar(c);
     }
 }

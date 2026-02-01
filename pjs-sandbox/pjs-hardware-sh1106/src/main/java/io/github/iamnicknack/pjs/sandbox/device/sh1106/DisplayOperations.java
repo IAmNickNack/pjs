@@ -20,8 +20,7 @@ public interface DisplayOperations {
      * Clear a single page of the display.
      */
     default void clearPage(int page) {
-        setPosition(page, 0);
-        setData(new byte[PAGE_SIZE], 0, PAGE_SIZE);
+        setData(page * PAGE_SIZE, new byte[PAGE_SIZE], 0, PAGE_SIZE);
     }
 
     /**
@@ -33,8 +32,7 @@ public interface DisplayOperations {
      * @param length The number of bytes to write.
      */
     default void setData(int page, int column, byte[] data, int offset, int length) {
-        setPosition(page, column);
-        setData(data, offset, length);
+        setData((page * PAGE_SIZE) + column, data, offset, length);
     }
 
     /**
@@ -44,19 +42,15 @@ public interface DisplayOperations {
      * @param offset The offset within the data array to start writing from.
      * @param length The number of bytes to write.
      */
-    default void setData(int position, byte[] data, int offset, int length) {
-        var page = position / PAGE_SIZE;
-        var column = position % PAGE_SIZE;
-        setData(page, column, data, offset, length);
-    }
+    void setData(int position, byte[] data, int offset, int length);
 
-    /**
-     * Write to the display buffer at the current location.
-     * @param data The data to write.
-     * @param offset The offset within the data array to start writing from.
-     * @param length The number of bytes to write.
-     */
-    void setData(byte[] data, int offset, int length);
+//    /**
+//     * Write to the display buffer at the current location.
+//     * @param data The data to write.
+//     * @param offset The offset within the data array to start writing from.
+//     * @param length The number of bytes to write.
+//     */
+//    void setData(byte[] data, int offset, int length);
 
     /**
      * Clear a section of the display buffer at the specified location.
@@ -68,12 +62,57 @@ public interface DisplayOperations {
         setData(page, column, new byte[length], 0, length);
     }
 
+//    /**
+//     * Set the current display position.
+//     * @param page The page to set the position on.
+//     * @param column The column to set the position on.
+//     */
+//    default void setPosition(int page, int column) {
+//        setPosition((page * PAGE_SIZE) + column);
+//    }
+//
+//    /**
+//     * Set the current display position.
+//     * @param position The position to set the display on.
+//     */
+//    void setPosition(int position);
+
     /**
-     * Set the current display position.
-     * @param page The page to set the position on.
-     * @param column The column to set the position on.
+     * Read data from the display buffer at the specified location.
+     * @param page The page to read from.
+     * @param column The column to read from.
+     * @param buffer The buffer to read into.
+     * @param offset The offset within the buffer to start writing to.
+     * @param length The number of bytes to read.
      */
-    void setPosition(int page, int column);
+    default void getData(int page, int column, byte[] buffer, int offset, int length) {
+        getData(page * PAGE_SIZE + column, buffer, offset, length);
+    }
+    /**
+     * Read data from the display buffer at the specified position.
+     * @param position The position to read from.
+     * @param buffer The buffer to read into.
+     * @param offset The offset within the buffer to start writing to.
+     * @param length The number of bytes to read.
+     */
+    void getData(int position, byte[] buffer, int offset, int length);
+
+    /**
+     * Get the value of a point on the display.
+     * @param page The page of the point.
+     * @param column The column of the point.
+     * @return The data value at the point.
+     */
+    default int getPointValue(int page, int column) {
+        return getPointValue(page * PAGE_SIZE + column);
+    }
+
+    /**
+     * Get the value of a point on the display.
+     * @param position The position of the point.
+     * @return The data value at the point.
+     */
+    int getPointValue(int position);
 
     /**
      * Copy the current display buffer contents into the given display.
