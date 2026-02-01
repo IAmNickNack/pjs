@@ -2,11 +2,11 @@ package io.github.iamnicknack.pjs.sandbox.device.sh1106;
 
 import org.junit.jupiter.api.Test;
 
-class DisplayBufferTest {
+class BufferedDisplayOperationsTest {
 
     @Test
     void dirtyBitsAreStoredByReference() {
-        var buffer = new DisplayBuffer();
+        var buffer = new BufferedDisplayOperations();
 
         buffer.setData(0, 0, new byte[1], 0, 1);
 
