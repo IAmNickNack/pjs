@@ -1,4 +1,6 @@
-package io.github.iamnicknack.pjs.sandbox.device.sh1106;
+package io.github.iamnicknack.pjs.sandbox.device.sh1106.impl;
+
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.DisplayOperations;
 
 public class StackedDisplayBuffer implements DisplayOperations {
 
@@ -28,6 +30,29 @@ public class StackedDisplayBuffer implements DisplayOperations {
     }
 
     @Override
+    public void orData(int page, int column, byte[] data, int offset, int length) {
+        for (int i = 0; i < length; i++) {
+            pixelGroups[page][(column + i) % PAGE_SIZE].addValue(data[offset + i]);
+        }
+    }
+
+    @Override
+    public void andData(int page, int column, byte[] data, int offset, int length) {
+        for (int i = 0; i < length; i++) {
+            var group = pixelGroups[page][(column + i) % PAGE_SIZE];
+            group.setValue((byte) (group.getValue() & data[offset + i]));
+        }
+    }
+
+    @Override
+    public void xorData(int page, int column, byte[] data, int offset, int length) {
+        for (int i = 0; i < length; i++) {
+            var group = pixelGroups[page][(column + i) % PAGE_SIZE];
+            group.setValue((byte) (group.getValue() ^ data[offset + i]));
+        }
+    }
+
+    @Override
     public void getData(int page, int column, byte[] buffer, int offset, int length) {
         for (int i = 0; i < length; i++) {
             buffer[offset + i] = pixelGroups[page][(column + i) % PAGE_SIZE].getValue();
@@ -36,7 +61,7 @@ public class StackedDisplayBuffer implements DisplayOperations {
 
     @Override
     public int getPointValue(int page, int column) {
-        return pixelGroups[page][column % PAGE_SIZE].getValue();
+        return pixelGroups[page][column % PAGE_SIZE].getValue() & 0xFF;
     }
 
     @Override
@@ -76,6 +101,10 @@ public class StackedDisplayBuffer implements DisplayOperations {
         }
     }
 
+    PixelGroup getPixelGroup(int page, int column) {
+        return pixelGroups[page][column % PAGE_SIZE];
+    }
+
     /**
      * Return a DisplayOperations instance that applies additive operations to the buffer.
      * @return A DisplayOperations instance for additive operations.
@@ -84,6 +113,11 @@ public class StackedDisplayBuffer implements DisplayOperations {
         return new DerivedDisplayOperations() {
             @Override
             public void setData(int page, int column, byte[] data, int offset, int length) {
+                StackedDisplayBuffer.this.addData(page, column, data, offset, length);
+            }
+
+            @Override
+            public void orData(int page, int column, byte[] data, int offset, int length) {
                 StackedDisplayBuffer.this.addData(page, column, data, offset, length);
             }
         };
@@ -97,6 +131,11 @@ public class StackedDisplayBuffer implements DisplayOperations {
         return new DerivedDisplayOperations() {
             @Override
             public void setData(int page, int column, byte[] data, int offset, int length) {
+                StackedDisplayBuffer.this.removeData(page, column, data, offset, length);
+            }
+
+            @Override
+            public void orData(int page, int column, byte[] data, int offset, int length) {
                 StackedDisplayBuffer.this.removeData(page, column, data, offset, length);
             }
         };
@@ -114,6 +153,21 @@ public class StackedDisplayBuffer implements DisplayOperations {
         @Override
         public void getData(int page, int column, byte[] buffer, int offset, int length) {
             StackedDisplayBuffer.this.getData(page, column, buffer, offset, length);
+        }
+
+        @Override
+        public void andData(int page, int column, byte[] data, int offset, int length) {
+            StackedDisplayBuffer.this.andData(page, column, data, offset, length);
+        }
+
+        @Override
+        public void orData(int page, int column, byte[] data, int offset, int length) {
+            StackedDisplayBuffer.this.orData(page, column, data, offset, length);
+        }
+
+        @Override
+        public void xorData(int page, int column, byte[] data, int offset, int length) {
+            StackedDisplayBuffer.this.xorData(page, column, data, offset, length);
         }
 
         @Override
@@ -146,7 +200,14 @@ public class StackedDisplayBuffer implements DisplayOperations {
 
         public void removeValue(byte value) {
             for (int i = 0; i < pixels.length; i++) {
-                pixels[i] -= (value & (1 << i)) != 0 ? 1 : 0;
+                int bit = value & (1 << i);
+                if (bit == 0) {
+                    continue;
+                }
+                if (pixels[i] == 0) {
+                    throw new IllegalStateException("Pixel value cannot be negative");
+                }
+                pixels[i] -= 1;
             }
         }
 
@@ -162,6 +223,10 @@ public class StackedDisplayBuffer implements DisplayOperations {
                 result |= pixels[i] > 0 ? (byte) (1 << i) : 0;
             }
             return result;
+        }
+
+        int getPlotCount(int pixelIndex) {
+            return pixels[pixelIndex];
         }
     }
 }

@@ -1,4 +1,4 @@
-package io.github.iamnicknack.pjs.sandbox.device.sh1106;
+package io.github.iamnicknack.pjs.sandbox.device.sh1106.impl;
 
 import org.junit.jupiter.api.Test;
 

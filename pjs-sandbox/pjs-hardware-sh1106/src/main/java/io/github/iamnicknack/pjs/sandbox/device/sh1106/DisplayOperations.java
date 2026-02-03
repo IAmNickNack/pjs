@@ -34,6 +34,36 @@ public interface DisplayOperations {
     void setData(int page, int column, byte[] data, int offset, int length);
 
     /**
+     * `or` the provided data with the existing data in the buffer at the specified location.
+     * @param page The page to write to.
+     * @param column The column to write to.
+     * @param data The data to write.
+     * @param offset The offset within the data array to start writing from.
+     * @param length The number of bytes to write.
+     */
+    void orData(int page, int column, byte[] data, int offset, int length);
+
+    /**
+     * `and` the provided data with the existing data in the buffer at the specified location.
+     * @param page The page to write to.
+     * @param column The column to write to.
+     * @param data The data to write.
+     * @param offset The offset within the data array to start writing from.
+     * @param length The number of bytes to write.
+     */
+    void andData(int page, int column, byte[] data, int offset, int length);
+
+    /**
+     * `xor` the provided data with the existing data in the buffer at the specified location.
+     * @param page The page to write to.
+     * @param column The column to write to.
+     * @param data The data to write.
+     * @param offset The offset within the data array to start writing from.
+     * @param length The number of bytes to write.
+     */
+    void xorData(int page, int column, byte[] data, int offset, int length);
+
+    /**
      * Clear a section of the display buffer at the specified location.
      * @param page The page to clear.
      * @param column The column to start clearing from.
@@ -67,5 +97,20 @@ public interface DisplayOperations {
      */
     default void copyTo(DisplayOperations other) {
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Represents a functional interface for performing operations on display data.
+     * This interface allows users to define custom data manipulation logic, which
+     * can then be applied to the display buffer at specified positions.
+     *
+     * Implementations of this interface can provide functionality such as modifying,
+     * clearing, or combining data in specific regions of the display buffer.
+     *
+     * This interface is primarily used to define data operations dynamically.
+     */
+    @FunctionalInterface
+    interface DataOperation {
+        void apply(int page, int column, byte[] data, int offset, int length);
     }
 }

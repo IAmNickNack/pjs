@@ -1,4 +1,7 @@
-package io.github.iamnicknack.pjs.sandbox.device.sh1106;
+package io.github.iamnicknack.pjs.sandbox.device.sh1106.impl;
+
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.DisplayOperations;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.DrawingOperations;
 
 public class DefaultDrawingOperations implements DrawingOperations {
 
@@ -16,10 +19,7 @@ public class DefaultDrawingOperations implements DrawingOperations {
         var offset = point.y() % PAGE_HEIGHT;
         var column = point.x();
 
-        var value = displayOperations.getPointValue(page, column);
-        value |= (1 << offset);
-
-        displayOperations.setData(page, column, new byte[] {(byte) value}, 0, 1);
+        displayOperations.orData(page, column, new byte[] {(byte) (1 << offset)}, 0, 1);
     }
 
     @Override
