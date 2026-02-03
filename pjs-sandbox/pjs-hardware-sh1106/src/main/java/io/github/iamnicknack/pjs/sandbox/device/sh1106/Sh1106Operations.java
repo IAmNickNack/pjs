@@ -2,16 +2,16 @@ package io.github.iamnicknack.pjs.sandbox.device.sh1106;
 
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Driver.CommandSequence;
 
-import java.nio.ByteBuffer;
-
 import static io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Driver.DEFAULT_STARTUP_SEQUENCE;
 
-public class Sh1106Operations implements DisplayOperations, ControlOperations {
+public class Sh1106Operations implements DisplayOperations, ControlOperations, TextOperations {
 
     private final Sh1106Driver display;
+    private final TextOperations textOperations;
 
     public Sh1106Operations(Sh1106Driver display) {
         this.display = display;
+        this.textOperations = TextOperations.create(this);
     }
 
     @Override
@@ -47,36 +47,29 @@ public class Sh1106Operations implements DisplayOperations, ControlOperations {
 
     @Override
     public void setData(int page, int column, byte[] data, int offset, int length) {
-        display.display(page, column, data, offset, length);
+        setPosition(page, column);
+        display.display(data, offset, length);
     }
 
     @Override
+    public void drawText(int page, int column, String text) {
+        textOperations.drawText(page, column, text);
+    }
+
+    @Override
+    public void clearText(int page, int column, int length) {
+        textOperations.clearText(page, column, length);
+    }
+
+    public void setPosition(int position) {
+        setPosition(position / PAGE_SIZE, position % PAGE_SIZE);
+    }
+
     public void setPosition(int page, int column) {
         new CommandSequence()
                 .append(Sh1106Driver.Command.PAGE_ADDRESS, page)
                 .append(Sh1106Driver.Command.DISPLAY_COLUMN_HIGH, (column + 2) >> 4)
                 .append(Sh1106Driver.Command.DISPLAY_COLUMN_LOW, (column + 2) & 0x0f)
                 .writeTo(display.getCommandWriteOperation());
-    }
-
-    @Override
-    public void drawText(String text) {
-        var buffer = ByteBuffer.allocate(text.length() * 6);
-        text.chars().forEach(c -> {
-            buffer.put(FontData.getCharacterData(c));
-        });
-        display.getDisplayWriteOperation().writeBytes(buffer.array(), 0, buffer.limit());
-    }
-
-    @Override
-    public void clearText(int page, int column, int length) {
-        setPosition(page, column);
-        var nullData = new byte[length * 6];
-        display.display(page, column, nullData, 0, nullData.length);
-    }
-
-    @Override
-    public void appendChar(char c) {
-        display.getDisplayWriteOperation().writeBytes(FontData.getCharacterData(c));
     }
 }

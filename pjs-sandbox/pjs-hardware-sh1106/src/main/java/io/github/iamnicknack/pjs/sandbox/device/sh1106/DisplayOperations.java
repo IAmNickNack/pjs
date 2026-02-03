@@ -2,15 +2,26 @@ package io.github.iamnicknack.pjs.sandbox.device.sh1106;
 
 public interface DisplayOperations {
 
+    int PAGE_SIZE = 128;
+    int PAGE_COUNT = 8;
+    int BUFFER_SIZE = PAGE_SIZE * PAGE_COUNT;
+    int BLOCK_SIZE = 16;
+    int BLOCK_COUNT = BUFFER_SIZE / BLOCK_SIZE;
+
     /**
      * Clear the entire display.
      */
-    void clear();
-
+    default void clear() {
+        for (int i = 0; i < 8; i++) {
+            clearPage(i);
+        }
+    }
     /**
      * Clear a single page of the display.
      */
-    void clearPage(int page);
+    default void clearPage(int page) {
+        setData(page, 0, new byte[PAGE_SIZE], 0, PAGE_SIZE);
+    }
 
     /**
      * Write to the display buffer at the specified location.
@@ -29,46 +40,21 @@ public interface DisplayOperations {
      * @param length The number of bytes to clear.
      */
     default void clearData(int page, int column, int length) {
-        var data = new byte[length];
-        setData(page, column, data, 0, length);
+        setData(page, column, new byte[length], 0, length);
     }
 
     /**
-     * Set the current display position.
-     * @param page The page to set the position on.
-     * @param column The column to set the position on.
+     * Represents a functional interface for performing operations on display data.
+     * This interface allows users to define custom data manipulation logic, which
+     * can then be applied to the display buffer at specified positions.
+     *
+     * Implementations of this interface can provide functionality such as modifying,
+     * clearing, or combining data in specific regions of the display buffer.
+     *
+     * This interface is primarily used to define data operations dynamically.
      */
-    void setPosition(int page, int column);
-
-    /**
-     * Write text to the display buffer.
-     * @param page The page to write to.
-     * @param column The column to write to.
-     * @param text The text to write.
-     */
-    default void drawText(int page, int column, String text) {
-        setPosition(page, column);
-        drawText(text);
+    @FunctionalInterface
+    interface DataOperation {
+        void apply(int page, int column, byte[] data, int offset, int length);
     }
-
-    /**
-     * Write text to the display buffer at the current position.
-     * @param text The text to write.
-     */
-    void drawText(String text);
-
-    /**
-     * Clear text from the display buffer.
-     * @param page The page to clear.
-     * @param column The column to start clearing from.
-     * @param length The number of characters to clear.
-     */
-    void clearText(int page, int column, int length);
-
-    /**
-     * Append a character to the display buffer at the current position.
-     * @param c The character to append.
-     */
-    void appendChar(char c);
-
 }

@@ -160,12 +160,6 @@ class Sh1106DriverTest {
                 operations.displayOn();
 
                 operations.drawText(0, 0, "I Am Nicknack!");
-
-                operations.setPosition(1, 0);
-                for(int i = 0; i < 3; i++) {
-                    Thread.sleep(250);
-                    operations.appendChar('.');
-                }
             } catch (Exception e) {
                 e.printStackTrace(System.err);
             }
