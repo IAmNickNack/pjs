@@ -1,8 +1,14 @@
 package io.github.iamnicknack.pjs.sandbox.device.sh1106.impl;
 
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.BufferedDisplayOperations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.DisplayOperations;
 
-public class StackedDisplayBuffer implements DisplayOperations {
+/**
+ * An implementation of {@link BufferedDisplayOperations} that allows pixels to be stacked on top of each other.
+ * <p>
+ * This can allow layers of data to be added and removed from a display buffer, seemingly independently of each other.
+ */
+public class StackedDisplayBuffer implements BufferedDisplayOperations {
 
     private final PixelGroup[][] pixelGroups = new PixelGroup[PAGE_COUNT][PAGE_SIZE];
 
@@ -66,24 +72,24 @@ public class StackedDisplayBuffer implements DisplayOperations {
 
     @Override
     public void copyTo(DisplayOperations other) {
-        DisplayOperations.super.copyTo(other);
+        BufferedDisplayOperations.super.copyTo(other);
     }
 
-    /**
-     * Set data in additive mode where pixels are "stacked" on top of each other by
-     * adding `1` to the count of values set on each pixel.
-     *
-     * @param page The page to set data on.
-     * @param column The column to start setting data from.
-     * @param data The data to set.
-     * @param offset The offset into the data array.
-     * @param length The number of pixels to set.
-     */
-    public void addData(int page, int column, byte[] data, int offset, int length) {
-        for (int i = 0; i < length; i++) {
-            pixelGroups[page][(column + i) % PAGE_SIZE].addValue(data[offset + i]);
-        }
-    }
+//    /**
+//     * Set data in additive mode where pixels are "stacked" on top of each other by
+//     * adding `1` to the count of values set on each pixel.
+//     *
+//     * @param page The page to set data on.
+//     * @param column The column to start setting data from.
+//     * @param data The data to set.
+//     * @param offset The offset into the data array.
+//     * @param length The number of pixels to set.
+//     */
+//    public void addData(int page, int column, byte[] data, int offset, int length) {
+//        for (int i = 0; i < length; i++) {
+//            pixelGroups[page][(column + i) % PAGE_SIZE].addValue(data[offset + i]);
+//        }
+//    }
 
     /**
      * Set data in subtractive mode where pixels are "subtracted" from the count set
@@ -95,9 +101,9 @@ public class StackedDisplayBuffer implements DisplayOperations {
      * @param offset The offset into the data array.
      * @param length The number of pixels to set.
      */
-    public void removeData(int page, int column, byte[] data, int offset, int length) {
+    public void subtractValue (int page, int column, byte[] data, int offset, int length) {
         for (int i = 0; i < length; i++) {
-            pixelGroups[page][(column + i) % PAGE_SIZE].removeValue(data[offset + i]);
+            pixelGroups[page][(column + i) % PAGE_SIZE].subtractValue(data[offset + i]);
         }
     }
 
@@ -109,16 +115,11 @@ public class StackedDisplayBuffer implements DisplayOperations {
      * Return a DisplayOperations instance that applies additive operations to the buffer.
      * @return A DisplayOperations instance for additive operations.
      */
-    public DisplayOperations additive() {
+    public BufferedDisplayOperations additive() {
         return new DerivedDisplayOperations() {
             @Override
             public void setData(int page, int column, byte[] data, int offset, int length) {
-                StackedDisplayBuffer.this.addData(page, column, data, offset, length);
-            }
-
-            @Override
-            public void orData(int page, int column, byte[] data, int offset, int length) {
-                StackedDisplayBuffer.this.addData(page, column, data, offset, length);
+                StackedDisplayBuffer.this.orData(page, column, data, offset, length);
             }
         };
     }
@@ -127,16 +128,16 @@ public class StackedDisplayBuffer implements DisplayOperations {
      * Return a DisplayOperations instance that applies subtractive operations to the buffer.
      * @return A DisplayOperations instance for subtractive operations.
      */
-    public DisplayOperations subtractive() {
+    public BufferedDisplayOperations subtractive() {
         return new DerivedDisplayOperations() {
             @Override
             public void setData(int page, int column, byte[] data, int offset, int length) {
-                StackedDisplayBuffer.this.removeData(page, column, data, offset, length);
+                StackedDisplayBuffer.this.subtractValue(page, column, data, offset, length);
             }
 
             @Override
             public void orData(int page, int column, byte[] data, int offset, int length) {
-                StackedDisplayBuffer.this.removeData(page, column, data, offset, length);
+                StackedDisplayBuffer.this.subtractValue(page, column, data, offset, length);
             }
         };
     }
@@ -144,10 +145,10 @@ public class StackedDisplayBuffer implements DisplayOperations {
     /**
      * Base class for display operations derived from this instance
      */
-    abstract class DerivedDisplayOperations implements DisplayOperations {
+    abstract class DerivedDisplayOperations implements BufferedDisplayOperations {
         @Override
         public void clearPage(int page) {
-            DisplayOperations.super.clearPage(page);
+            BufferedDisplayOperations.super.clearPage(page);
         }
 
         @Override
@@ -198,7 +199,7 @@ public class StackedDisplayBuffer implements DisplayOperations {
             }
         }
 
-        public void removeValue(byte value) {
+        public void subtractValue(byte value) {
             for (int i = 0; i < pixels.length; i++) {
                 int bit = value & (1 << i);
                 if (bit == 0) {

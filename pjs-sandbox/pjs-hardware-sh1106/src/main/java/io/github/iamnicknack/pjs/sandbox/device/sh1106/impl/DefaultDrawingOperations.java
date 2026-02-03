@@ -1,15 +1,18 @@
 package io.github.iamnicknack.pjs.sandbox.device.sh1106.impl;
 
-import io.github.iamnicknack.pjs.sandbox.device.sh1106.DisplayOperations;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.BufferedDisplayOperations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.DrawingOperations;
 
+/**
+ * Naive implementation of {@link DrawingOperations} which are not optimised for the page layout of the SH1106.
+ */
 public class DefaultDrawingOperations implements DrawingOperations {
 
     public static final int PAGE_HEIGHT = 8;
 
-    private final DisplayOperations displayOperations;
+    private final BufferedDisplayOperations displayOperations;
 
-    public DefaultDrawingOperations(DisplayOperations displayOperations) {
+    public DefaultDrawingOperations(BufferedDisplayOperations displayOperations) {
         this.displayOperations = displayOperations;
     }
 

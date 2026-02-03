@@ -2,12 +2,12 @@ package io.github.iamnicknack.pjs.sandbox.example;
 
 import io.github.iamnicknack.pjs.device.i2c.I2CConfig;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
-import io.github.iamnicknack.pjs.sandbox.device.sh1106.BufferedDisplayOperations;
-import io.github.iamnicknack.pjs.sandbox.device.sh1106.DefaultDrawingOperations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Driver;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Operations;
-import io.github.iamnicknack.pjs.sandbox.device.sh1106.StackedDisplayBuffer;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.TextOperations;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.impl.DefaultDrawingOperations;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.impl.DirtyTrackingDisplayBuffer;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.impl.StackedDisplayBuffer;
 
 public class OledExample implements Runnable {
 
@@ -29,37 +29,43 @@ public class OledExample implements Runnable {
         deviceOperations.clear();
         deviceOperations.displayOn();
 
-        var stackedBuffer = new StackedDisplayBuffer();
-        var additiveDisplayOperations = new BufferedDisplayOperations(stackedBuffer.additive(), 8);
-        var subtractiveDisplayOperations = new BufferedDisplayOperations(stackedBuffer.subtractive(), 8);
+        runStacked();
+    }
 
-        var textOperations = TextOperations.create(additiveDisplayOperations);
+    void runSimple() {
+        var dirtyTrackingDisplayBuffer = new DirtyTrackingDisplayBuffer(16);
+        var textOperations = TextOperations.create(dirtyTrackingDisplayBuffer);
         textOperations.drawText(4, 0, "012345678901234567890");
 
+        dirtyTrackingDisplayBuffer.copyTo(deviceOperations);
+    }
+
+    void runStacked() {
+        var stackedBuffer = new StackedDisplayBuffer();
+        var trackingBufferFactory = DirtyTrackingDisplayBuffer.Factory.newDefault(8);
+
+        var additiveDisplayOperations = trackingBufferFactory.create(stackedBuffer.additive());
+        var subtractiveDisplayOperations = trackingBufferFactory.create(stackedBuffer.subtractive());
+
+        // Display text across the width of the screen. First, write to the buffer
+        var textOperations = TextOperations.create(additiveDisplayOperations);
+        textOperations.drawText(4, 0, "012345678901234567890");
+        // Sync the buffer with the display
         additiveDisplayOperations.copyTo(deviceOperations);
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
+        // Additive drawing operations to draw over the text
         var additiveDrawOperations = new DefaultDrawingOperations(additiveDisplayOperations);
-        additiveDrawOperations.drawEllipse(0, 40, 8, 4);
-        additiveDisplayOperations.copyTo(deviceOperations);
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
+        // Subtractive drawing operations to remove the drawn data without affecting the text
         var subtractiveDrawOperations = new DefaultDrawingOperations(subtractiveDisplayOperations);
 
-        for (int i = 0; i < 256; i++) {
-            subtractiveDrawOperations.drawEllipse(i, 40, 8, 4);
-            additiveDrawOperations.drawEllipse(i + 1, 40, 8, 4);
-            subtractiveDisplayOperations.copyTo(deviceOperations);
+        // Move a bar across the text
+        for (int i = 0; i < 1024; i++) {
+            additiveDrawOperations.drawLine(i, 28, i, 44);
+            additiveDrawOperations.drawLine(i+1, 28, i+1, 44);
+            additiveDisplayOperations.copyTo(deviceOperations);
+            subtractiveDrawOperations.drawLine(i, 28, i, 44);
+            subtractiveDrawOperations.drawLine(i+1, 28, i+1, 44);
         }
+        additiveDisplayOperations.copyTo(deviceOperations);
     }
 }

@@ -1,17 +1,17 @@
 package io.github.iamnicknack.pjs.sandbox.device.sh1106.impl;
 
-import io.github.iamnicknack.pjs.sandbox.device.sh1106.DisplayOperations;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.BufferedDisplayOperations;
 
 /**
- * Default implementation of {@link DisplayOperations} that uses a byte array as the display buffer.
+ * Default implementation of {@link BufferedDisplayOperations} that uses a byte array as the display buffer.
  */
-public class DefaultDisplayBuffer implements DisplayOperations {
+public class DefaultDisplayBuffer implements BufferedDisplayOperations {
 
-    private final byte[][] buffer = new byte[PAGE_COUNT][DisplayOperations.PAGE_SIZE];
+    private final byte[][] buffer = new byte[PAGE_COUNT][PAGE_SIZE];
 
     @Override
     public void setData(int page, int column, byte[] data, int offset, int length) {
-        if (column + length > DisplayOperations.PAGE_SIZE) {
+        if (column + length > PAGE_SIZE) {
             throw new IllegalArgumentException("Requested data is outside the display buffer");
         }
         System.arraycopy(data, offset, this.buffer[page], column, length);
@@ -24,7 +24,7 @@ public class DefaultDisplayBuffer implements DisplayOperations {
 
     @Override
     public void getData(int page, int column, byte[] buffer, int offset, int length) {
-        if (column + length > DisplayOperations.PAGE_SIZE) {
+        if (column + length > PAGE_SIZE) {
             throw new IllegalArgumentException("Requested data is outside the display buffer");
         }
         System.arraycopy(this.buffer[page], column, buffer, offset, length);
@@ -32,7 +32,7 @@ public class DefaultDisplayBuffer implements DisplayOperations {
 
     @Override
     public int getPointValue(int page, int column) {
-        if (column > DisplayOperations.PAGE_SIZE) {
+        if (column > PAGE_SIZE) {
             throw new IllegalArgumentException("Requested data is outside the display buffer");
         }
         return buffer[page][column] & 0xFF;

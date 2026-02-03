@@ -52,31 +52,6 @@ public class Sh1106Operations implements DisplayOperations, ControlOperations, T
     }
 
     @Override
-    public void orData(int page, int column, byte[] data, int offset, int length) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void xorData(int page, int column, byte[] data, int offset, int length) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void andData(int page, int column, byte[] data, int offset, int length) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void getData(int page, int column, byte[] buffer, int offset, int length) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int getPointValue(int page, int column) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void drawText(int page, int column, String text) {
         textOperations.drawText(page, column, text);
     }

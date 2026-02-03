@@ -51,13 +51,13 @@ class StackedDisplayBufferTest {
     @Test
     void canSetPixelValueMultipleTimes() {
         var buffer = new StackedDisplayBuffer();
-        buffer.addData(0, 0, new byte[] { 0b00000001 }, 0, 1);
+        buffer.orData(0, 0, new byte[] { 0b00000001 }, 0, 1);
 
         byte[] bytes = new byte[1];
         buffer.getData(0, 0, bytes, 0, 1);
         assertEquals(1, bytes[0]);
 
-        buffer.addData(0, 0, new byte[] { 0b00000001 }, 0, 1);
+        buffer.orData(0, 0, new byte[] { 0b00000001 }, 0, 1);
 
         var group = buffer.getPixelGroup(0, 0);
         assertEquals(2, group.getPlotCount(0));
@@ -66,20 +66,21 @@ class StackedDisplayBufferTest {
     @Test
     void canUnsetPixelValue() {
         var buffer = new StackedDisplayBuffer();
-        buffer.addData(0, 0, new byte[] { 0b00000001 }, 0, 1);
-        buffer.addData(0, 0, new byte[] { 0b00000001 }, 0, 1);
+        buffer.orData(0, 0, new byte[] { 0b00000001 }, 0, 1);
+        buffer.orData(0, 0, new byte[] { 0b00000001 }, 0, 1);
 
         var group = buffer.getPixelGroup(0, 0);
         assertEquals(2, group.getPlotCount(0));
 
-        buffer.removeData(0, 0, new byte[] { 0b00000001 }, 0, 1);
+        buffer.subtractValue(0, 0, new byte[] { 0b00000001 }, 0, 1);
         assertEquals(1, group.getPlotCount(0));
 
-        buffer.removeData(0, 0, new byte[] { 0b00000001 }, 0, 1);
+        buffer.subtractValue(0, 0, new byte[] { 0b00000001 }, 0, 1);
         assertEquals(0, group.getPlotCount(0));
 
-        buffer.removeData(0, 0, new byte[] { 0b00000001 }, 0, 1);
-        assertEquals(0, group.getPlotCount(0));
+        assertThrows(IllegalStateException.class, () ->
+                buffer.subtractValue(0, 0, new byte[] { 0b00000001 }, 0, 1)
+        );
     }
 
     @Test

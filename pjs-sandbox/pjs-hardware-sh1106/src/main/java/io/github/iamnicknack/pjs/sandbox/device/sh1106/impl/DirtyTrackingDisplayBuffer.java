@@ -1,16 +1,17 @@
 package io.github.iamnicknack.pjs.sandbox.device.sh1106.impl;
 
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.BufferedDisplayOperations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.DisplayOperations;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BufferedDisplayOperations implements DisplayOperations {
+public class DirtyTrackingDisplayBuffer implements BufferedDisplayOperations {
 
     /**
      * Delegate operations
      */
-    private final DisplayOperations delegate;
+    private final BufferedDisplayOperations delegate;
 
     /**
      * Container for dirty block tracking
@@ -20,7 +21,7 @@ public class BufferedDisplayOperations implements DisplayOperations {
     /**
      * Constructor with default block size
      */
-    public BufferedDisplayOperations() {
+    public DirtyTrackingDisplayBuffer() {
         this(BLOCK_SIZE);
     }
 
@@ -28,7 +29,7 @@ public class BufferedDisplayOperations implements DisplayOperations {
      * Constructor with custom block size
      * @param blockSize the block size
      */
-    public BufferedDisplayOperations(int blockSize) {
+    public DirtyTrackingDisplayBuffer(int blockSize) {
         this(new DefaultDisplayBuffer(), blockSize);
     }
 
@@ -37,12 +38,12 @@ public class BufferedDisplayOperations implements DisplayOperations {
      * @param delegate the delegate operations
      * @param blockSize the block size
      */
-    public BufferedDisplayOperations(DisplayOperations delegate, int blockSize) {
+    public DirtyTrackingDisplayBuffer(BufferedDisplayOperations delegate, int blockSize) {
         this.delegate = delegate;
         this.dirtyDisplay = new DirtyDisplay(blockSize);
     }
 
-    private BufferedDisplayOperations(DisplayOperations delegate, DirtyDisplay dirtyDisplay) {
+    private DirtyTrackingDisplayBuffer(BufferedDisplayOperations delegate, DirtyDisplay dirtyDisplay) {
         this.delegate = delegate;
         this.dirtyDisplay = dirtyDisplay;
     }
@@ -105,21 +106,21 @@ public class BufferedDisplayOperations implements DisplayOperations {
     @Override
     public void copyTo(DisplayOperations other) {
 
-        List<DirtyBlock> dirtyBlocks = new ArrayList<>();
+        List<Range> dirtyRanges = new ArrayList<>();
 
         for (int p = 0; p < PAGE_COUNT; p++) {
             for (int i = 0; i < dirtyDisplay.blocksPerPage; i++) {
                 var block = this.dirtyDisplay.blocks[p][i];
                 if (block.dirty) {
-                    if (dirtyBlocks.isEmpty()) {
-                        dirtyBlocks.add(block);
+                    if (dirtyRanges.isEmpty()) {
+                        dirtyRanges.add(block.range);
                     } else {
-                        var last = dirtyBlocks.getLast();
-                        if (block.follows(last)) {
-                            var concat = last.concat(block);
-                            dirtyBlocks.set(dirtyBlocks.size() - 1, concat);
+                        var last = dirtyRanges.getLast();
+                        if (block.range.follows(last)) {
+                            var concat = last.concat(block.range);
+                            dirtyRanges.set(dirtyRanges.size() - 1, concat);
                         } else {
-                            dirtyBlocks.add(block);
+                            dirtyRanges.add(block.range);
                         }
                     }
                     block.dirty = false;
@@ -127,15 +128,16 @@ public class BufferedDisplayOperations implements DisplayOperations {
             }
         }
 
-        for (var marker : dirtyBlocks) {
-            var bytes = new byte[marker.range.length];
-            this.delegate.getData(marker.range.page, marker.range.column, bytes, 0, marker.range.length);
-            other.setData(marker.range.page, marker.range.column, bytes, 0, marker.range.length);
+        for (var range : dirtyRanges) {
+            var bytes = new byte[range.length];
+            this.delegate.getData(range.page, range.column, bytes, 0, range.length);
+            other.setData(range.page, range.column, bytes, 0, range.length);
         }
     }
 
     /**
-     * Factory for creating BufferedDisplayOperations instances
+     * Factory for creating BufferedDisplayOperations instances. Creating instances via a factory can allow
+     * instances to share dirty tracking information.
      */
     public interface Factory {
         /**
@@ -143,7 +145,7 @@ public class BufferedDisplayOperations implements DisplayOperations {
          * @param delegate the delegate operations to use.
          * @return a new BufferedDisplayOperations instance.
          */
-        BufferedDisplayOperations create(DisplayOperations delegate);
+        BufferedDisplayOperations create(BufferedDisplayOperations delegate);
 
         /**
          * Create a new factory with the default block size.
@@ -175,8 +177,8 @@ public class BufferedDisplayOperations implements DisplayOperations {
         }
 
         @Override
-        public BufferedDisplayOperations create(DisplayOperations delegate) {
-            return new BufferedDisplayOperations(delegate, dirtyDisplay);
+        public DirtyTrackingDisplayBuffer create(BufferedDisplayOperations delegate) {
+            return new DirtyTrackingDisplayBuffer(delegate, dirtyDisplay);
         }
     }
 
@@ -226,7 +228,6 @@ public class BufferedDisplayOperations implements DisplayOperations {
                 }
             }
         }
-
     }
 
     /**
@@ -234,20 +235,18 @@ public class BufferedDisplayOperations implements DisplayOperations {
      * Used internally to indicate which portions of data have been modified.
      */
     private static class DirtyBlock {
+        /**
+         * Dirty status
+         */
         boolean dirty;
+
+        /**
+         * The range of data affected by this block.
+         */
         final Range range;
 
         public DirtyBlock(Range range) {
             this.range = range;
-        }
-
-        public boolean follows(DirtyBlock other) {
-            return (this.range.page == other.range.page) &&
-                    (this.range.column == (other.range.column + other.range.length));
-        }
-
-        public DirtyBlock concat(DirtyBlock other) {
-            return new DirtyBlock(new Range(this.range.page, this.range.column, this.range.length + other.range.length));
         }
     }
 
@@ -257,5 +256,13 @@ public class BufferedDisplayOperations implements DisplayOperations {
      * @param column the starting column number
      * @param length the length of the range
      */
-    private record Range(int page, int column, int length) {}
+    private record Range(int page, int column, int length) {
+        public boolean follows(Range other) {
+            return (this.page == other.page) && (this.column == (other.column + other.length));
+        }
+
+        public Range concat(Range other) {
+            return new Range(this.page, this.column, this.length + other.length);
+        }
+    }
 }
