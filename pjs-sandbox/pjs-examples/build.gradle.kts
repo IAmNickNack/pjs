@@ -13,15 +13,14 @@ dependencies {
     implementation("io.github.iamnicknack:pjs-native-device:${properties["pjs.version"]}")
     implementation("io.github.iamnicknack:pjs-grpc-device:${properties["pjs.version"]}")
     implementation("io.github.iamnicknack:pjs-http-device:${properties["pjs.version"]}")
-    implementation("io.github.iamnicknack:pjs-pi4j-device:${properties["pjs.version"]}")
+    api("io.github.iamnicknack:pjs-pi4j-device:${properties["pjs.version"]}")
 
     implementation(project(":pjs-hardware-25lc"))
     implementation(project(":pjs-hardware-mcp23x"))
     implementation(project(":pjs-hardware-sh1106"))
 
-    implementation(libs.pi4j.core)
-    implementation(libs.pi4j.plugin.ffm)
     implementation(libs.bundles.logging)
+    implementation(libs.bundles.pi4j.plugins)
 }
 
 application {

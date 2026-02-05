@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     api(project(":pjs-core"))
-    api(libs.slf4j.api)
-    implementation(libs.pi4j.core)
+    api(libs.pi4j.core)
+    implementation(libs.bundles.pi4j.plugins)
     testImplementation(libs.pi4j.plugin.mock)
 }

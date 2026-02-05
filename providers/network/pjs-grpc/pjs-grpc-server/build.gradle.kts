@@ -14,8 +14,8 @@ dependencies {
     implementation(project(":pjs-mock-device"))
     implementation(project(":pjs-utils"))
     implementation(libs.bundles.logging)
-    implementation(libs.bundles.pi4j)
     implementation(libs.grpc.inprocess)
+    runtimeOnly(libs.bundles.pi4j.plugins)
 }
 
 tasks.named<JavaExec>("run") {
