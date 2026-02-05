@@ -1,6 +1,17 @@
 package io.github.iamnicknack.pjs.sandbox;
 
-import com.pi4j.Pi4J;
+import com.pi4j.extension.Plugin;
+import com.pi4j.plugin.ffm.FFMPlugin;
+import com.pi4j.plugin.mock.MockPlugin;
+import io.github.iamnicknack.pi4j.grpc.client.GrpcPlugin;
+import io.github.iamnicknack.pjs.ffm.NativeDeviceRegistry;
+import io.github.iamnicknack.pjs.ffm.context.NativeContext;
+import io.github.iamnicknack.pjs.grpc.GrpcDeviceRegistry;
+import io.github.iamnicknack.pjs.http.client.HttpDeviceRegistry;
+import io.github.iamnicknack.pjs.logging.LoggingDeviceRegistry;
+import io.github.iamnicknack.pjs.mock.MockDeviceRegistry;
+import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
+import io.github.iamnicknack.pjs.pi4j.Pi4jDeviceRegistryLoader;
 import io.github.iamnicknack.pjs.sandbox.example.EepromExample;
 import io.github.iamnicknack.pjs.sandbox.example.GpioExample;
 import io.github.iamnicknack.pjs.sandbox.example.I2CExample;
@@ -10,14 +21,6 @@ import io.github.iamnicknack.pjs.sandbox.example.PwmExample;
 import io.github.iamnicknack.pjs.sandbox.example.SevenSegmentExample;
 import io.github.iamnicknack.pjs.sandbox.example.SpiExample;
 import io.github.iamnicknack.pjs.sandbox.example.ThreeToEightExample;
-import io.github.iamnicknack.pjs.ffm.NativeDeviceRegistry;
-import io.github.iamnicknack.pjs.ffm.context.NativeContext;
-import io.github.iamnicknack.pjs.grpc.GrpcDeviceRegistry;
-import io.github.iamnicknack.pjs.http.client.HttpDeviceRegistry;
-import io.github.iamnicknack.pjs.logging.LoggingDeviceRegistry;
-import io.github.iamnicknack.pjs.mock.MockDeviceRegistry;
-import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
-import io.github.iamnicknack.pjs.pi4j.Pi4jDeviceRegistry;
 import io.github.iamnicknack.pjs.util.args.CommandLineParser;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
@@ -45,12 +48,12 @@ public class Main {
             .arg(PWM_EXAMPLE)
             .arg(MCP_EXAMPLE)
             .arg(OLED_EXAMPLE)
+            .arg(PI4J_MODE)
             .arg(LOGGING)
             .arg(HELP)
             .build();
 
     public static void main(String[] args) {
-
         var commandLineArgs = commandLineParser.parse(args);
 
         if (commandLineArgs.flag(HELP)) {
@@ -70,10 +73,18 @@ public class Main {
             }
             case "http" -> new HttpDeviceRegistry("http://" + commandLineArgs.value(GRPC_HOST) + ":" + commandLineArgs.value(GRPC_PORT) + "/");
             case "ffm" -> new NativeDeviceRegistry(new NativeContext(Arena.ofAuto()));
-            case "pi4j" -> new Pi4jDeviceRegistry(Pi4J.newAutoContext());
+            case "pi4j" -> {
+                Class<? extends Plugin> pluginClass = switch (commandLineArgs.valueOrNull(PI4J_MODE)) {
+                    case "mock" -> MockPlugin.class;
+                    case "ffm" -> FFMPlugin.class;
+                    case "grpc" -> GrpcPlugin.class;
+                    case null, default -> null;
+                };
+                var loader = new Pi4jDeviceRegistryLoader(pluginClass);
+                yield loader.load(commandLineArgs.asMap());
+            }
             default -> new MockDeviceRegistry();
         }) {
-
             var registryDelegate = (commandLineArgs.flag(LOGGING))
                     ? new LoggingDeviceRegistry(registry)
                     : registry;

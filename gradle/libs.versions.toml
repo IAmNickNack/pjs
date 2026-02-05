@@ -20,6 +20,7 @@ publish-vanniktech = "0.36.0"
 dokka = "2.1.0"
 
 pi4j = "4.0.0-SNAPSHOT"
+pi4j-grpc = "0.0.1-SNAPSHOT"
 
 ktor = "3.4.0"
 koin = "4.1.1"
@@ -43,6 +44,7 @@ slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 pi4j-core = { module = "com.pi4j:pi4j-core", version.ref = "pi4j" }
 pi4j-plugin-ffm = { module = "com.pi4j:pi4j-plugin-ffm", version.ref = "pi4j" }
 pi4j-plugin-mock = { module = "com.pi4j:pi4j-plugin-mock", version.ref = "pi4j" }
+pi4j-plugin-grpc = { module = "io.github.iamnicknack:pi4j-plugin-grpc", version.ref = "pi4j-grpc" }
 
 # gRPC
 grpc-protobuf = { group = "io.grpc", name = "grpc-protobuf", version.ref = "grpc-core" }
@@ -76,7 +78,7 @@ koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 [bundles]
 
 logging = ["logback-classic", "slf4j-api"]
-pi4j = ["pi4j-core", "pi4j-plugin-ffm"]
+pi4j-plugins = ["pi4j-plugin-ffm", "pi4j-plugin-grpc", "pi4j-plugin-mock"]
 
 [plugins]
 

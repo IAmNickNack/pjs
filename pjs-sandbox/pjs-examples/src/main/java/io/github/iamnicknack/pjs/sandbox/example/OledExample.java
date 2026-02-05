@@ -59,13 +59,17 @@ public class OledExample implements Runnable {
         var subtractiveDrawOperations = new DefaultDrawingOperations(subtractiveDisplayOperations);
 
         // Move a bar across the text
-        for (int i = 0; i < 1024; i++) {
+        for (int i = 0; i < 256; i++) {
             additiveDrawOperations.drawLine(i, 28, i, 44);
-            additiveDrawOperations.drawLine(i+1, 28, i+1, 44);
+            if ((i + 1) % 128 != 0) {
+                additiveDrawOperations.drawLine(i + 1, 28, i + 1, 44);
+            }
             additiveDisplayOperations.copyTo(deviceOperations);
             subtractiveDrawOperations.drawLine(i, 28, i, 44);
-            subtractiveDrawOperations.drawLine(i+1, 28, i+1, 44);
+            if ((i + 1) % 128 != 0) {
+                subtractiveDrawOperations.drawLine(i + 1, 28, i + 1, 44);
+            }
         }
         additiveDisplayOperations.copyTo(deviceOperations);
-    }
+     }
 }

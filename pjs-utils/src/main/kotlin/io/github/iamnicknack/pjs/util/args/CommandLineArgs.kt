@@ -85,13 +85,32 @@ class CommandLineArgs(
     fun flag(arg: CommandLineArgument): Boolean = flag(arg.name)
 
     /**
-     * Return the parsed command line arguments as a map of system properties.
+     * Check if the argument is present in the parsed arguments.
+     * @param arg the argument name
+     * @return true if the argument is present, false otherwise
+     */
+    fun contains(arg: String): Boolean = values.containsKey(arg)
+
+    /**
+     * Check if the argument is present in the parsed arguments.
+     * @param arg the argument
+     * @return true if the argument is present, false otherwise
+     */
+    fun contains(arg: CommandLineArgument): Boolean = values.containsKey(arg.name)
+
+    /**
+     * Return the parsed command line arguments as a map of system properties
      * @return System properties map of parsed arguments.
      */
     fun asMap(): Map<String, Any> {
-        return values
-            .filter { (_, value) -> value.property != null }
-            .mapNotNull { e -> e.value.typed<Any>()?.let { e.key to it} }
+        return values.values
+            .mapNotNull { arg ->
+                if (arg.property != null && arg.value != null) {
+                    arg.property to arg.value
+                } else {
+                    null
+                }
+            }
             .toMap()
     }
 
