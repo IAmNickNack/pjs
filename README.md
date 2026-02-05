@@ -52,9 +52,9 @@ Device adapters provided in this repository include:
 
 * [pjs-native-device](providers/pjs-native) - Adapters which communicate with hardware via Java FFM APIs
 * [pjs-mock-device](providers/pjs-mock-device) - Mock device adapters which can be used for testing
-* [pjs-grpc-device](providers/network/pjs-grpc) - Device adapters and server application which allow PJs to 
+* [pjs-grpc-device](providers/network/pjs-grpc) - Device adapters and server application which allows PJs to 
 communicate with a remote Pi via gRPC
-* [pjs-http-device](providers/network/pjs-http) - Device adapters and server application which allow PJs to
+* [pjs-http-device](providers/network/pjs-http) - Device adapters and server application which allows PJs to
   communicate with a remote Pi via REST
 * [pjs-pi4j-device](providers/pjs-pi4j-device) - Device adapter which uses [Pi4J](https://www.pi4j.com) providers to 
 communicate with hardware
@@ -65,7 +65,7 @@ The [pjs-sandbox](pjs-sandbox) module contains a number of examples that demonst
  with examples of PJs abstractions used to implement specific hardware devices.
 
 The implemented devices currently include:
-* [pjs-hardware-25lc](pjs-sandbox/pjs-hardware-25lc) - A PJs SPI implementation for the 24LC256 EEPROM. 
+* [pjs-hardware-25lc](pjs-sandbox/pjs-hardware-25lc) - A PJs SPI implementation for the 24LC64 EEPROM. 
 * [pjs-hardware-mcp23x](pjs-sandbox/pjs-hardware-mcp23x) - PJs SPI and I2C implementations for the MCP23008/S08 port
  expander.
 * [pjs-hardware-sh1106](pjs-sandbox/pjs-hardware-sh1106) - A PJs I2C implementation for the SH1106 OLED display.

@@ -75,22 +75,6 @@ public class StackedDisplayBuffer implements BufferedDisplayOperations {
         BufferedDisplayOperations.super.copyTo(other);
     }
 
-//    /**
-//     * Set data in additive mode where pixels are "stacked" on top of each other by
-//     * adding `1` to the count of values set on each pixel.
-//     *
-//     * @param page The page to set data on.
-//     * @param column The column to start setting data from.
-//     * @param data The data to set.
-//     * @param offset The offset into the data array.
-//     * @param length The number of pixels to set.
-//     */
-//    public void addData(int page, int column, byte[] data, int offset, int length) {
-//        for (int i = 0; i < length; i++) {
-//            pixelGroups[page][(column + i) % PAGE_SIZE].addValue(data[offset + i]);
-//        }
-//    }
-
     /**
      * Set data in subtractive mode where pixels are "subtracted" from the count set
      * for the pixel
