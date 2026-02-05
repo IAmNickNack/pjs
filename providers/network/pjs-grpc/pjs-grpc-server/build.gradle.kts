@@ -15,7 +15,7 @@ dependencies {
     implementation(project(":pjs-utils"))
     implementation(libs.bundles.logging)
     implementation(libs.grpc.inprocess)
-    runtimeOnly(libs.bundles.pi4j)
+    runtimeOnly(libs.bundles.pi4j.plugins)
 }
 
 tasks.named<JavaExec>("run") {
