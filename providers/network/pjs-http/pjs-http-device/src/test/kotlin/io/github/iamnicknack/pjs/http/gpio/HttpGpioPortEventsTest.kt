@@ -19,7 +19,7 @@ class HttpGpioPortEventsTest {
     fun `can listen for events`() = pjsHttpTestCase {
         val config = GpioPortConfig.builder()
             .id("test-port")
-            .mode(GpioPortMode.INPUT)
+            .portMode(GpioPortMode.INPUT)
             .pin(1)
             .build()
         val httpPort = httpDeviceRegistry.create(config) as HttpGpioPort

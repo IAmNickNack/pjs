@@ -1,6 +1,7 @@
 package io.github.iamnicknack.pjs.http.gpio
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import io.github.iamnicknack.pjs.device.gpio.GpioEventMode
 import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
@@ -31,15 +32,19 @@ interface GpioPortHandler : ConfigHandler<GpioPort> {
     @JsonIgnoreProperties(ignoreUnknown = true)
     class GpioPortConfigPayload(
         val pinNumber: IntArray,
-        val mode: GpioPortMode,
-        val defaultValue: Int? = null
+        val portMode: GpioPortMode,
+        val eventMode: GpioEventMode = GpioEventMode.NONE,
+        val defaultValue: Int? = null,
+        val debounceDelay: Int? = null
     ) : ConfigHandler.DeviceConfigPayload<GpioPort> {
 
         override fun asDeviceConfig(deviceId: String?): GpioPortConfig = GpioPortConfig.builder()
             .id(deviceId ?: "GPIO[${this.pinNumber.joinToString(",")}")
             .pin(*this.pinNumber)
-            .mode(this.mode)
+            .portMode(this.portMode)
+            .eventMode(this.eventMode)
             .defaultValue(this.defaultValue ?: 0)
+            .debounceDelay(this.debounceDelay ?: 0)
             .build()
     }
 

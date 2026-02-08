@@ -28,7 +28,7 @@ public class Pi4jPortProvider implements GpioPortProvider {
 
     @Override
     public GpioPort create(GpioPortConfig config) {
-        if (config.mode().isSet(GpioPortMode.OUTPUT)) {
+        if (config.portMode().isSet(GpioPortMode.OUTPUT)) {
             var devices = createOutputs(config);
             return new Pi4jOutputPort(
                     config,
@@ -46,7 +46,7 @@ public class Pi4jPortProvider implements GpioPortProvider {
     }
 
     private List<DigitalInput> createInputs(GpioPortConfig config) {
-        var mode = switch (config.mode()) {
+        var mode = switch (config.portMode()) {
             case INPUT_PULLDOWN -> PullResistance.PULL_DOWN;
             case INPUT_PULLUP -> PullResistance.PULL_UP;
             default -> PullResistance.OFF;
@@ -55,6 +55,7 @@ public class Pi4jPortProvider implements GpioPortProvider {
                 .mapToObj(pin -> DigitalInputConfig.newBuilder(pi4jContext)
                         .bcm(pin)
                         .pull(mode)
+                        .debounce((long) config.debounceDelay())
                         .build()
                 )
                 .map(pi4jContext::create)

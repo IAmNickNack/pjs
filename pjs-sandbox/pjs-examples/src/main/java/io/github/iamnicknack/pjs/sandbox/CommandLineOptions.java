@@ -13,10 +13,10 @@ public class CommandLineOptions {
             .build();
 
     public static final CommandLineArgument PI4J_MODE = new CommandLineArgument.Builder()
-            .name("pi4j-mode")
+            .name("pi4j-portMode")
             .defaultValue("auto")
-            .description("The Pi4J mode to use. (`mock`, `grpc`, `ffm`, `auto`)")
-            .property("pjs.pi4j.mode")
+            .description("The Pi4J portMode to use. (`mock`, `grpc`, `ffm`, `auto`)")
+            .property("pjs.pi4j.portMode")
             .build();
 
     public static final CommandLineArgument GRPC_HOST = new CommandLineArgument.Builder()
@@ -94,6 +94,13 @@ public class CommandLineOptions {
             .isFlag(true)
             .description("Run the OLED example")
             .property("pjs.example.oled")
+            .build();
+
+    public static final CommandLineArgument DEBOUNCE_EXAMPLE = new CommandLineArgument.Builder()
+            .name("debounce")
+            .isFlag(true)
+            .description("Run the debounce example")
+            .property("pjs.example.debounce")
             .build();
 
     public static final CommandLineArgument LOGGING = new CommandLineArgument.Builder()

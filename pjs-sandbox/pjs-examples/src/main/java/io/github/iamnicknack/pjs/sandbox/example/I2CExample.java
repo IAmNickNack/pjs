@@ -16,7 +16,7 @@ public class I2CExample implements Runnable {
 
     private static final GpioPortConfig RESET_PIN_CONFIG = GpioPortConfig.builder()
             .pin(27)
-            .mode(GpioPortMode.OUTPUT)
+            .portMode(GpioPortMode.OUTPUT)
             .build();
 
     private final Mcp23xxxExample example;

@@ -5,7 +5,7 @@ import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.grpc.deviceOrThrow
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.Empty
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.EventType
+import io.github.iamnicknack.pjs.grpc.gen.v1.port.EventMode
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortServiceGrpcKt
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.RemoveListenerRequest
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.StateChangeEvent
@@ -52,7 +52,7 @@ class GrpcPortService(
     override fun addListener(request: DeviceRequest): Flow<StateChangeEvent> {
         // should only do this if port is input
         val device = deviceRegistry.deviceOrThrow<GpioPort>(request.deviceId)
-            .takeIf { (it.config as GpioPortConfig).mode.isSet(GpioPortMode.INPUT) }
+            .takeIf { (it.config as GpioPortConfig).portMode.isSet(GpioPortMode.INPUT) }
             ?: throw Status.INVALID_ARGUMENT
                 .withDescription("Can only listen to input ports")
                 .asRuntimeException()
@@ -67,7 +67,7 @@ class GrpcPortService(
                 val changeEvent = StateChangeEvent.newBuilder()
                     .setDeviceId(request.deviceId)
                     .setListenerId(listenerId)
-                    .setEventType(event.eventType.asEventType())
+                    .setEventMode(event.eventType.asEventType())
                     .setValue(event.port.read())
                     .build()
 
@@ -81,7 +81,7 @@ class GrpcPortService(
             val registerEvent = StateChangeEvent.newBuilder()
                 .setDeviceId(request.deviceId)
                 .setListenerId(listenerId)
-                .setEventType(GpioChangeEventType.NONE.asEventType())
+                .setEventMode(GpioChangeEventType.NONE.asEventType())
                 .setValue(0)
                 .build()
 
@@ -108,11 +108,11 @@ class GrpcPortService(
     /**
      * Map the API event type to gRPC event type.
      */
-    private fun GpioChangeEventType.asEventType(): EventType {
+    private fun GpioChangeEventType.asEventType(): EventMode {
         return when(this) {
-            GpioChangeEventType.RISING -> EventType.RISING
-            GpioChangeEventType.FALLING -> EventType.FALLING
-            else -> EventType.NONE
+            GpioChangeEventType.RISING -> EventMode.RISING
+            GpioChangeEventType.FALLING -> EventMode.FALLING
+            else -> EventMode.NONE
         }
     }
 

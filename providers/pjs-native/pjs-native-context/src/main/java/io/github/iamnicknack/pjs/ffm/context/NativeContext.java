@@ -114,6 +114,10 @@ public class NativeContext implements SegmentAllocator, MemorySegmentMapper {
         }
     }
 
+    /**
+     * A MethodCaller implementation that handles captured state and throws {@link CapturedStateException}, allowing
+     * native error state to be propagated.
+     */
     class CapturedStateMethodHandleCaller implements MethodCaller {
 
         // Captured state for errno
@@ -163,7 +167,6 @@ public class NativeContext implements SegmentAllocator, MemorySegmentMapper {
             }
         }
     }
-
 
     /**
      * A functional interface for calling native methods with variable arguments.

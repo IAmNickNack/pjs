@@ -15,13 +15,13 @@ class MockGpioPortTest {
     private final GpioPortConfig outputConfig = GpioPortConfig.builder()
             .id("mock-output")
             .pin(1)
-            .mode(GpioPortMode.OUTPUT)
+            .portMode(GpioPortMode.OUTPUT)
             .build();
 
     private final GpioPortConfig inputConfig = GpioPortConfig.builder()
             .id("mock-input")
             .pin(1)
-            .mode(GpioPortMode.INPUT)
+            .portMode(GpioPortMode.INPUT)
             .build();
 
     @Test

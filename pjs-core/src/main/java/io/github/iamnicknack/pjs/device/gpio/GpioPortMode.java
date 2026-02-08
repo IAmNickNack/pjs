@@ -1,7 +1,7 @@
 package io.github.iamnicknack.pjs.device.gpio;
 
 /**
- * The mode of a GPIO port, determining its behavior as input or output and any pull-up/pull-down resistors.
+ * The portMode of a GPIO port, determining its behavior as input or output and any pull-up/pull-down resistors.
  */
 public enum GpioPortMode {
     /**
@@ -22,12 +22,12 @@ public enum GpioPortMode {
     OUTPUT(2),
     /**
      * The port is configured as an open-drain output.
-     * In this mode, the output can either drive the line low or leave it floating (high impedance).
+     * In this portMode, the output can either drive the line low or leave it floating (high impedance).
      */
     OUTPUT_OPENDRAIN(10),
     /**
      * The port is configured as an open-source output.
-     * In this mode, the output can either drive the line high or leave it floating (
+     * In this portMode, the output can either drive the line high or leave it floating (
      */
     OUTPUT_OPENSOURCE(6);
 
@@ -38,8 +38,8 @@ public enum GpioPortMode {
     }
 
     /**
-     * Is the specified mode implied by this mode?
-     * @param mode the mode to test
+     * Is the specified portMode implied by this portMode?
+     * @param mode the portMode to test
      * @return true if the bit mask matches
      */
     public boolean isSet(GpioPortMode mode) {

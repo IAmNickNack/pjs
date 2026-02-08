@@ -17,6 +17,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.groupElement;
 
 /**
  * @see <a href="https://github.com/torvalds/linux/blob/07d9df80082b8d1f37e05658371b087cb6738770/include/uapi/linux/gpio.h#L153-L173">linux/gpio.h</a>
+ * @see <a href="https://docs.kernel.org/userspace-api/gpio/chardev.html#c.gpio_v2_line_config">gpio_v2_line_config</a>
  */
 @SerializeUsing(LineConfig.Serializer.class)
 @DeserializeUsing(LineConfig.Deserializer.class)
@@ -34,6 +35,14 @@ public record LineConfig(
                 "flags=" + flags +
                 ", attributes=" + Arrays.toString(attributes) +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof LineConfig config) {
+            return flags == config.flags && Arrays.equals(attributes, config.attributes);
+        }
+        return false;
     }
 
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(

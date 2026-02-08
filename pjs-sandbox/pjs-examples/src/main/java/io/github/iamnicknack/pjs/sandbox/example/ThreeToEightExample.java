@@ -37,13 +37,13 @@ public class ThreeToEightExample implements Runnable {
         private static final GpioPortConfig PORT_CONFIG = GpioPortConfig.builder()
                 .id("328-out")
                 .pin(22, 23, 24)
-                .mode(GpioPortMode.OUTPUT)
+                .portMode(GpioPortMode.OUTPUT)
                 .build();
 
         private static final GpioPortConfig ENABLE_CONFIG = GpioPortConfig.builder()
                 .id("328-enable")
                 .pin(25)
-                .mode(GpioPortMode.OUTPUT)
+                .portMode(GpioPortMode.OUTPUT)
                 .build();
 
         private final GpioPort dataPort;
@@ -82,25 +82,25 @@ public class ThreeToEightExample implements Runnable {
         private static final GpioPortConfig PIN0_CONFIG = GpioPortConfig.builder()
                 .id("328-0")
                 .pin(22)
-                .mode(GpioPortMode.OUTPUT)
+                .portMode(GpioPortMode.OUTPUT)
                 .build();
 
         private static final GpioPortConfig PIN1_CONFIG = GpioPortConfig.builder()
                 .id("328-1")
                 .pin(23)
-                .mode(GpioPortMode.OUTPUT)
+                .portMode(GpioPortMode.OUTPUT)
                 .build();
 
         private static final GpioPortConfig PIN2_CONFIG = GpioPortConfig.builder()
                 .id("328-2")
                 .pin(24)
-                .mode(GpioPortMode.OUTPUT)
+                .portMode(GpioPortMode.OUTPUT)
                 .build();
 
         private static final GpioPortConfig ENABLE_CONFIG = GpioPortConfig.builder()
                 .id("328-enable")
                 .pin(25)
-                .mode(GpioPortMode.OUTPUT)
+                .portMode(GpioPortMode.OUTPUT)
                 .build();
 
         private final Pin[] pins;

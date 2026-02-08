@@ -38,7 +38,7 @@ public class NativeI2CProvider implements I2CProvider {
         var directModeSupported = (functions & I2C_FUNC_I2C) != 0;
 
         if (!directModeSupported) {
-            throw new IllegalStateException("I2C bus " + config.bus() + " does not support direct mode.");
+            throw new IllegalStateException("I2C bus " + config.bus() + " does not support direct portMode.");
         }
 
         return new NativeI2C(config, nativeContext, fileDescriptor);

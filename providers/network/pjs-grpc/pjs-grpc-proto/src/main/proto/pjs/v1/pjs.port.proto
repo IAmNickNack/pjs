@@ -24,8 +24,10 @@ service PortConfigService {
 message PortConfigPayload {
   optional string deviceId = 1;
   repeated int32 pinNumber = 2;
-  PortMode mode = 3;
-  int32 defaultValue = 4;
+  PortMode portMode = 3;
+  EventMode eventMode = 4;
+  int32 defaultValue = 5;
+  int32 debounceDelay = 6;
 }
 
 message PortConfigListResponse {
@@ -35,7 +37,7 @@ message PortConfigListResponse {
 message StateChangeEvent {
   string deviceId = 1;
   string listenerId = 2;
-  EventType eventType = 3;
+  EventMode eventMode = 3;
   int32 value = 4;
 }
 
@@ -53,10 +55,11 @@ enum PortMode {
   OUTPUT_OPENSOURCE = 6;
 }
 
-enum EventType {
+enum EventMode {
   NONE = 0;
   RISING = 1;
   FALLING = 2;
+  BOTH = 3;
 }
 
 message Empty {}

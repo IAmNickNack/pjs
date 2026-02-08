@@ -8,7 +8,7 @@ import org.jspecify.annotations.Nullable;
  * @param baudRate SPI baud rate in Hz
  * @param bus the SPI hardware bus number
  * @param chipSelect the SPI chip-select pin number
- * @param mode the SPI mode (default 0)
+ * @param mode the SPI portMode (default 0)
  * @param bitsPerWord the SPI bits per word (default 8)
  * @param lsbFirst send data LSB first (default false)
  * @param id unique identifier for the device

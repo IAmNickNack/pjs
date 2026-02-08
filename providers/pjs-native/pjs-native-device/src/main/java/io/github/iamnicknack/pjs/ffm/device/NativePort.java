@@ -1,5 +1,6 @@
 package io.github.iamnicknack.pjs.ffm.device;
 
+import io.github.iamnicknack.pjs.device.gpio.GpioEventMode;
 import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
 import io.github.iamnicknack.pjs.ffm.context.NativeContext;
@@ -10,6 +11,7 @@ import io.github.iamnicknack.pjs.ffm.device.context.gpio.GpioConstants;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineValues;
 import io.github.iamnicknack.pjs.ffm.event.EventPoller;
 import io.github.iamnicknack.pjs.ffm.event.PollEvent;
+import io.github.iamnicknack.pjs.ffm.event.PollEventsCallback;
 import io.github.iamnicknack.pjs.model.event.GpioChangeEvent;
 import io.github.iamnicknack.pjs.model.event.GpioEventListener;
 import org.slf4j.Logger;
@@ -22,9 +24,19 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Predicate;
 
 /**
  * A GPIO port that uses native IOCTL calls to read and write pin values
+ * <p>
+ * Software debounce is enabled by default, but can be disabled by setting the system property
+ * `pjs.gpio.debounce.software` to `false`. This is kind of hacky, but is a compromise while
+ * the hardware debounce implementation remains questionable.
+ * <ul>
+ *     <li>Maybe this toggle should be part of the {@link GpioPortConfig}
+ *     <li>Which properties should/could be `system properties` and which ought to
+ *             be configurable per device, by the user requires some consideration.
+ * </ul>
  */
 class NativePort implements GpioPort, AutoCloseable {
 
@@ -45,16 +57,30 @@ class NativePort implements GpioPort, AutoCloseable {
         this.config = config;
         this.fileDescriptor = fileDescriptor;
         this.ioctlOperations = new IoctlOperationsImpl(nativeContext);
-        this.eventPoller = new EventPoller(fileDescriptor.fd(), this::pollEventsCallback, Duration.ofMillis(100), nativeContext);
-        this.eventPollingExecutorService = Executors.newSingleThreadExecutor(r -> {
-            Objects.requireNonNull(r);
-            var thread = new Thread(r, "gpio-event-poller-" + config.id());
-            thread.setDaemon(true);
-            thread.setUncaughtExceptionHandler((t, e) ->
-                    logger.error("Error on thread: {}", t.getName(), e)
+
+        boolean softwareDebounce = System.getProperty("pjs.gpio.debounce.software", "true")
+                .equalsIgnoreCase("true");
+
+        if (config.eventMode() != GpioEventMode.NONE) {
+            this.eventPoller = new EventPoller(
+                    fileDescriptor.fd(),
+                    new DebouncedEventsCallback((softwareDebounce) ? config.debounceDelay() * 1000L : 0),
+                    Duration.ofMillis(100),
+                    nativeContext
             );
-            return thread;
-        });
+            this.eventPollingExecutorService = Executors.newSingleThreadExecutor(r -> {
+                Objects.requireNonNull(r);
+                var thread = new Thread(r, "gpio-event-poller-" + config.id());
+                thread.setDaemon(true);
+                thread.setUncaughtExceptionHandler((t, e) ->
+                        logger.error("Error on thread: {}", t.getName(), e)
+                );
+                return thread;
+            });
+        } else {
+            this.eventPoller = null;
+            this.eventPollingExecutorService = null;
+        }
     }
 
     @Override
@@ -83,25 +109,72 @@ class NativePort implements GpioPort, AutoCloseable {
 
     @Override
     public void addListener(GpioEventListener<GpioPort> listener) {
-         listeners.add(listener);
-         if (!eventPoller.isRunning()) {
-            eventPollingExecutorService.submit(eventPoller);
+        if (eventPoller != null) {
+            listeners.add(listener);
+            if (!eventPoller.isRunning()) {
+                eventPollingExecutorService.submit(eventPoller);
+            }
         }
     }
 
     @Override
     public void removeListener(GpioEventListener<GpioPort> listener) {
-        listeners.remove(listener);
-        if (listeners.isEmpty() &&  eventPoller.isRunning()) {
-            eventPoller.stop();
+        if (eventPoller != null) {
+            listeners.remove(listener);
+            if (listeners.isEmpty() && eventPoller.isRunning()) {
+                eventPoller.stop();
+            }
         }
     }
 
-    private void pollEventsCallback(EventPoller eventPoller, List<PollEvent> pollEvents) {
-        pollEvents.stream()
-                .map(pollEvent -> new GpioChangeEvent<>(this, pollEvent.asLineChangeEventType()))
-                .forEach(gpioChangeEvent -> listeners
-                        .forEach(gpioEventListener -> gpioEventListener.onEvent(gpioChangeEvent))
-                );
+    /**
+     * Callback operation for event polling which implements a software debounce filter
+     */
+    class DebouncedEventsCallback implements PollEventsCallback {
+
+        private final Predicate<PollEvent> debouncer;
+
+        /**
+         * Constructor
+         * @param debounceDelay the debounce delay in the whatever timeunit is used by the native context.
+         *                      Any divisor or multiplier needs to be applied before passing it to this constructor.
+         */
+        public DebouncedEventsCallback(long debounceDelay) {
+            this.debouncer = (debounceDelay > 0)
+                    ? new DebounceFilter(debounceDelay)
+                    : _ -> true;
+        }
+
+        @Override
+        public void callback(EventPoller poller, List<PollEvent> pollEvents) {
+            pollEvents.stream()
+                    .filter(debouncer)
+                    .map(pollEvent -> new GpioChangeEvent<>(NativePort.this, pollEvent.asLineChangeEventType()))
+                    .forEach(gpioChangeEvent -> listeners
+                            .forEach(gpioEventListener -> gpioEventListener.onEvent(gpioChangeEvent))
+                    );
+        }
+    }
+
+    /**
+     * Stateful predicate, which can be used as a software debouncer
+     */
+    static class DebounceFilter implements Predicate<PollEvent> {
+
+        private long last = 0;
+        private final long debounce;
+
+        public DebounceFilter(long debounce) {
+            this.debounce = debounce;
+        }
+
+        @Override
+        public boolean test(PollEvent pollEvent) {
+            if ((pollEvent.timestamp() - last > debounce) || (last == 0)) {
+                last = pollEvent.timestamp();
+                return true;
+            }
+            return false;
+        }
     }
 }

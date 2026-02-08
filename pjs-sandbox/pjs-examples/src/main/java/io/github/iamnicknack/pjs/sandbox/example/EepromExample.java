@@ -35,7 +35,7 @@ public class EepromExample implements Runnable {
     private static final GpioPortConfig HOLD_PIN_CONFIG = GpioPortConfig.builder()
             .id("HOLD-PIN")
             .pin(27)
-            .mode(GpioPortMode.OUTPUT)
+            .portMode(GpioPortMode.OUTPUT)
             .build();
 
     private final Logger logger = LoggerFactory.getLogger(EepromExample.class);

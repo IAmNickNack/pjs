@@ -2,6 +2,7 @@ package io.github.iamnicknack.pjs.grpc
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import io.github.iamnicknack.pjs.device.gpio.GpioEventMode
 import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
@@ -25,17 +26,18 @@ class GrpcGpioPortTest {
 
     private val outputConfig = GpioPortConfig.builder()
         .id("test-output")
-        .mode(GpioPortMode.OUTPUT)
+        .portMode(GpioPortMode.OUTPUT)
         .build()
 
     private val inputConfig = GpioPortConfig.builder()
         .id("test-input")
-        .mode(GpioPortMode.INPUT)
+        .portMode(GpioPortMode.INPUT)
+        .eventMode(GpioEventMode.BOTH)
         .build()
 
     private val errorPortConfig = GpioPortConfig.builder()
         .id("test-error")
-        .mode(GpioPortMode.OUTPUT)
+        .portMode(GpioPortMode.OUTPUT)
         .build()
 
 

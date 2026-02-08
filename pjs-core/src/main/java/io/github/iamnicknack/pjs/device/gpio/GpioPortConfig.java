@@ -9,13 +9,16 @@ import java.util.Arrays;
 /**
  * Configuration for a GPIO port which can be used by a {@link GpioPortProvider} to construct a {@link GpioPort} instance.
  * @param pinNumber array of pin numbers
- * @param mode mode of the port
+ * @param portMode portMode of the port
+ * @param debounceDelay debounce delay in microseconds
  * @param id unique identifier for the port
  */
 public record GpioPortConfig(
         int[] pinNumber,
-        GpioPortMode mode,
+        GpioPortMode portMode,
+        GpioEventMode eventMode,
         int defaultValue,
+        int debounceDelay,
         String id
 ) implements DeviceConfig<GpioPort> {
 
@@ -34,8 +37,10 @@ public record GpioPortConfig(
 
     public static class Builder {
         private final ArrayList<Integer> pinNumber = new ArrayList<>();
-        private GpioPortMode mode = GpioPortMode.INPUT;
+        private GpioPortMode portMode = GpioPortMode.INPUT;
+        private GpioEventMode eventMode = GpioEventMode.NONE;
         private int defaultValue = -1;
+        private int debounceDelay = 0;
         @Nullable
         private String id;
 
@@ -49,13 +54,23 @@ public record GpioPortConfig(
             return this;
         }
 
-        public Builder mode(GpioPortMode mode) {
-            this.mode = mode;
+        public Builder portMode(GpioPortMode mode) {
+            this.portMode = mode;
+            return this;
+        }
+
+        public Builder eventMode(GpioEventMode mode) {
+            this.eventMode = mode;
             return this;
         }
 
         public Builder defaultValue(int value) {
             this.defaultValue = value;
+            return this;
+        }
+
+        public Builder debounceDelay(int debounceDelay) {
+            this.debounceDelay = debounceDelay;
             return this;
         }
 
@@ -66,8 +81,8 @@ public record GpioPortConfig(
 
         public GpioPortConfig build() {
             int[] pinNumber = this.pinNumber.stream().mapToInt(Integer::intValue).toArray();
-            var id = (this.id != null) ? this.id : String.format("GPIO-%s-%s", this.mode, Arrays.toString(pinNumber));
-            return new GpioPortConfig(pinNumber, mode, defaultValue, id);
+            var id = (this.id != null) ? this.id : String.format("GPIO-%s-%s", this.portMode, Arrays.toString(pinNumber));
+            return new GpioPortConfig(pinNumber, portMode, eventMode, defaultValue, debounceDelay, id);
         }
     }
 }

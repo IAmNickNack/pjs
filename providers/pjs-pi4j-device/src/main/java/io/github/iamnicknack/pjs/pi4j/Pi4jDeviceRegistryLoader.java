@@ -12,7 +12,6 @@ import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -39,7 +38,7 @@ public class Pi4jDeviceRegistryLoader implements DeviceRegistryLoader {
     @Override
     public @Nullable DeviceRegistry load(Map<String, Object> properties) {
         var javaProperties = properties.entrySet().stream()
-                .filter(Objects::nonNull)
+                .filter(e -> e.getValue() != null)
                 .map(e -> Map.entry(e.getKey(), e.getValue().toString()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
