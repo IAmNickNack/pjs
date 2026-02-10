@@ -18,7 +18,7 @@ public class DebounceExample implements Runnable {
             .pin(23)
             .portMode(GpioPortMode.INPUT_PULLDOWN)
             .eventMode(GpioEventMode.RISING)
-            .debounceDelay(500_000)
+            .debounceDelay(20_000)
             .build();
 
     private final Logger logger = LoggerFactory.getLogger(DebounceExample.class);

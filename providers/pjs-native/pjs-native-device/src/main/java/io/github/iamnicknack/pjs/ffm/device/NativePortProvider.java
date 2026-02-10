@@ -104,7 +104,6 @@ public class NativePortProvider implements GpioPortProvider {
 
         var debounceAttr = new LineAttribute(LineAttribute.Id.DEBOUNCE_PERIOD_US, (eventFlags != 0) ? config.debounceDelay() : 0);
         var mask = GpioPinMask.packBits(config.pinNumber());
-//                gpioMaskFor(config.pinNumber());
         var debounceConfig = new LineConfigAttribute(debounceAttr, mask);
         var lineConfig = new LineConfig(modeFlags | eventFlags, new LineConfigAttribute[] { debounceConfig });
         return new LineRequest(config.pinNumber(), config.id(), lineConfig, 0, 0);
