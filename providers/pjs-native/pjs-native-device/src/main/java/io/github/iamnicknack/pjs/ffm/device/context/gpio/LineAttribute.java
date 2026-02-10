@@ -17,6 +17,8 @@ import static java.lang.foreign.MemoryLayout.PathElement.groupElement;
  * Line attribute structure.
  * @param id the attribute id / type
  * @param value the value of the attribute
+ * @see <a href="https://docs.kernel.org/userspace-api/gpio/chardev.html#c.gpio_v2_line_attribute">gpio_v2_line_attribute</a>
+ * @see <a href="https://github.com/torvalds/linux/blob/master/include/uapi/linux/gpio.h#L130-L138">gpio_v2_line_attribute (GitHub)</a>
  */
 @SerializeUsing(LineAttribute.Serializer.class)
 @DeserializeUsing(LineAttribute.Deserializer.class)

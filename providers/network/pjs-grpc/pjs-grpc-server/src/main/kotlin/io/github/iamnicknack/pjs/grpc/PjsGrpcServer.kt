@@ -3,6 +3,7 @@ package io.github.iamnicknack.pjs.grpc
 import io.github.iamnicknack.pjs.grpc.config.DefaultGrpcServer
 import io.github.iamnicknack.pjs.server.ConfigurableDeviceRegistryProvider
 import io.github.iamnicknack.pjs.server.ServerConfiguration
+import io.github.iamnicknack.pjs.util.LoggingUtils
 import io.grpc.ServerBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -39,5 +40,6 @@ object PjsGrpcServer {
 }
 
 fun main(args: Array<String>) {
+    LoggingUtils.setLogbackLevelsFromProperties(System.getProperties())
     PjsGrpcServer.execute(args)
 }

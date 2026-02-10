@@ -10,3 +10,7 @@ plugins {
 }
 
 javaModuleSystem.moduleName = "pjs.util"
+
+dependencies {
+    compileOnly(libs.logback.classic)
+}
