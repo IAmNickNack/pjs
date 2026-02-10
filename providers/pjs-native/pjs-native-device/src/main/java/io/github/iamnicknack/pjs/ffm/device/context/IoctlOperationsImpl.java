@@ -10,15 +10,11 @@ public class IoctlOperationsImpl implements IoctlOperations {
 
     private  final NativeContext nativeContext;
 
-    private final NativeContext.MethodCaller ioctlIntByValue;
     private final NativeContext.MethodCaller ioctlIntByReference;
-    private final NativeContext.MethodCaller ioctlLongByReference;
 
     public IoctlOperationsImpl(NativeContext nativeContext) {
         this.nativeContext = nativeContext;
-        this.ioctlIntByValue = nativeContext.capturedStateMethodCaller("ioctl", Descriptors.IOCTL_INT_BY_VALUE);
         this.ioctlIntByReference = nativeContext.capturedStateMethodCaller("ioctl", Descriptors.IOCTL_INT_BY_REFERENCE);
-        this.ioctlLongByReference = nativeContext.capturedStateMethodCaller("ioctl", Descriptors.IOCTL_LONG_BY_REFERENCE);
     }
 
     public IoctlOperationsImpl(SegmentAllocator segmentAllocator) {

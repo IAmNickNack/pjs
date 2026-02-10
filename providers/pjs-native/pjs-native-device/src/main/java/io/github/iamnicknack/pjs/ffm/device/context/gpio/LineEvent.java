@@ -6,6 +6,8 @@ import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentSerializer;
 import io.github.iamnicknack.pjs.ffm.context.segment.SerializeUsing;
 
 import java.lang.foreign.MemoryLayout;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.SegmentAllocator;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.VarHandle;
 
@@ -46,9 +48,9 @@ public record LineEvent(
 
 
     public static class Serializer implements MemorySegmentSerializer<LineEvent> {
-        private final java.lang.foreign.SegmentAllocator segmentAllocator;
+        private final SegmentAllocator segmentAllocator;
 
-        public Serializer(java.lang.foreign.SegmentAllocator segmentAllocator) {
+        public Serializer(SegmentAllocator segmentAllocator) {
             this.segmentAllocator = segmentAllocator;
         }
 
@@ -58,7 +60,7 @@ public record LineEvent(
         }
 
         @Override
-        public java.lang.foreign.MemorySegment serialize(LineEvent data) {
+        public MemorySegment serialize(LineEvent data) {
             var segment = segmentAllocator.allocate(LAYOUT);
             VH_TIMESTAMP_NS.set(segment, 0L, data.timestampNs);
             VH_ID.set(segment, 0L, data.id);
@@ -77,7 +79,7 @@ public record LineEvent(
         }
 
         @Override
-        public LineEvent deserialize(java.lang.foreign.MemorySegment segment) {
+        public LineEvent deserialize(MemorySegment segment) {
             var timestampNs = (long) VH_TIMESTAMP_NS.get(segment, 0L);
             var id = (int) VH_ID.get(segment, 0L);
             var offset = (int) VH_OFFSET.get(segment, 0L);

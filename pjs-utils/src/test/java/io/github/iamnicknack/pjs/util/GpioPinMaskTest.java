@@ -48,6 +48,20 @@ class GpioPinMaskTest {
     }
 
     @Test
+    void canCreateSimpleMask() {
+        var pinMask = new GpioPinMask(new int[] { 2 });
+        assertThat(pinMask.getUnpackedMask()).isEqualTo(4);
+        assertThat(GpioPinMask.gpioMaskFor(new int[] { 2 })).isEqualTo(4);
+    }
+
+    @Test
+    void canCreateMultiPinMask() {
+        var pinMask = new GpioPinMask(new int[] { 2, 4 });
+        assertThat(pinMask.getUnpackedMask()).isEqualTo(20);
+        assertThat(GpioPinMask.gpioMaskFor(new int[] { 2, 4 })).isEqualTo(20);
+    }
+
+    @Test
     void canMaskValue() {
         var pinMask = new GpioPinMask(0b10);
 

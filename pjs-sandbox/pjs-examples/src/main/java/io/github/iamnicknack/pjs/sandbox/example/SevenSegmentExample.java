@@ -15,7 +15,7 @@ public class SevenSegmentExample implements Runnable {
 
     private static final GpioPortConfig RESET_PIN_CONFIG = GpioPortConfig.builder()
             .pin(5)
-            .mode(GpioPortMode.OUTPUT)
+            .portMode(GpioPortMode.OUTPUT)
             .build();
 
 

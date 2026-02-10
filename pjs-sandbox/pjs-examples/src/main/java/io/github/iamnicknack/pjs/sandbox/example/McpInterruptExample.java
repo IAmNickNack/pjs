@@ -27,20 +27,20 @@ public class McpInterruptExample implements Runnable {
     private static final GpioPortConfig RESET_PIN_CONFIG = GpioPortConfig.builder()
             .id("RESET-PIN")
             .pin(27)
-            .mode(GpioPortMode.OUTPUT)
+            .portMode(GpioPortMode.OUTPUT)
             .defaultValue(1)
             .build();
 
     private static final GpioPortConfig INTERRUPT_PIN_CONFIG = GpioPortConfig.builder()
             .id("INTERRUPT-PIN")
             .pin(14)
-            .mode(GpioPortMode.INPUT_PULLUP)
+            .portMode(GpioPortMode.INPUT_PULLUP)
             .build();
 
     private static final GpioPortConfig OUTPUT_PIN_CONFIG = GpioPortConfig.builder()
             .id("OUTPUT-PIN")
             .pin(1)
-            .mode(GpioPortMode.OUTPUT)
+            .portMode(GpioPortMode.OUTPUT)
             .defaultValue(0)
             .build();
 

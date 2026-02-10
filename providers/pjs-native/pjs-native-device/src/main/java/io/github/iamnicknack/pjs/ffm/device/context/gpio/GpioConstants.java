@@ -3,6 +3,9 @@ package io.github.iamnicknack.pjs.ffm.device.context.gpio;
 import static io.github.iamnicknack.pjs.ffm.device.context.IoctlConstants._IOR;
 import static io.github.iamnicknack.pjs.ffm.device.context.IoctlConstants._IOWR;
 
+/**
+ * @see <a href="https://github.com/torvalds/linux/blob/master/include/uapi/linux/gpio.h">gpio.h</a>
+ */
 public class GpioConstants {
 
     public final static int GPIOHANDLES_MAX = 64;

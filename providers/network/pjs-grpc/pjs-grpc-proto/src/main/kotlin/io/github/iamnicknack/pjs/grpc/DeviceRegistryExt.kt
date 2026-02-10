@@ -1,11 +1,13 @@
 package io.github.iamnicknack.pjs.grpc
 
+import io.github.iamnicknack.pjs.device.gpio.GpioEventMode
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.device.i2c.I2CConfig
 import io.github.iamnicknack.pjs.device.pwm.PwmConfig
 import io.github.iamnicknack.pjs.device.spi.SpiConfig
 import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.I2CBusConfigPayload
+import io.github.iamnicknack.pjs.grpc.gen.v1.port.EventMode
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortConfigPayload
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortMode
 import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PwmConfigPayload
@@ -37,8 +39,21 @@ fun PortConfigPayload.asGpioPortConfig(): GpioPortConfig {
     return GpioPortConfig.builder()
         .id(this.deviceId)
         .pin(*this.pinNumberList.toIntArray())
-        .mode(this.mode.asGpioPortMode())
+        .portMode(this.portMode.asGpioPortMode())
+        .eventMode(this.eventMode.asGpioEventMode())
         .defaultValue(this.defaultValue)
+        .debounceDelay(this.debounceDelay)
+        .build()
+}
+
+fun GpioPortConfig.asPortConfigPayload(): PortConfigPayload {
+    return PortConfigPayload.newBuilder()
+        .setDeviceId(this.id)
+        .setPortMode(this.portMode.asPortMode())
+        .setEventMode(this.eventMode.asEventMode())
+        .setDefaultValue(this.defaultValue)
+        .addAllPinNumber(this.pinNumber.toList())
+        .setDebounceDelay(this.debounceDelay)
         .build()
 }
 
@@ -50,17 +65,8 @@ fun PortMode.asGpioPortMode(): GpioPortMode {
         PortMode.OUTPUT -> GpioPortMode.OUTPUT
         PortMode.OUTPUT_OPENDRAIN -> GpioPortMode.OUTPUT_OPENDRAIN
         PortMode.OUTPUT_OPENSOURCE -> GpioPortMode.OUTPUT_OPENSOURCE
-        else -> throw IllegalArgumentException("Unsupported port mode: $this")
+        else -> throw IllegalArgumentException("Unsupported port portMode: $this")
     }
-}
-
-fun GpioPortConfig.asPortConfigPayload(): PortConfigPayload {
-    return PortConfigPayload.newBuilder()
-        .setDeviceId(this.id)
-        .setMode(this.mode.asPortMode())
-        .setDefaultValue(this.defaultValue)
-        .addAllPinNumber(this.pinNumber.toList())
-        .build()
 }
 
 fun GpioPortMode.asPortMode(): PortMode {
@@ -71,6 +77,24 @@ fun GpioPortMode.asPortMode(): PortMode {
         GpioPortMode.OUTPUT -> PortMode.OUTPUT
         GpioPortMode.OUTPUT_OPENDRAIN -> PortMode.OUTPUT_OPENDRAIN
         GpioPortMode.OUTPUT_OPENSOURCE -> PortMode.OUTPUT_OPENSOURCE
+    }
+}
+
+fun EventMode.asGpioEventMode(): GpioEventMode {
+    return when (this) {
+        EventMode.RISING -> GpioEventMode.RISING
+        EventMode.FALLING -> GpioEventMode.FALLING
+        EventMode.BOTH -> GpioEventMode.BOTH
+        else -> GpioEventMode.NONE
+    }
+}
+
+fun GpioEventMode.asEventMode(): EventMode {
+    return when (this) {
+        GpioEventMode.RISING -> EventMode.RISING
+        GpioEventMode.FALLING -> EventMode.FALLING
+        GpioEventMode.BOTH -> EventMode.BOTH
+        else -> EventMode.NONE
     }
 }
 

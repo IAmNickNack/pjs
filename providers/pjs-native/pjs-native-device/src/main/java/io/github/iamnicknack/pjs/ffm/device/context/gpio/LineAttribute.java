@@ -49,14 +49,28 @@ public record LineAttribute(
     }
 
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.JAVA_INT.withName("id"),
-        ValueLayout.JAVA_INT.withName("padding"),
-        ValueLayout.JAVA_LONG.withName("value")
+            ValueLayout.JAVA_INT.withName("id"),
+            ValueLayout.JAVA_INT.withName("padding"),
+            MemoryLayout.unionLayout(
+                    ValueLayout.JAVA_LONG.withName("flags"),
+                    ValueLayout.JAVA_LONG.withName("values"),
+                    ValueLayout.JAVA_INT.withName("debounce_period_us")
+            ).withName("union")
     );
 
     private static final VarHandle VH_ID = LAYOUT.varHandle(groupElement("id"));
-    private static final VarHandle VH_VALUE = LAYOUT.varHandle(groupElement("value"));
-
+    private static final VarHandle VH_FLAGS = LAYOUT.varHandle(
+            groupElement("union"),
+            groupElement("flags")
+    );
+    private static final VarHandle VH_VALUES = LAYOUT.varHandle(
+            groupElement("union"),
+            groupElement("values")
+    );
+    private static final VarHandle VH_DEBOUNCE = LAYOUT.varHandle(
+            groupElement("union"),
+            groupElement("debounce_period_us")
+    );
 
     public static class Serializer implements MemorySegmentSerializer<LineAttribute> {
 
@@ -75,7 +89,11 @@ public record LineAttribute(
         public MemorySegment serialize(LineAttribute data) {
             var segment = segmentAllocator.allocate(LAYOUT);
             VH_ID.set(segment, 0L, data.id.id);
-            VH_VALUE.set(segment, 0L, data.value);
+            switch (data.id) {
+                case FLAGS -> VH_FLAGS.set(segment, 0L, data.value);
+                case VALUES -> VH_VALUES.set(segment, 0L, data.value);
+                case DEBOUNCE_PERIOD_US -> VH_DEBOUNCE.set(segment, 0L, (int)data.value);
+            }
             return segment;
         }
     }
@@ -89,9 +107,14 @@ public record LineAttribute(
 
         @Override
         public LineAttribute deserialize(MemorySegment segment) {
+            var id = Id.fromId((int) VH_ID.get(segment, 0L));
             return new LineAttribute(
-                    Id.fromId((int) VH_ID.get(segment, 0L)),
-                    (long) VH_VALUE.get(segment, 0L)
+                    id,
+                    switch (id) {
+                        case FLAGS -> (long) VH_FLAGS.get(segment, 0L);
+                        case VALUES -> (long) VH_VALUES.get(segment, 0L);
+                        case DEBOUNCE_PERIOD_US -> (int)VH_DEBOUNCE.get(segment, 0L);
+                    }
             );
         }
     }

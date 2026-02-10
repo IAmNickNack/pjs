@@ -12,15 +12,7 @@ import io.github.iamnicknack.pjs.logging.LoggingDeviceRegistry;
 import io.github.iamnicknack.pjs.mock.MockDeviceRegistry;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
 import io.github.iamnicknack.pjs.pi4j.Pi4jDeviceRegistryLoader;
-import io.github.iamnicknack.pjs.sandbox.example.EepromExample;
-import io.github.iamnicknack.pjs.sandbox.example.GpioExample;
-import io.github.iamnicknack.pjs.sandbox.example.I2CExample;
-import io.github.iamnicknack.pjs.sandbox.example.McpInterruptExample;
-import io.github.iamnicknack.pjs.sandbox.example.OledExample;
-import io.github.iamnicknack.pjs.sandbox.example.PwmExample;
-import io.github.iamnicknack.pjs.sandbox.example.SevenSegmentExample;
-import io.github.iamnicknack.pjs.sandbox.example.SpiExample;
-import io.github.iamnicknack.pjs.sandbox.example.ThreeToEightExample;
+import io.github.iamnicknack.pjs.sandbox.example.*;
 import io.github.iamnicknack.pjs.util.args.CommandLineParser;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
@@ -48,6 +40,7 @@ public class Main {
             .arg(PWM_EXAMPLE)
             .arg(MCP_EXAMPLE)
             .arg(OLED_EXAMPLE)
+            .arg(DEBOUNCE_EXAMPLE)
             .arg(PI4J_MODE)
             .arg(LOGGING)
             .arg(HELP)
@@ -108,6 +101,8 @@ public class Main {
                 example = new McpInterruptExample(registryDelegate);
             } else if (commandLineArgs.flag(OLED_EXAMPLE.getName())) {
                 example = new OledExample(registryDelegate);
+            } else if (commandLineArgs.flag(DEBOUNCE_EXAMPLE.getName())) {
+                example = new DebounceExample(registryDelegate);
             } else {
                 example = () -> logger.info("No example selected");
             }

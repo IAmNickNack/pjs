@@ -13,13 +13,13 @@ public class GpioExample implements Runnable {
     private static final GpioPortConfig INPUT_CONFIG = GpioPortConfig.builder()
             .id("GPIO-INPUT")
             .pin(22)
-            .mode(GpioPortMode.INPUT)
+            .portMode(GpioPortMode.INPUT)
             .build();
 
     private static final GpioPortConfig OUTPUT_CONFIG = GpioPortConfig.builder()
             .id("GPIO-OUTPUT")
             .pin(1, 27)
-            .mode(GpioPortMode.OUTPUT)
+            .portMode(GpioPortMode.OUTPUT)
             .build();
 
     private static final int DELAY = 250;

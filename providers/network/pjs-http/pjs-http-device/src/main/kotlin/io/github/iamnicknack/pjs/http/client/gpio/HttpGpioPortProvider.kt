@@ -17,7 +17,9 @@ class HttpGpioPortProvider(
 
     fun GpioPortConfig.asGpioPortConfigPayload() = GpioPortHandler.GpioPortConfigPayload(
         this.pinNumber,
-        this.mode,
-        this.defaultValue
+        this.portMode,
+        this.eventMode,
+        this.defaultValue,
+        this.debounceDelay
     )
 }

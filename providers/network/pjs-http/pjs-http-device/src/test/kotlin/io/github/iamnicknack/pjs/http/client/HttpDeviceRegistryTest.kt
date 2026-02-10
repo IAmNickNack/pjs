@@ -22,7 +22,7 @@ class HttpDeviceRegistryTest {
         val id = "test-device"
 
         return listOf<Pair<Class<*>, (DeviceRegistry) -> Unit>>(
-            GpioPort::class.java to { it.create(GpioPortConfig.builder().id(id).mode(GpioPortMode.OUTPUT).pin(1).build()) },
+            GpioPort::class.java to { it.create(GpioPortConfig.builder().id(id).portMode(GpioPortMode.OUTPUT).pin(1).build()) },
             Spi::class.java to { it.create(SpiConfig.builder().id(id).build()) },
             I2C::class.java to { it.create(I2CConfig.builder().id(id).build()) },
             PwmConfig::class.java to { it.create(PwmConfig.builder().id(id).build()) }

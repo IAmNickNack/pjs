@@ -34,7 +34,7 @@ public class FileOperationsImpl implements FileOperations {
         var path = nativeContext.allocateFrom(pathname);
         if ((flags & Flags.O_CREAT) != 0) {
             var mode = 0644;
-            return (int) openCreate.call(path, flags, mode); // Default mode if not specified
+            return (int) openCreate.call(path, flags, mode); // Default portMode if not specified
         } else {
             return (int) open.call(path, flags);
         }
@@ -102,7 +102,7 @@ public class FileOperationsImpl implements FileOperations {
                 ValueLayout.JAVA_INT, // return type
                 ValueLayout.ADDRESS,  // const char *pathname
                 ValueLayout.JAVA_INT, // int flags
-                ValueLayout.JAVA_INT  // mode_t mode (optional, used with O_CREAT)
+                ValueLayout.JAVA_INT  // mode_t portMode (optional, used with O_CREAT)
         );
 
         static final FunctionDescriptor OPEN = FunctionDescriptor.of(

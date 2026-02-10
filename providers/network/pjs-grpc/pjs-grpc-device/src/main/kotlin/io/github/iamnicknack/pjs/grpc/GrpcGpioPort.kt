@@ -2,7 +2,7 @@ package io.github.iamnicknack.pjs.grpc
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.EventType
+import io.github.iamnicknack.pjs.grpc.gen.v1.port.EventMode
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortConfigServiceGrpc
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortServiceGrpc
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.RemoveListenerRequest
@@ -128,17 +128,17 @@ class GrpcGpioPort(
                     "Received event: {}, {}, {}, {}",
                     value.deviceId,
                     value.listenerId,
-                    value.eventType,
+                    value.eventMode,
                     value.value
                 )
             }
             // Using NONE to indicate connection status.
             // This should maybe have a specific event type
-            if (value.eventType == EventType.NONE) {
+            if (value.eventMode == EventMode.NONE) {
                 listenerId = value.listenerId
                 connectionRendezvous.trySend(Unit)
             } else {
-                val event = GpioChangeEvent(device, value.eventType.asGpioChangeEventType())
+                val event = GpioChangeEvent(device, value.eventMode.asGpioChangeEventType())
                 eventListener.onEvent(event)
             }
         }
@@ -155,10 +155,10 @@ class GrpcGpioPort(
             logger.info("Event stream completed on device: {}", device.config.id)
         }
 
-        private fun EventType.asGpioChangeEventType(): GpioChangeEventType {
+        private fun EventMode.asGpioChangeEventType(): GpioChangeEventType {
             return when(this) {
-                EventType.RISING -> GpioChangeEventType.RISING
-                EventType.FALLING -> GpioChangeEventType.FALLING
+                EventMode.RISING -> GpioChangeEventType.RISING
+                EventMode.FALLING -> GpioChangeEventType.FALLING
                 else -> GpioChangeEventType.NONE
             }
         }

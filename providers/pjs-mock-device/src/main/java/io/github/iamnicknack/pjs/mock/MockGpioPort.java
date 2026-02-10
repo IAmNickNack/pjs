@@ -69,7 +69,7 @@ public class MockGpioPort implements GpioPort {
      * @param value the new value
      */
     public void mockValue(int value) {
-        if (config.mode().isSet(GpioPortMode.INPUT)) {
+        if (config.portMode().isSet(GpioPortMode.INPUT)) {
             var eventType = eventTypeForValue(value);
             if (eventType != GpioChangeEventType.NONE) {
                 logger.debug("Mocking value change on port {}: {} -> {}", config.id(), portValue, value);
