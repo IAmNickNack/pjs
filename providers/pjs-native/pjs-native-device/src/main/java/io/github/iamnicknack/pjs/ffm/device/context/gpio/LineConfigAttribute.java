@@ -11,6 +11,9 @@ import java.lang.foreign.SegmentAllocator;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.VarHandle;
 
+/**
+ * @see <a href="https://github.com/torvalds/linux/blob/master/include/uapi/linux/gpio.h#L148-L151>gpio_v2_line_config_attribute (GitHub))</a>
+ */
 @SerializeUsing(LineConfigAttribute.Serializer.class)
 @DeserializeUsing(LineConfigAttribute.Deserializer.class)
 public record LineConfigAttribute(

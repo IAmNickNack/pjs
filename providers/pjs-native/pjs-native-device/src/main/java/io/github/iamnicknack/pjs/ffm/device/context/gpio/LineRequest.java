@@ -15,6 +15,9 @@ import java.util.Arrays;
 
 import static java.lang.foreign.MemoryLayout.PathElement.groupElement;
 
+/**
+ * @see <a href="https://github.com/torvalds/linux/blob/master/include/uapi/linux/gpio.h#L195-L204">gpio_v2_line_request (GitHub)</a>
+ */
 @SerializeUsing(LineRequest.Serializer.class)
 @DeserializeUsing(LineRequest.Deserializer.class)
 public record LineRequest(

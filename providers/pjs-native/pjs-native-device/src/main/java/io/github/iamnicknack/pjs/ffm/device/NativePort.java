@@ -61,6 +61,8 @@ class NativePort implements GpioPort, AutoCloseable {
         boolean softwareDebounce = System.getProperty("pjs.gpio.debounce.software", "true")
                 .equalsIgnoreCase("true");
 
+        logger.debug("GPIO debounce software filter is {}", softwareDebounce ? "enabled" : "disabled");
+
         if (config.eventMode() != GpioEventMode.NONE) {
             this.eventPoller = new EventPoller(
                     fileDescriptor.fd(),
