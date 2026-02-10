@@ -29,9 +29,8 @@ import java.util.function.Predicate;
 /**
  * A GPIO port that uses native IOCTL calls to read and write pin values
  * <p>
- * Software debounce is enabled by default, but can be disabled by setting the system property
- * `pjs.gpio.debounce.software` to `false`. This is kind of hacky, but is a compromise while
- * the hardware debounce implementation remains questionable.
+ * Software debounce is disabled by default, but can be enabled by setting the system property
+ * `pjs.gpio.debounce.software` to `true`. This is kind of hacky.
  * <ul>
  *     <li>Maybe this toggle should be part of the {@link GpioPortConfig}
  *     <li>Which properties should/could be `system properties` and which ought to
@@ -58,8 +57,9 @@ class NativePort implements GpioPort, AutoCloseable {
         this.fileDescriptor = fileDescriptor;
         this.ioctlOperations = new IoctlOperationsImpl(nativeContext);
 
-        boolean softwareDebounce = System.getProperty("pjs.gpio.debounce.software", "true")
+        boolean softwareDebounce = System.getProperty("pjs.gpio.debounce.software", "false")
                 .equalsIgnoreCase("true");
+        logger.debug("GPIO debounce software filter is {}", softwareDebounce ? "enabled" : "disabled");
 
         logger.debug("GPIO debounce software filter is {}", softwareDebounce ? "enabled" : "disabled");
 
