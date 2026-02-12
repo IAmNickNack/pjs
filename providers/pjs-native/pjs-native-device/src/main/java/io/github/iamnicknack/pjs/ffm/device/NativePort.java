@@ -61,8 +61,6 @@ class NativePort implements GpioPort, AutoCloseable {
                 .equalsIgnoreCase("true");
         logger.debug("GPIO debounce software filter is {}", softwareDebounce ? "enabled" : "disabled");
 
-        logger.debug("GPIO debounce software filter is {}", softwareDebounce ? "enabled" : "disabled");
-
         if (config.eventMode() != GpioEventMode.NONE) {
             this.eventPoller = new EventPoller(
                     fileDescriptor.fd(),
@@ -104,7 +102,9 @@ class NativePort implements GpioPort, AutoCloseable {
 
     @Override
     public void close() {
-        eventPollingExecutorService.shutdownNow();
+        if (eventPollingExecutorService != null) {
+            eventPollingExecutorService.shutdownNow();
+        }
         logger.debug("Closing GPIO port with file descriptor: {}", fileDescriptor.fd());
         fileDescriptor.close();
     }

@@ -2,6 +2,7 @@ package io.github.iamnicknack.pjs.ffm.device;
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
+import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortProvider;
 import io.github.iamnicknack.pjs.ffm.context.NativeContext;
 import io.github.iamnicknack.pjs.ffm.device.context.*;
@@ -102,10 +103,17 @@ public class NativePortProvider implements GpioPortProvider {
                 config.debounceDelay()
         );
 
-        var debounceAttr = new LineAttribute(LineAttribute.Id.DEBOUNCE_PERIOD_US, (eventFlags != 0) ? config.debounceDelay() : 0);
-        var mask = GpioPinMask.packBits(config.pinNumber());
-        var debounceConfig = new LineConfigAttribute(debounceAttr, mask);
-        var lineConfig = new LineConfig(modeFlags | eventFlags, new LineConfigAttribute[] { debounceConfig });
+        LineConfigAttribute[] attributes;
+        if (config.portMode().isSet(GpioPortMode.INPUT)) {
+            var debounceAttr = new LineAttribute(LineAttribute.Id.DEBOUNCE_PERIOD_US, (eventFlags != 0) ? config.debounceDelay() : 0);
+            var mask = GpioPinMask.packBits(config.pinNumber());
+            var debounceConfig = new LineConfigAttribute(debounceAttr, mask);
+            attributes = new LineConfigAttribute[] { debounceConfig };
+        } else {
+            attributes = new LineConfigAttribute[0];
+        }
+
+        var lineConfig = new LineConfig(modeFlags | eventFlags, attributes);
         return new LineRequest(config.pinNumber(), config.id(), lineConfig, 0, 0);
     }
 }
