@@ -9,6 +9,7 @@ import io.github.iamnicknack.pjs.ffm.device.context.FileOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.FileOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.device.context.spi.SpiConstants;
+import io.github.iamnicknack.pjs.logging.LoggingSpi;
 
 public class NativeSpiProvider implements SpiProvider {
 
@@ -40,6 +41,7 @@ public class NativeSpiProvider implements SpiProvider {
 
     @Override
     public SpiTransfer createTransfer(Spi spi) {
-        return ((NativeSpi)spi).new Transfer();
+        var delegateSpi = (spi instanceof LoggingSpi loggingSpi) ? loggingSpi.getDelegate() : spi;
+        return ((NativeSpi)delegateSpi).new Transfer();
     }
 }
