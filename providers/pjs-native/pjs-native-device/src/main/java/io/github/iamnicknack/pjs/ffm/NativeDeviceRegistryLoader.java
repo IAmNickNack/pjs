@@ -1,5 +1,6 @@
 package io.github.iamnicknack.pjs.ffm;
 
+import io.github.iamnicknack.pjs.ffm.context.DefaultNativeContext;
 import io.github.iamnicknack.pjs.ffm.context.NativeContext;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader;
@@ -20,6 +21,6 @@ public class NativeDeviceRegistryLoader implements DeviceRegistryLoader {
 
     @Override
     public @Nullable DeviceRegistry load(Map<String, Object> properties) {
-        return new NativeDeviceRegistry(new NativeContext(Arena.ofAuto()));
+        return new NativeDeviceRegistry(new DefaultNativeContext(Arena.ofAuto()));
     }
 }

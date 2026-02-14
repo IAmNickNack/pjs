@@ -1,5 +1,6 @@
 package io.github.iamnicknack.pjs.ffm.device.context;
 
+import io.github.iamnicknack.pjs.ffm.context.DefaultNativeContext;
 import io.github.iamnicknack.pjs.ffm.context.method.MethodCaller;
 import io.github.iamnicknack.pjs.ffm.context.NativeContext;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapper;
@@ -22,7 +23,7 @@ public class IoctlOperationsImpl implements IoctlOperations {
     }
 
     public IoctlOperationsImpl(SegmentAllocator segmentAllocator) {
-        this(new NativeContext(segmentAllocator));
+        this(new DefaultNativeContext(segmentAllocator));
     }
 
     @Override

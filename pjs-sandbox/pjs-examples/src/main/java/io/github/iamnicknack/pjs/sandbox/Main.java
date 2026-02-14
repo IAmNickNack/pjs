@@ -5,7 +5,7 @@ import com.pi4j.plugin.ffm.FFMPlugin;
 import com.pi4j.plugin.mock.MockPlugin;
 import io.github.iamnicknack.pi4j.grpc.client.GrpcPlugin;
 import io.github.iamnicknack.pjs.ffm.NativeDeviceRegistry;
-import io.github.iamnicknack.pjs.ffm.context.NativeContext;
+import io.github.iamnicknack.pjs.ffm.context.DefaultNativeContext;
 import io.github.iamnicknack.pjs.grpc.GrpcDeviceRegistry;
 import io.github.iamnicknack.pjs.http.client.HttpDeviceRegistry;
 import io.github.iamnicknack.pjs.logging.LoggingDeviceRegistry;
@@ -65,7 +65,7 @@ public class Main {
                 yield new GrpcDeviceRegistry(channel);
             }
             case "http" -> new HttpDeviceRegistry("http://" + commandLineArgs.value(GRPC_HOST) + ":" + commandLineArgs.value(GRPC_PORT) + "/");
-            case "ffm" -> new NativeDeviceRegistry(new NativeContext(Arena.ofAuto()));
+            case "ffm" -> new NativeDeviceRegistry(new DefaultNativeContext(Arena.ofAuto()));
             case "pi4j" -> {
                 Class<? extends Plugin> pluginClass = switch (commandLineArgs.valueOrNull(PI4J_MODE)) {
                     case "mock" -> MockPlugin.class;
@@ -102,7 +102,7 @@ public class Main {
             } else if (commandLineArgs.flag(OLED_EXAMPLE.getName())) {
                 example = new OledExample(registryDelegate);
             } else if (commandLineArgs.flag(DEBOUNCE_EXAMPLE.getName())) {
-                example = new DebounceExample(registryDelegate);
+                example = new DebounceTester(registryDelegate);
             } else {
                 example = () -> logger.info("No example selected");
             }

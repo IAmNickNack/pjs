@@ -1,6 +1,6 @@
 package io.github.iamnicknack.pjs.ffm.device.context;
 
-import io.github.iamnicknack.pjs.ffm.context.NativeContext;
+import io.github.iamnicknack.pjs.ffm.context.DefaultNativeContext;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Disabled
 class FileOperationsImplTest {
 
-    private final FileOperations fileOperations = new FileOperationsImpl(new NativeContext(Arena.ofAuto()));
+    private final FileOperations fileOperations = new FileOperationsImpl(new DefaultNativeContext(Arena.ofAuto()));
 
     @AfterAll
     static void afterAll() {
