@@ -4,6 +4,7 @@ module pjs.ffm {
     requires org.slf4j;
     requires org.jspecify;
     requires pjs.util;
+    requires java.desktop;
 
     exports io.github.iamnicknack.pjs.ffm;
 }

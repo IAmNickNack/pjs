@@ -17,7 +17,7 @@ class LineConfigTest {
         var configAttribute = new LineConfigAttribute(attr, 1 << 15);
         var config = new LineConfig(1, new LineConfigAttribute[] { configAttribute });
         var segment = mapper.segment(config);
-        var deserialisedConfig = mapper.convertValue(segment, LineConfig.class);
+        var deserialisedConfig = mapper.value(segment, LineConfig.class);
         Assertions.assertThat(deserialisedConfig).isEqualTo(config);
     }
 }

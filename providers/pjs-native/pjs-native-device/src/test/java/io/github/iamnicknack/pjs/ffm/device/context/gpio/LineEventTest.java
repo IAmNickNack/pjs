@@ -20,7 +20,7 @@ class LineEventTest {
     void canWriteRead() {
         var lineEvent = new LineEvent(1, 2, 3, 4, 5);
         var segment = mapper.segment(lineEvent);
-        var deserialisedLineEvent = mapper.convertValue(segment, LineEvent.class);
+        var deserialisedLineEvent = mapper.value(segment, LineEvent.class);
 
         assertThat(deserialisedLineEvent).isEqualTo(lineEvent);
     }
@@ -34,7 +34,7 @@ class LineEventTest {
         assertThat(bytes.length).isEqualTo(LineEvent.LAYOUT.byteSize());
 
         var bytesSegment = allocator.allocateFrom(ValueLayout.JAVA_BYTE, bytes);
-        var deserialisedLineEvent = mapper.convertValue(bytesSegment, LineEvent.class);
+        var deserialisedLineEvent = mapper.value(bytesSegment, LineEvent.class);
 
         assertThat(deserialisedLineEvent).isEqualTo(lineEvent);
     }

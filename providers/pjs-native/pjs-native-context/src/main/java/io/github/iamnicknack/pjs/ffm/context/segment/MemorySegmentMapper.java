@@ -11,7 +11,7 @@ public interface MemorySegmentMapper {
      * @return the converted value
      * @param <T> the target type
      */
-    <T> T convertValue(MemorySegment segment, Class<T> targetType);
+    <T> T value(MemorySegment segment, Class<T> targetType);
 
     /**
      * Write a value to a MemorySegment, converting it from the specified source type.

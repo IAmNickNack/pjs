@@ -14,7 +14,7 @@ class LineAttributeTest {
     void canSerialiseFlags() {
         var attr = new LineAttribute(LineAttribute.Id.FLAGS, 1);
         var segment = mapper.segment(attr);
-        var deserialisedAttr = mapper.convertValue(segment, LineAttribute.class);
+        var deserialisedAttr = mapper.value(segment, LineAttribute.class);
         assert attr.equals(deserialisedAttr);
     }
 
@@ -22,7 +22,7 @@ class LineAttributeTest {
     void canSerialiseValues() {
         var attr = new LineAttribute(LineAttribute.Id.VALUES, 7);
         var segment = mapper.segment(attr);
-        var deserialisedAttr = mapper.convertValue(segment, LineAttribute.class);
+        var deserialisedAttr = mapper.value(segment, LineAttribute.class);
         assert attr.equals(deserialisedAttr);
     }
 
@@ -30,7 +30,7 @@ class LineAttributeTest {
     void canSerialiseDebouncePeriod() {
         var attr = new LineAttribute(LineAttribute.Id.DEBOUNCE_PERIOD_US, 50_000);
         var segment = mapper.segment(attr);
-        var deserialisedAttr = mapper.convertValue(segment, LineAttribute.class);
+        var deserialisedAttr = mapper.value(segment, LineAttribute.class);
         assert attr.equals(deserialisedAttr);
     }
 

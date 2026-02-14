@@ -23,7 +23,7 @@ class LineRequestTest {
         );
 
         var segment = mapper.segment(original, LineRequest.class);
-        var restored = mapper.convertValue(segment, LineRequest.class);
+        var restored = mapper.value(segment, LineRequest.class);
 
         Assertions.assertThat(restored.offsets()).containsExactly(original.offsets());
         Assertions.assertThat(restored.consumer()).isEqualTo(original.consumer());

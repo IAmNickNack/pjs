@@ -16,7 +16,7 @@ class PollTest {
     void canSerialise() {
         var poll = new Poll(1, 2, 3);
         var segment = mapper.segment(poll);
-        var deserialisedPoll = mapper.convertValue(segment, Poll.class);
+        var deserialisedPoll = mapper.value(segment, Poll.class);
 
         assertThat(deserialisedPoll).isEqualTo(poll);
 

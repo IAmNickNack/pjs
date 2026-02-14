@@ -10,6 +10,10 @@ public interface IoctlOperations {
      */
     int ioctl(int fd, long command, int data);
 
+    default int ioctl(FileDescriptor fd, long command, int data) {
+        return ioctl(fd.fd(), command, data);
+    }
+
     /**
      * Perform an ioctl read/write-like operation with arbitrary data passed by reference.
      * @param fd the spi device file descriptor
@@ -21,6 +25,10 @@ public interface IoctlOperations {
      */
     <T> T ioctl(int fd, long command, T data, Class<T> type);
 
+    default <T> T ioctl(FileDescriptor fd, long command, T data, Class<T> type) {
+        return ioctl(fd.fd(), command, data, type);
+    }
+
     /**
      * Perform an ioctl read/write-like operation with arbitrary data passed by reference.
      * @param fd the spi device file descriptor
@@ -31,6 +39,10 @@ public interface IoctlOperations {
      */
     <T> T ioctl(int fd, long command, T data);
 
+    default <T> T ioctl(FileDescriptor fd, long command, T data) {
+        return ioctl(fd.fd(), command, data);
+    }
+
     /**
      * Perform an ioctl read-like operation.
      * @param fd the spi device file descriptor
@@ -40,4 +52,8 @@ public interface IoctlOperations {
      * @param <T> the type of data
      */
     <T> T ioctl(int fd, long command, Class<T> type);
+
+    default <T> T ioctl(FileDescriptor fd, long command, Class<T> type) {
+        return ioctl(fd.fd(), command, type);
+    }
 }
