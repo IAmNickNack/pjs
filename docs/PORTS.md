@@ -7,8 +7,8 @@ the underlying transport mechanism.
 
 For example:
 * GPIO is a `Port`
-* I2C _can be_ one or manmy `Port`s
-* SPI _can be_ one or manmy `Port`s
+* I2C _can be_ one or many `Port`s
+* SPI _can be_ one or many `Port`s
 * PWM can even be interpreted as a collection of ports which expose frequency, duty cycle, etc. 
 
 ## SerialPort
