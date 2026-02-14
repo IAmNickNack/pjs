@@ -26,7 +26,7 @@ public class GpioOperationsImpl implements GpioOperations {
     @Override
     public ChipInfo chipInfo(String devicePath) {
         try(var fd = fileOperations.openFd(devicePath, Flags.O_RDONLY | Flags.O_CLOEXEC)) {
-            return ioctlOperations.ioctl(fd.fd(), GpioConstants.GPIO_GET_CHIPINFO_IOCTL, ChipInfo.class);
+            return ioctlOperations.ioctl(fd, GpioConstants.GPIO_GET_CHIPINFO_IOCTL, ChipInfo.class);
         }
     }
 
@@ -35,7 +35,7 @@ public class GpioOperationsImpl implements GpioOperations {
         try (var fd = fileOperations.openFd(chipInfo.getPath(), Flags.O_RDONLY | Flags.O_CLOEXEC)) {
             return IntStream.range(0, chipInfo.lines())
                     .mapToObj(line -> ioctlOperations.ioctl(
-                            fd.fd(),
+                            fd,
                             GpioConstants.GPIO_V2_GET_LINEINFO_IOCTL,
                             LineInfo.ofOffset(line),
                             LineInfo.class
@@ -48,7 +48,7 @@ public class GpioOperationsImpl implements GpioOperations {
     public LineInfo lineInfo(ChipInfo chipInfo, int offset) {
         try (var fd = fileOperations.openFd(chipInfo.getPath(), Flags.O_RDONLY | Flags.O_CLOEXEC)) {
             return ioctlOperations.ioctl(
-                    fd.fd(),
+                    fd,
                     GpioConstants.GPIO_V2_GET_LINEINFO_IOCTL,
                     LineInfo.ofOffset(offset),
                     LineInfo.class
