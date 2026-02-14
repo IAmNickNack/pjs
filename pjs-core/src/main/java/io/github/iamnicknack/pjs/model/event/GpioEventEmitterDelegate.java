@@ -18,22 +18,24 @@ public class GpioEventEmitterDelegate<T extends GpioEventEmitter<T>>
     private final Set<GpioEventListener<T>> listeners = new CopyOnWriteArraySet<>();
 
     /**
-     * Top-level executor used to forward events.
-     */
-    private final ExecutorService eventExecutor = new DirectExecutorService();
-    /**
      * Executor used to invoke listeners within an event-forwarding operation.
      */
-    private final ExecutorService listenerExecutor = eventExecutor;
-
-//    private final ExecutorService eventExecutor = Executors.newSingleThreadExecutor();
-//    private final ExecutorService listenerExecutor = Executors.newVirtualThreadPerTaskExecutor();
+    private final ExecutorService listenerExecutor;
 
     public GpioEventEmitterDelegate() {
-        // do nothing
+        this(new DirectExecutorService());
+    }
+
+    public GpioEventEmitterDelegate(ExecutorService listenerExecutor) {
+        this.listenerExecutor = listenerExecutor;
     }
 
     public GpioEventEmitterDelegate(GpioEventEmitter<T> delegate) {
+        this(delegate, new DirectExecutorService());
+    }
+
+    public GpioEventEmitterDelegate(GpioEventEmitter<T> delegate, ExecutorService listenerExecutor) {
+        this.listenerExecutor = listenerExecutor;
         delegate.addListener(this);
     }
 
@@ -57,25 +59,21 @@ public class GpioEventEmitterDelegate<T extends GpioEventEmitter<T>>
             return;
         }
 
-        eventExecutor.submit(() -> {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Forwarding event: {}", event);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Forwarding event: {}", event);
+        }
+        listeners.forEach(l -> listenerExecutor.submit(() -> {
+            try {
+                l.onEvent(event);
+            } catch (Exception ex) {
+                logger.error("Failed to forward event: {}", event, ex);
             }
-            listeners.forEach(l -> listenerExecutor.submit(() -> {
-                try {
-                    l.onEvent(event);
-                } catch (Exception ex) {
-                    logger.error("Failed to forward event: {}", event, ex);
-                }
-            }));
-        });
+        }));
     }
 
     @Override
     public void close() throws Exception {
-        eventExecutor.shutdown();
         listenerExecutor.shutdown();
-        eventExecutor.awaitTermination(1, java.util.concurrent.TimeUnit.SECONDS);
         listenerExecutor.awaitTermination(1, java.util.concurrent.TimeUnit.SECONDS);
     }
 }
