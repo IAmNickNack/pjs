@@ -18,22 +18,40 @@ public class GpioEventEmitterDelegate<T extends GpioEventEmitter<T>>
     private final Set<GpioEventListener<T>> listeners = new CopyOnWriteArraySet<>();
 
     /**
-     * Top-level executor used to forward events.
-     */
-    private final ExecutorService eventExecutor = new DirectExecutorService();
-    /**
      * Executor used to invoke listeners within an event-forwarding operation.
      */
-    private final ExecutorService listenerExecutor = eventExecutor;
+    private final ExecutorService listenerExecutor;
 
-//    private final ExecutorService eventExecutor = Executors.newSingleThreadExecutor();
-//    private final ExecutorService listenerExecutor = Executors.newVirtualThreadPerTaskExecutor();
-
+    /**
+     * Handles events on the current thread
+     */
     public GpioEventEmitterDelegate() {
-        // do nothing
+        this(new DirectExecutorService());
     }
 
+    /**
+     * Dispatches events on the provided executor
+     * @param listenerExecutor the executor to use for event dispatching
+     */
+    public GpioEventEmitterDelegate(ExecutorService listenerExecutor) {
+        this.listenerExecutor = listenerExecutor;
+    }
+
+    /**
+     * Handle events from the provided delegate on the current thread.
+     * @param delegate the delegate to handle events from.
+     */
     public GpioEventEmitterDelegate(GpioEventEmitter<T> delegate) {
+        this(new DirectExecutorService(), delegate);
+    }
+
+    /**
+     * Handle events from the provided delegate on the provided executor.
+     * @param listenerExecutor the executor to use for event dispatching.
+     * @param delegate the delegate to handle events from.
+     */
+    public GpioEventEmitterDelegate(ExecutorService listenerExecutor, GpioEventEmitter<T> delegate) {
+        this.listenerExecutor = listenerExecutor;
         delegate.addListener(this);
     }
 
@@ -57,25 +75,21 @@ public class GpioEventEmitterDelegate<T extends GpioEventEmitter<T>>
             return;
         }
 
-        eventExecutor.submit(() -> {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Forwarding event: {}", event);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Forwarding event: {}", event);
+        }
+        listeners.forEach(l -> listenerExecutor.submit(() -> {
+            try {
+                l.onEvent(event);
+            } catch (Exception ex) {
+                logger.error("Failed to forward event: {}", event, ex);
             }
-            listeners.forEach(l -> listenerExecutor.submit(() -> {
-                try {
-                    l.onEvent(event);
-                } catch (Exception ex) {
-                    logger.error("Failed to forward event: {}", event, ex);
-                }
-            }));
-        });
+        }));
     }
 
     @Override
     public void close() throws Exception {
-        eventExecutor.shutdown();
         listenerExecutor.shutdown();
-        eventExecutor.awaitTermination(1, java.util.concurrent.TimeUnit.SECONDS);
         listenerExecutor.awaitTermination(1, java.util.concurrent.TimeUnit.SECONDS);
     }
 }
