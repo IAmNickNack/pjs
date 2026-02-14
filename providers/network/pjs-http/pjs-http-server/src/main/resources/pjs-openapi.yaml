@@ -546,6 +546,9 @@ components:
         defaultValue:
           type: "integer"
           format: "int32"
+        debounceDelay:
+          type: "integer"
+          format: "int32"
       required:
         - pinNumber
         - mode

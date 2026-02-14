@@ -23,6 +23,7 @@ import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import io.github.iamnicknack.pjs.server.ConfigurableDeviceRegistryProvider
 import io.github.iamnicknack.pjs.server.DeviceRegistryProvider
 import io.github.iamnicknack.pjs.server.ServerConfiguration
+import io.github.iamnicknack.pjs.util.StartupUtils
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -37,7 +38,7 @@ import org.koin.ktor.ext.get
 import org.koin.ktor.plugin.Koin
 
 fun main(args: Array<String>) {
-
+    StartupUtils.loadApplicationProperties()
     val config = ServerConfiguration.createFromCommandLine(args)
     if (config.help) {
         ServerConfiguration.parser.help(System.out)
