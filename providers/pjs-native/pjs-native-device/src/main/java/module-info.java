@@ -7,4 +7,6 @@ module pjs.ffm {
     requires java.desktop;
 
     exports io.github.iamnicknack.pjs.ffm;
+
+    uses io.github.iamnicknack.pjs.ffm.context.NativeContext;
 }

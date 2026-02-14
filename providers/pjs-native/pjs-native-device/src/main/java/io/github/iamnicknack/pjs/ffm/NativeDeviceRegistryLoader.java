@@ -6,9 +6,9 @@ import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader;
 import org.jspecify.annotations.Nullable;
 
-import java.lang.foreign.Arena;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ServiceLoader;
 
 public class NativeDeviceRegistryLoader implements DeviceRegistryLoader {
 
@@ -21,6 +21,10 @@ public class NativeDeviceRegistryLoader implements DeviceRegistryLoader {
 
     @Override
     public @Nullable DeviceRegistry load(Map<String, Object> properties) {
-        return new NativeDeviceRegistry(new DefaultNativeContext(Arena.ofAuto()));
+        var context = ServiceLoader.load(NativeContext.class, NativeContext.class.getClassLoader()).stream()
+                .findFirst()
+                .map(ServiceLoader.Provider::get)
+                .orElseGet(DefaultNativeContext::new);
+        return new NativeDeviceRegistry(context);
     }
 }

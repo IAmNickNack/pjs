@@ -6,6 +6,7 @@ import io.github.iamnicknack.pjs.ffm.context.method.MethodCallerFactory;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapper;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapperImpl;
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.Linker;
 import java.lang.foreign.SegmentAllocator;
 import java.lang.foreign.SymbolLookup;
@@ -22,6 +23,10 @@ public class DefaultNativeContext implements NativeContext {
     private final MethodCallerFactory methodCallerFactory;
 
     private final MethodCallerFactory capturedStateMethodCallerFactory;
+
+    public DefaultNativeContext() {
+        this(Arena.ofAuto());
+    }
 
     public DefaultNativeContext(SegmentAllocator segmentAllocator) {
         this(segmentAllocator, Linker.nativeLinker().defaultLookup(), new MemorySegmentMapperImpl(segmentAllocator));
