@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
+import static io.github.iamnicknack.pjs.ffm.device.context.FileOperationsImplTest.defaultFileOperations;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class GpioOperationsImplTest {
@@ -23,7 +24,7 @@ class GpioOperationsImplTest {
     @Test
     void canReadChipInfo() {
         performTest(
-                builder -> defaultOperations("canReadChipInfo").apply(builder)
+                builder -> defaultFileOperations("canReadChipInfo").apply(builder)
                         .addMethodCaller("ioctl", IoctlOperationsImpl.Descriptors.IOCTL_INT_BY_REFERENCE, args -> {
                             assertThat(args[0]).isEqualTo(1);
                             assertThat(args[1]).isEqualTo(GpioConstants.GPIO_GET_CHIPINFO_IOCTL);
@@ -40,7 +41,7 @@ class GpioOperationsImplTest {
     @Test
     void canReaLines() {
         performTest(
-                builder -> defaultOperations("/dev/chip name").apply(builder)
+                builder -> defaultFileOperations("/dev/chip name").apply(builder)
                         .addMethodCaller("ioctl", IoctlOperationsImpl.Descriptors.IOCTL_INT_BY_REFERENCE, args -> {
                             assertThat(args[0]).isEqualTo(1);
                             assertThat(args[1]).isEqualTo(GpioConstants.GPIO_V2_GET_LINEINFO_IOCTL);
@@ -62,7 +63,7 @@ class GpioOperationsImplTest {
     @Test
     void canReadLine() {
         performTest(
-                builder -> defaultOperations("/dev/chip name").apply(builder)
+                builder -> defaultFileOperations("/dev/chip name").apply(builder)
                         .addMethodCaller("ioctl", IoctlOperationsImpl.Descriptors.IOCTL_INT_BY_REFERENCE, args -> {
                             assertThat(args[0]).isEqualTo(1);
                             assertThat(args[1]).isEqualTo(GpioConstants.GPIO_V2_GET_LINEINFO_IOCTL);
@@ -82,15 +83,7 @@ class GpioOperationsImplTest {
         );
     }
 
-    private UnaryOperator<FakeNativeContext.Builder> defaultOperations(String filename) {
-        return builder -> builder
-                .addMethodCaller("open", FileOperationsImpl.Descriptors.OPEN, args -> {
-                    assertThat(((MemorySegment)args[0]).getString(0)).isEqualTo(filename);
-                    return 1;
-                })
-                .addMethodCaller("fcntl", FileOperationsImpl.Descriptors.FCNTL, args -> 1)
-                .addMethodCaller("close", FileOperationsImpl.Descriptors.CLOSE, args -> 0);
-    }
+
 
     private void performTest(
             UnaryOperator<FakeNativeContext.Builder> configurer,

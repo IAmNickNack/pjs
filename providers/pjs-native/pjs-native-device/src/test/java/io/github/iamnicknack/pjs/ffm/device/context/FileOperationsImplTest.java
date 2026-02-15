@@ -239,4 +239,14 @@ class FileOperationsImplTest {
             methodCallerFactory.assertInvoked();
         }
     }
+
+    static UnaryOperator<FakeNativeContext.Builder> defaultFileOperations(String filename) {
+        return builder -> builder
+                .addMethodCaller("open", FileOperationsImpl.Descriptors.OPEN, args -> {
+                    assertThat(((MemorySegment)args[0]).getString(0)).isEqualTo(filename);
+                    return 1;
+                })
+                .addMethodCaller("fcntl", FileOperationsImpl.Descriptors.FCNTL, args -> 1)
+                .addMethodCaller("close", FileOperationsImpl.Descriptors.CLOSE, args -> 0);
+    }
 }
