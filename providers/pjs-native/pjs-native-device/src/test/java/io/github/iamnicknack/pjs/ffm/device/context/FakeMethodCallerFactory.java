@@ -45,7 +45,11 @@ public class FakeMethodCallerFactory implements MethodCallerFactory {
         return args -> {
             var key = new Key(name, functionDescriptor);
             invocationCounts.put(key, invocationCounts.getOrDefault(key, 0) + 1);
-            return lookup.get(key).call(args);
+            var caller = lookup.get(key);
+            assertThat(caller)
+                    .as("Method caller for %s with descriptor %s not found".formatted(name, functionDescriptor))
+                    .isNotNull();
+            return caller.call(args);
         };
     }
 
