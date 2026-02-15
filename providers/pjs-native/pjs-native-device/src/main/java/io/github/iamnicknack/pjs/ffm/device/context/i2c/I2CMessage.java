@@ -58,6 +58,15 @@ public record I2CMessage(
                 '}';
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof I2CMessage message
+                && address == message.address
+                && flags == message.flags
+                && length == message.length
+                && Arrays.equals(buffer, message.buffer);
+    }
+
     public static class Serializer implements MemorySegmentSerializer<I2CMessage> {
         private final SegmentAllocator segmentAllocator;
 
