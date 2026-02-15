@@ -10,19 +10,29 @@ import java.lang.foreign.ValueLayout;
 
 public class PollingOperationsImpl implements PollingOperations {
 
-    private final MethodCaller poll;
+    private final MethodCaller pollCaller;
     private final MemorySegmentMapper memorySegmentMapper;
 
     public PollingOperationsImpl(NativeContext nativeContext) {
-        this.poll = nativeContext.getCapturedStateMethodCallerFactory()
-                .create("poll", Descriptors.POLL);
-        this.memorySegmentMapper = nativeContext.getMemorySegmentMapper();
+        this(
+                nativeContext.getCapturedStateMethodCallerFactory()
+                        .create("poll", Descriptors.POLL),
+                nativeContext.getMemorySegmentMapper()
+        );
+    }
+
+    public PollingOperationsImpl(
+            MethodCaller pollCaller,
+            MemorySegmentMapper memorySegmentMapper
+    ) {
+        this.pollCaller = pollCaller;
+        this.memorySegmentMapper = memorySegmentMapper;
     }
 
     @Override
     public Poll poll(Poll poll, int timeout) {
         var dataMemorySegment = memorySegmentMapper.segment(poll, Poll.class);
-        this.poll.call(dataMemorySegment, 1,  timeout);
+        this.pollCaller.call(dataMemorySegment, 1,  timeout);
         return memorySegmentMapper.value(dataMemorySegment, Poll.class);
     }
 

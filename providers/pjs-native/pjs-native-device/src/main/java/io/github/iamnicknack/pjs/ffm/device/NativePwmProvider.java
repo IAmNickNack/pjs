@@ -1,15 +1,11 @@
 package io.github.iamnicknack.pjs.ffm.device;
 
-import io.github.iamnicknack.pjs.ffm.context.NativeContext;
-import io.github.iamnicknack.pjs.ffm.device.context.FileOperationsImpl;
-import io.github.iamnicknack.pjs.ffm.device.context.SysfsOperationsImpl;
 import io.github.iamnicknack.pjs.device.pwm.Pwm;
 import io.github.iamnicknack.pjs.device.pwm.PwmConfig;
 import io.github.iamnicknack.pjs.device.pwm.PwmProvider;
+import io.github.iamnicknack.pjs.ffm.device.context.SysfsOperationsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.file.Path;
 
 import static io.github.iamnicknack.pjs.ffm.device.NativePwm.ENABLE_PATH;
 
@@ -24,22 +20,22 @@ public class NativePwmProvider implements PwmProvider {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final NativeContext nativeContext;
+    private final SysfsOperationsFactory sysfsOperationsFactory;
 
-    public NativePwmProvider(NativeContext context) {
-        this.nativeContext = context;
+    public NativePwmProvider(SysfsOperationsFactory sysfsOperationsFactory) {
+        this.sysfsOperationsFactory = sysfsOperationsFactory;
     }
 
     @Override
     public Pwm create(PwmConfig config) {
-        var fs = new FileOperationsImpl(nativeContext);
+//        var fs = new FileOperationsImpl(nativeContext);
 
-        var chip = new SysfsOperationsImpl(Path.of(CHIP_PATH + config.chip()), fs);
+        var chip = sysfsOperationsFactory.createSysfsOperations(CHIP_PATH + config.chip());
         if (!chip.exists()) {
             throw new IllegalArgumentException("PWM chip " + config.chip() + " does not exist");
         }
 
-        var channel = new SysfsOperationsImpl(chip.path().resolve(PWM_PATH + config.channel()), fs);
+        var channel = sysfsOperationsFactory.createSysfsOperations(chip.path().resolve(PWM_PATH + config.channel()));
         if (!channel.exists()) {
             var pwm = chip.readInt(CHIP_NPWM_PATH);
             if (config.channel() < 0 || config.channel() >= pwm) {

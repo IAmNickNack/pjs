@@ -13,14 +13,19 @@ public class GpioOperationsImpl implements GpioOperations {
     private final FileOperations fileOperations;
     private final IoctlOperations ioctlOperations;
 
-    public GpioOperationsImpl(NativeContext nativeContext) {
-        this.fileOperations = new FileOperationsImpl(nativeContext);
-        this.ioctlOperations = new IoctlOperationsImpl(nativeContext);
-    }
-
-    public GpioOperationsImpl(FileOperations fileOperations, IoctlOperations ioctlOperations) {
+    public GpioOperationsImpl(
+            FileOperations fileOperations,
+            IoctlOperations ioctlOperations
+    ) {
         this.fileOperations = fileOperations;
         this.ioctlOperations = ioctlOperations;
+    }
+
+    public GpioOperationsImpl(NativeContext nativeContext) {
+        this(
+                new FileOperationsImpl(nativeContext),
+                new IoctlOperationsImpl(nativeContext)
+        );
     }
 
     @Override

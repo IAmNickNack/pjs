@@ -70,7 +70,7 @@ class EventPollerTest {
                     assertion.set(expectation.predicate.apply(pollEvents));
                 };
 
-                var poller = new EventPoller(
+                var poller = new EventPollerImpl(
                         1,
                         callback,
                         Duration.ZERO,

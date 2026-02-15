@@ -2,11 +2,9 @@ package io.github.iamnicknack.pjs.ffm.device;
 
 import io.github.iamnicknack.pjs.device.spi.Spi;
 import io.github.iamnicknack.pjs.device.spi.SpiConfig;
-import io.github.iamnicknack.pjs.ffm.context.NativeContext;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapper;
 import io.github.iamnicknack.pjs.ffm.device.context.FileDescriptor;
 import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperations;
-import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.device.context.spi.SpiConstants;
 import io.github.iamnicknack.pjs.ffm.device.context.spi.SpiTransfer;
 
@@ -17,19 +15,25 @@ import java.lang.foreign.ValueLayout;
 public class NativeSpi implements Spi, AutoCloseable {
 
     private final SpiConfig config;
-    private final SegmentAllocator nativeContext;
+    private final SegmentAllocator segmentAllocator;
     private final IoctlOperations ioctlOperations;
     private final FileDescriptor fileDescriptor;
     private final MemorySegmentMapper memorySegmentMapper;
     private final SpiTransfer.Serializer transferSerializer;
 
-    public NativeSpi(SpiConfig config, NativeContext context, FileDescriptor fileDescriptor) {
+    public NativeSpi(
+            SpiConfig config,
+            FileDescriptor fileDescriptor,
+            IoctlOperations ioctlOperations,
+            SegmentAllocator segmentAllocator,
+            MemorySegmentMapper memorySegmentMapper
+    ) {
         this.config = config;
-        this.nativeContext = context.getSegmentAllocator();
-        this.ioctlOperations = new IoctlOperationsImpl(context);
         this.fileDescriptor = fileDescriptor;
-        this.memorySegmentMapper = context.getMemorySegmentMapper();
-        this.transferSerializer = new SpiTransfer.Serializer(nativeContext);
+        this.segmentAllocator = segmentAllocator;
+        this.ioctlOperations = ioctlOperations;
+        this.memorySegmentMapper = memorySegmentMapper;
+        this.transferSerializer = new SpiTransfer.Serializer(segmentAllocator);
     }
 
     @Override
@@ -39,9 +43,9 @@ public class NativeSpi implements Spi, AutoCloseable {
 
     @Override
     public int transfer(byte[] write, int writeOffset, byte[] read, int readOffset, int length) {
-        var writeBufferSegment = nativeContext.allocateFrom(ValueLayout.JAVA_BYTE, write);
+        var writeBufferSegment = segmentAllocator.allocateFrom(ValueLayout.JAVA_BYTE, write);
         var outSegment = writeBufferSegment.asSlice(writeOffset, length);
-        var inSegment = nativeContext.allocate(length);
+        var inSegment = segmentAllocator.allocate(length);
 
         var transfer = SpiTransfer.builder()
                 .txBuf(outSegment)
@@ -70,8 +74,8 @@ public class NativeSpi implements Spi, AutoCloseable {
             var spiTransfers = new SpiTransfer[messages.length];
             for (int i = 0; i < messages.length; i++) {
                 var currentTransfer = messages[i];
-                var txBuffer = nativeContext.allocateFrom(ValueLayout.JAVA_BYTE, currentTransfer.sliceWrite());
-                var rxBuffer = nativeContext.allocate(currentTransfer.length());
+                var txBuffer = segmentAllocator.allocateFrom(ValueLayout.JAVA_BYTE, currentTransfer.sliceWrite());
+                var rxBuffer = segmentAllocator.allocate(currentTransfer.length());
                 spiTransfers[i] = SpiTransfer.builder()
                         .txBuf(txBuffer)
                         .rxBuf(rxBuffer)
@@ -81,7 +85,7 @@ public class NativeSpi implements Spi, AutoCloseable {
                         .build();
             }
 
-            var segment = transferSerializer.serializeArray(spiTransfers, nativeContext);
+            var segment = transferSerializer.serializeArray(spiTransfers, segmentAllocator);
             ioctlOperations.ioctl(
                     fileDescriptor,
                     SpiConstants.SPI_IOC_MESSAGE(spiTransfers.length),
