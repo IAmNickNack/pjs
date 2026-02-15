@@ -51,6 +51,13 @@ public record LineInfo(
     private static final VarHandle VH_FLAGS = LAYOUT.varHandle(groupElement("flags"));
     private static final MethodHandle MH_ATTRS = LAYOUT.sliceHandle(groupElement("attrs"));
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        var that = (LineInfo) obj;
+        return offset == that.offset && flags == that.flags && Arrays.equals(attrs, that.attrs);
+    }
 
     public static class Serializer implements MemorySegmentSerializer<LineInfo> {
         private final SegmentAllocator segmentAllocator;

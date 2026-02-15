@@ -5,6 +5,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Configuration for a GPIO port which can be used by a {@link GpioPortProvider} to construct a {@link GpioPort} instance.
@@ -28,6 +29,19 @@ public record GpioPortConfig(
 
     public int getPinMask() {
         return Arrays.stream(pinNumber).reduce(0, (acc, pin) -> acc | (1 << pin));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        GpioPortConfig that = (GpioPortConfig) obj;
+        return Arrays.equals(pinNumber, that.pinNumber)
+                && portMode == that.portMode
+                && eventMode == that.eventMode
+                && defaultValue == that.defaultValue
+                && debounceDelay == that.debounceDelay
+                && Objects.equals(id, that.id);
     }
 
     @Override

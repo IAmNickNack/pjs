@@ -28,6 +28,10 @@ public interface FileOperations {
      */
     int close(int fd);
 
+    default int close(FileDescriptor fd) {
+        return close(fd.fd());
+    }
+
     /**
      * Read from a file descriptor into a byte array.
      * @param fd the file descriptor to read from
@@ -37,6 +41,10 @@ public interface FileOperations {
      * @return the number of bytes read, or -1 on error
      */
     int read(int fd, byte[] buffer, int offset, int count);
+
+    default int read(FileDescriptor fd, byte[] buffer, int offset, int count) {
+        return read(fd.fd(), buffer, offset, count);
+    }
 
     /**
      * Read from a file descriptor into a MemorySegment, processed by a handler.
@@ -49,6 +57,10 @@ public interface FileOperations {
      */
     <T> T read(int fd, int offset, int length, BiFunction<MemorySegment, Integer, T> handler);
 
+    default <T> T read(FileDescriptor fd, int offset, int length, BiFunction<MemorySegment, Integer, T> handler) {
+        return read(fd.fd(), offset, length, handler);
+    }
+
     /**
      * Write to a file descriptor from a byte array.
      * @param fd the file descriptor to write to
@@ -58,6 +70,10 @@ public interface FileOperations {
      * @return the number of bytes written, or -1 on error
      */
     int write(int fd, byte[] buffer, int offset, int count);
+
+    default int write(FileDescriptor fd, byte[] buffer, int offset, int count) {
+        return write(fd.fd(), buffer, offset, count);
+    }
 
     int access(String pathname, int mode);
 

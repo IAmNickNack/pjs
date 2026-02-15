@@ -16,7 +16,7 @@ class I2CMessageTest {
     void test() {
         var message = new I2CMessage(1, 2, 3, new byte[] { 1, 2, 3 });
         var segment = mapper.segment(message);
-        var deserializedMessage = mapper.convertValue(segment, I2CMessage.class);
+        var deserializedMessage = mapper.value(segment, I2CMessage.class);
 
         assertEqual(message, deserializedMessage);
     }

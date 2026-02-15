@@ -20,7 +20,7 @@ class LineConfigAttributeTest {
         var bytes = segment.toArray(ValueLayout.JAVA_BYTE);
         assert bytes.length == LineConfigAttribute.LAYOUT.byteSize();
 
-        var deserialisedAttribute = mapper.convertValue(segment, LineConfigAttribute.class);
+        var deserialisedAttribute = mapper.value(segment, LineConfigAttribute.class);
         assert attribute.equals(deserialisedAttribute);
     }
 }

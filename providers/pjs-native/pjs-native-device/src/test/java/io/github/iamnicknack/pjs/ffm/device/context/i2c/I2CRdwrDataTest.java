@@ -22,7 +22,7 @@ class I2CRdwrDataTest {
                 2
         );
         var segment = mapper.segment(data);
-        var deserializedData = mapper.convertValue(segment, I2CRdwrData.class);
+        var deserializedData = mapper.value(segment, I2CRdwrData.class);
 
         assertThat(deserializedData.messageCount()).isEqualTo(2);
         for (int i = 0; i < 2; i++) {

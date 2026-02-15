@@ -44,7 +44,7 @@ public class MemorySegmentMapperImpl implements MemorySegmentMapper {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T convertValue(MemorySegment segment, Class<T> targetType) {
+    public <T> T value(MemorySegment segment, Class<T> targetType) {
         return Optional.ofNullable(deserializerMap.computeIfAbsent(targetType, this::findDeserializer))
                 .map(deserializer -> (T)deserializer.deserialize(segment))
                 .orElseThrow(() -> new IllegalArgumentException("No deserializer registered for type: " + targetType));

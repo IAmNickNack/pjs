@@ -22,7 +22,7 @@ public class SysfsOperationsImpl implements SysfsOperations {
     @Override
     public void write(String path, byte[] value) {
         try (var fd = fileOperations.openFd(devicePath.resolve(path).toString(), FileOperationsImpl.Flags.O_WRONLY)) {
-            fileOperations.write(fd.fd(), value, 0, Math.min(value.length, MAX_FILE_SIZE));
+            fileOperations.write(fd, value, 0, Math.min(value.length, MAX_FILE_SIZE));
         }
     }
 
@@ -30,7 +30,7 @@ public class SysfsOperationsImpl implements SysfsOperations {
     public byte[] read(String path) {
         try (var fd = fileOperations.openFd(devicePath.resolve(path).toString(), FileOperationsImpl.Flags.O_RDONLY)) {
             var buffer = new byte[MAX_FILE_SIZE];
-            var bytesRead = fileOperations.read(fd.fd(), buffer, 0, MAX_FILE_SIZE);
+            var bytesRead = fileOperations.read(fd, buffer, 0, MAX_FILE_SIZE);
             var result = new byte[bytesRead];
             System.arraycopy(buffer, 0, result, 0, bytesRead);
             return result;

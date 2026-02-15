@@ -36,4 +36,8 @@ public class FileDescriptor implements AutoCloseable, SerialWriteOperation, Seri
             fileOperations.close(fd);
         }
     }
+
+    public boolean isValid() {
+        return fileOperations.isValid(fd) >= 0;
+    }
 }
