@@ -11,7 +11,7 @@ import java.util.function.BiFunction;
 
 public class FileOperationsImpl implements FileOperations {
 
-    private final SegmentAllocator nativeContext;
+    private final SegmentAllocator segmentAllocator;
     private final MethodCaller openCreate;
     private final MethodCaller open;
     private final MethodCaller close;
@@ -21,7 +21,7 @@ public class FileOperationsImpl implements FileOperations {
     private final MethodCaller fcntl;
 
     public FileOperationsImpl(NativeContext nativeContext) {
-        this.nativeContext = nativeContext.getSegmentAllocator();
+        this.segmentAllocator = nativeContext.getSegmentAllocator();
 
         var methodCallerFactory = nativeContext.getMethodCallerFactory();
         var capturedStateMethodCallerFactory = nativeContext.getCapturedStateMethodCallerFactory();
@@ -37,7 +37,7 @@ public class FileOperationsImpl implements FileOperations {
 
     @Override
     public int open(String pathname, int flags) {
-        var path = nativeContext.allocateFrom(pathname);
+        var path = segmentAllocator.allocateFrom(pathname);
         if ((flags & Flags.O_CREAT) != 0) {
             var mode = 0644;
             return (int) openCreate.call(path, flags, mode); // Default portMode if not specified
@@ -60,7 +60,7 @@ public class FileOperationsImpl implements FileOperations {
     public int read(int fd, byte[] buffer, int offset, int count) {
         return this.read(fd, offset, count, (segment, bytesRead) -> {
             if (bytesRead > 0) {
-                segment.asByteBuffer().get(buffer, 0, bytesRead);
+                segment.asByteBuffer().get(buffer, offset, bytesRead);
             }
             return bytesRead;
         });
@@ -68,20 +68,21 @@ public class FileOperationsImpl implements FileOperations {
 
     @Override
     public <T> T read(int fd, int offset, int length, BiFunction<MemorySegment, Integer, T> handler) {
-        var buf = nativeContext.allocate(ValueLayout.JAVA_BYTE, length);
-        int  bytesRead = (int) read.call(fd, buf, length);
+        var buf = segmentAllocator.allocate(ValueLayout.JAVA_BYTE, length);
+        int bytesRead = (int) read.call(fd, buf, length);
         return handler.apply(buf, bytesRead);
     }
 
     @Override
     public int write(int fd, byte[] buffer, int offset, int count) {
-        var buf = nativeContext.allocateFrom(ValueLayout.JAVA_BYTE, buffer);
-        return (int) write.call(fd, buf, count);
+        var segment = segmentAllocator.allocate(count);
+        segment.asByteBuffer().put(buffer, offset, count);
+        return (int) write.call(fd, segment, count);
     }
 
     @Override
     public int access(String pathname, int mode) {
-        var path = nativeContext.allocateFrom(pathname);
+        var path = segmentAllocator.allocateFrom(pathname);
         return (int) access.call(path, mode);
     }
 
@@ -103,7 +104,7 @@ public class FileOperationsImpl implements FileOperations {
     /**
      * Native file operation descriptors
      */
-    private static class Descriptors {
+    static class Descriptors {
         static final FunctionDescriptor OPEN_CREATE = FunctionDescriptor.of(
                 ValueLayout.JAVA_INT, // return type
                 ValueLayout.ADDRESS,  // const char *pathname

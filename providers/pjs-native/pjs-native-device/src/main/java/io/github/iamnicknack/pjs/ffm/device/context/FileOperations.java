@@ -28,6 +28,10 @@ public interface FileOperations {
      */
     int close(int fd);
 
+    default int close(FileDescriptor fd) {
+        return close(fd.fd());
+    }
+
     /**
      * Read from a file descriptor into a byte array.
      * @param fd the file descriptor to read from

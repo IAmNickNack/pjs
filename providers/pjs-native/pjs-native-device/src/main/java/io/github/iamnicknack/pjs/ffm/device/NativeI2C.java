@@ -55,4 +55,9 @@ class NativeI2C implements I2C {
         var payload = new I2CRdwrData(messages, messages.length);
         return ioctlOperations.ioctl(fileDescriptor.fd(), I2C_RDWR, payload);
     }
+
+    @Override
+    public void close() throws Exception {
+        fileDescriptor.close();
+    }
 }
