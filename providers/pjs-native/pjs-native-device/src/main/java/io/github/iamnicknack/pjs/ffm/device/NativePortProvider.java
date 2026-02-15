@@ -5,13 +5,11 @@ import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortProvider;
-import io.github.iamnicknack.pjs.ffm.context.NativeContext;
 import io.github.iamnicknack.pjs.ffm.device.context.FileDescriptor;
 import io.github.iamnicknack.pjs.ffm.device.context.FileOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.FileOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.PollingOperations;
-import io.github.iamnicknack.pjs.ffm.device.context.PollingOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.ChipInfo;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.GpioConstants;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineAttribute;
@@ -42,22 +40,20 @@ public class NativePortProvider implements GpioPortProvider {
     private final Logger logger = LoggerFactory.getLogger(NativePortProvider.class);
 
     private final ChipInfo chipInfo;
-    private final NativeContext nativeContext;
     private final FileOperations fileOperations;
     private final IoctlOperations ioctlOperations;
     private final PollingOperations pollingOperations;
 
     public NativePortProvider(
             ChipInfo chipInfo,
-            NativeContext nativeContext,
             FileOperations fileOperations,
-            IoctlOperations ioctlOperations
+            IoctlOperations ioctlOperations,
+            PollingOperations pollingOperations
     ) {
         this.chipInfo = chipInfo;
-        this.nativeContext = nativeContext;
         this.fileOperations = fileOperations;
         this.ioctlOperations = ioctlOperations;
-        this.pollingOperations = new PollingOperationsImpl(nativeContext);
+        this.pollingOperations = pollingOperations;
     }
 
     @Override
