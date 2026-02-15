@@ -4,8 +4,7 @@ import com.pi4j.extension.Plugin;
 import com.pi4j.plugin.ffm.FFMPlugin;
 import com.pi4j.plugin.mock.MockPlugin;
 import io.github.iamnicknack.pi4j.grpc.client.GrpcPlugin;
-import io.github.iamnicknack.pjs.ffm.NativeDeviceRegistry;
-import io.github.iamnicknack.pjs.ffm.context.DefaultNativeContext;
+import io.github.iamnicknack.pjs.ffm.NativeDeviceRegistryLoader;
 import io.github.iamnicknack.pjs.grpc.GrpcDeviceRegistry;
 import io.github.iamnicknack.pjs.http.client.HttpDeviceRegistry;
 import io.github.iamnicknack.pjs.logging.LoggingDeviceRegistry;
@@ -18,8 +17,6 @@ import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.foreign.Arena;
 
 import static io.github.iamnicknack.pjs.sandbox.CommandLineOptions.*;
 
@@ -65,7 +62,7 @@ public class Main {
                 yield new GrpcDeviceRegistry(channel);
             }
             case "http" -> new HttpDeviceRegistry("http://" + commandLineArgs.value(GRPC_HOST) + ":" + commandLineArgs.value(GRPC_PORT) + "/");
-            case "ffm" -> new NativeDeviceRegistry(new DefaultNativeContext(Arena.ofAuto()));
+            case "ffm" -> new NativeDeviceRegistryLoader().load(commandLineArgs.asMap());
             case "pi4j" -> {
                 Class<? extends Plugin> pluginClass = switch (commandLineArgs.valueOrNull(PI4J_MODE)) {
                     case "mock" -> MockPlugin.class;

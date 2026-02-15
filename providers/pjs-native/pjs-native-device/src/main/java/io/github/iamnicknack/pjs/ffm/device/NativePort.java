@@ -1,19 +1,19 @@
 package io.github.iamnicknack.pjs.ffm.device;
 
-import io.github.iamnicknack.pjs.device.gpio.GpioEventMode;
 import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
-import io.github.iamnicknack.pjs.ffm.context.NativeContext;
 import io.github.iamnicknack.pjs.ffm.device.context.FileDescriptor;
+import io.github.iamnicknack.pjs.ffm.device.context.FileOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperations;
-import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperationsImpl;
+import io.github.iamnicknack.pjs.ffm.device.context.PollingOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.GpioConstants;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineValues;
 import io.github.iamnicknack.pjs.ffm.event.EventPoller;
+import io.github.iamnicknack.pjs.ffm.event.EventPollerImpl;
 import io.github.iamnicknack.pjs.ffm.event.PollEvent;
-import io.github.iamnicknack.pjs.ffm.event.PollEventsCallback;
 import io.github.iamnicknack.pjs.model.event.GpioChangeEvent;
 import io.github.iamnicknack.pjs.model.event.GpioEventListener;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +34,7 @@ class NativePort implements GpioPort, AutoCloseable {
     private static final LineValues LOW_MASK = new LineValues(0, Long.MAX_VALUE);
 
     private final Logger logger = LoggerFactory.getLogger(NativePort.class);
+
     private final GpioPortConfig config;
     private final IoctlOperations ioctlOperations;
     private final FileDescriptor fileDescriptor;
@@ -41,24 +42,34 @@ class NativePort implements GpioPort, AutoCloseable {
     private final EventPoller eventPoller;
     private final ExecutorService eventPollingExecutorService;
 
-    public NativePort(GpioPortConfig config, FileDescriptor fileDescriptor, NativeContext nativeContext) {
+    private final Predicate<PollEvent> pollEventPredicate;
 
-        logger.debug("Creating GPIO port with file descriptor: {}", fileDescriptor.fd());
+    /**
+     * Create a new instance with event polling support
+     * Create a new instance with no event polling support
+     * @param config the port configuration
+     * @param fileDescriptor the file descriptor for the GPIO port
+     * @param ioctlOperations ioctl implementation
+     */
+    public NativePort(
+            GpioPortConfig config,
+            FileDescriptor fileDescriptor,
+            IoctlOperations ioctlOperations,
+            @Nullable FileOperations fileOperations,
+            @Nullable PollingOperations pollingOperations
 
+    ) {
         this.config = config;
         this.fileDescriptor = fileDescriptor;
-        this.ioctlOperations = new IoctlOperationsImpl(nativeContext);
-
-        boolean softwareDebounce = NativePortProvider.isSoftwareDebounceEnabled();
-        logger.debug("GPIO debounce software filter is {}", softwareDebounce ? "enabled" : "disabled");
-
-        if (config.eventMode() != GpioEventMode.NONE) {
-            this.eventPoller = new EventPoller(
+        this.ioctlOperations = ioctlOperations;
+        if (pollingOperations != null) {
+            this.eventPoller = new EventPollerImpl(
                     fileDescriptor.fd(),
-                    new DebouncedEventsCallback((softwareDebounce) ? config.debounceDelay() * 1000L : 0),
+                    this::eventPollerCallback,
                     Duration.ofMillis(100),
-                    nativeContext
-            );
+                    pollingOperations,
+                    fileOperations
+            );;
             this.eventPollingExecutorService = Executors.newSingleThreadExecutor(r -> {
                 Objects.requireNonNull(r);
                 var thread = new Thread(r, "gpio-event-poller-" + config.id());
@@ -67,11 +78,28 @@ class NativePort implements GpioPort, AutoCloseable {
                         logger.error("Error on thread: {}", t.getName(), e)
                 );
                 return thread;
-            });
+            });;
         } else {
             this.eventPoller = null;
             this.eventPollingExecutorService = null;
         }
+        this.pollEventPredicate = (NativePortProvider.isSoftwareDebounceEnabled())
+                ? new DebounceFilter(config.debounceDelay() * 1000L)
+                : _ -> true;
+    }
+
+    /**
+     * Create a new instance with no event polling support
+     * @param config the port configuration
+     * @param fileDescriptor the file descriptor for the GPIO port
+     * @param ioctlOperations ioctl implementation
+     */
+    public NativePort(
+            GpioPortConfig config,
+            FileDescriptor fileDescriptor,
+            IoctlOperations ioctlOperations
+    ) {
+        this(config, fileDescriptor, ioctlOperations, null, null);
     }
 
     @Override
@@ -81,14 +109,14 @@ class NativePort implements GpioPort, AutoCloseable {
 
     @Override
     public Integer read() {
-        var value = ioctlOperations.ioctl(fileDescriptor.fd(), GpioConstants.GPIO_V2_LINE_GET_VALUES_IOCTL, LOW_MASK);
+        var value = ioctlOperations.ioctl(fileDescriptor, GpioConstants.GPIO_V2_LINE_GET_VALUES_IOCTL, LOW_MASK);
         return (int)value.bits();
     }
 
     @Override
     public void write(Integer value) {
         var lineValues = new LineValues(value, Long.MAX_VALUE);
-        ioctlOperations.ioctl(fileDescriptor.fd(), GpioConstants.GPIO_V2_LINE_SET_VALUES_IOCTL, lineValues);
+        ioctlOperations.ioctl(fileDescriptor, GpioConstants.GPIO_V2_LINE_SET_VALUES_IOCTL, lineValues);
     }
 
     @Override
@@ -102,8 +130,7 @@ class NativePort implements GpioPort, AutoCloseable {
 
     @Override
     public void addListener(GpioEventListener<GpioPort> listener) {
-        if (eventPoller != null) {
-            listeners.add(listener);
+        if ((eventPoller != null) && (listeners.add(listener))) {
             if (!eventPoller.isRunning()) {
                 eventPollingExecutorService.submit(eventPoller);
             }
@@ -112,41 +139,18 @@ class NativePort implements GpioPort, AutoCloseable {
 
     @Override
     public void removeListener(GpioEventListener<GpioPort> listener) {
-        if (eventPoller != null) {
-            listeners.remove(listener);
+        if ((eventPoller != null) && listeners.remove(listener)) {
             if (listeners.isEmpty() && eventPoller.isRunning()) {
                 eventPoller.stop();
             }
         }
     }
 
-    /**
-     * Callback operation for event polling which implements a software debounce filter
-     */
-    class DebouncedEventsCallback implements PollEventsCallback {
-
-        private final Predicate<PollEvent> debouncer;
-
-        /**
-         * Constructor
-         * @param debounceDelay the debounce delay in the whatever timeunit is used by the native context.
-         *                      Any divisor or multiplier needs to be applied before passing it to this constructor.
-         */
-        public DebouncedEventsCallback(long debounceDelay) {
-            this.debouncer = (debounceDelay > 0)
-                    ? new DebounceFilter(debounceDelay)
-                    : _ -> true;
-        }
-
-        @Override
-        public void callback(EventPoller poller, List<PollEvent> pollEvents) {
-            pollEvents.stream()
-                    .filter(debouncer)
-                    .map(pollEvent -> new GpioChangeEvent<>(NativePort.this, pollEvent.asLineChangeEventType()))
-                    .forEach(gpioChangeEvent -> listeners
-                            .forEach(gpioEventListener -> gpioEventListener.onEvent(gpioChangeEvent))
-                    );
-        }
+    private void eventPollerCallback(EventPoller poller, List<PollEvent> pollEvents) {
+        pollEvents.stream()
+                .filter(pollEventPredicate)
+                .map(pollEvent -> new GpioChangeEvent<>(NativePort.this, pollEvent.asLineChangeEventType()))
+                .forEach(event -> listeners.forEach(listener -> listener.onEvent(event)));
     }
 
     /**

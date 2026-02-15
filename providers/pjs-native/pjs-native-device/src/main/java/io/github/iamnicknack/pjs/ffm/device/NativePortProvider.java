@@ -1,12 +1,25 @@
 package io.github.iamnicknack.pjs.ffm.device;
 
+import io.github.iamnicknack.pjs.device.gpio.GpioEventMode;
 import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortProvider;
 import io.github.iamnicknack.pjs.ffm.context.NativeContext;
-import io.github.iamnicknack.pjs.ffm.device.context.*;
-import io.github.iamnicknack.pjs.ffm.device.context.gpio.*;
+import io.github.iamnicknack.pjs.ffm.device.context.FileDescriptor;
+import io.github.iamnicknack.pjs.ffm.device.context.FileOperations;
+import io.github.iamnicknack.pjs.ffm.device.context.FileOperationsImpl;
+import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperations;
+import io.github.iamnicknack.pjs.ffm.device.context.PollingOperations;
+import io.github.iamnicknack.pjs.ffm.device.context.PollingOperationsImpl;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.ChipInfo;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.GpioConstants;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineAttribute;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineConfig;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineConfigAttribute;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineInfo;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineRequest;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.PinFlag;
 import io.github.iamnicknack.pjs.util.GpioPinMask;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -32,19 +45,7 @@ public class NativePortProvider implements GpioPortProvider {
     private final NativeContext nativeContext;
     private final FileOperations fileOperations;
     private final IoctlOperations ioctlOperations;
-
-    public NativePortProvider(NativeContext context) {
-        this(context, 0);
-    }
-
-    public NativePortProvider(NativeContext context, int chip) {
-        this(
-                new GpioOperationsImpl(context).chipInfo("/dev/gpiochip" + chip),
-                context,
-                new FileOperationsImpl(context),
-                new IoctlOperationsImpl(context)
-        );
-    }
+    private final PollingOperations pollingOperations;
 
     public NativePortProvider(
             ChipInfo chipInfo,
@@ -56,33 +57,73 @@ public class NativePortProvider implements GpioPortProvider {
         this.nativeContext = nativeContext;
         this.fileOperations = fileOperations;
         this.ioctlOperations = ioctlOperations;
+        this.pollingOperations = new PollingOperationsImpl(nativeContext);
     }
 
     @Override
     public GpioPort create(GpioPortConfig config) {
-        try(var fileDescriptor = fileOperations
-                .openFd(chipInfo.getPath(), FileOperationsImpl.Flags.O_RDWR | FileOperationsImpl.Flags.O_CLOEXEC)) {
-            Arrays.stream(config.pinNumber()).forEach(pinNumber -> {
-                var lineInfoResult = ioctlOperations
-                        .ioctl(fileDescriptor.fd(), GpioConstants.GPIO_V2_GET_LINEINFO_IOCTL, LineInfo.ofOffset(pinNumber));
-                if (PinFlag.USED.isSet(lineInfoResult.flags())) {
-                    throw new IllegalStateException("Pin " + lineInfoResult.offset() + " is already in use.");
-                }
-            });
+        try(var fileDescriptor = fileOperations.openFd(
+                chipInfo.getPath(),
+                FileOperationsImpl.Flags.O_RDWR | FileOperationsImpl.Flags.O_CLOEXEC)
+        ) {
+            checkLines(config, fileDescriptor);
 
             var lineRequest = createLineRequest(config);
-            var lineRequestResult = ioctlOperations.ioctl(fileDescriptor.fd(), GpioConstants.GPIO_V2_GET_LINE_IOCTL, lineRequest);
+            var lineRequestResult = ioctlOperations.ioctl(
+                    fileDescriptor,
+                    GpioConstants.GPIO_V2_GET_LINE_IOCTL,
+                    lineRequest
+            );
 
             logger.debug("Created port {} with result {}", config.id(), lineRequestResult);
 
-            var port = new NativePort(config, fileOperations.createFileDescriptor(lineRequestResult.fd()), nativeContext);
+            var port = ((config.eventMode() != GpioEventMode.NONE) && (config.portMode().isSet(GpioPortMode.INPUT))
+                    ? new NativePort(
+                            config,
+                            fileOperations.createFileDescriptor(lineRequestResult.fd()),
+                            ioctlOperations,
+                            fileOperations,
+                            pollingOperations
+                    )
+                    : new NativePort(
+                            config,
+                            fileOperations.createFileDescriptor(lineRequestResult.fd()),
+                            ioctlOperations
+                    )
+            );
+
             if (config.defaultValue() >= 0) {
                 port.write(config.defaultValue());
             }
+
             return port;
         }
     }
 
+    /**
+     * Check lines are available or not currently in use
+     * @param config the requested config
+     * @param fileDescriptor the file descriptor for the GPIO port
+     */
+    private void checkLines(GpioPortConfig config, FileDescriptor fileDescriptor) {
+        Arrays.stream(config.pinNumber()).forEach(pinNumber -> {
+            var lineInfoResult = ioctlOperations.ioctl(
+                    fileDescriptor,
+                    GpioConstants.GPIO_V2_GET_LINEINFO_IOCTL,
+                    LineInfo.ofOffset(pinNumber)
+            );
+            if (PinFlag.USED.isSet(lineInfoResult.flags())) {
+                throw new IllegalStateException("Pin " + lineInfoResult.offset() + " is already in use.");
+            }
+        });
+
+    }
+
+    /**
+     * Construct a {@link LineRequest} from the given {@link GpioPortConfig}.
+     * @param config the requested config
+     * @return the constructed {@link LineRequest}
+     */
     private @NonNull LineRequest createLineRequest(GpioPortConfig config) {
         var eventFlags = switch (config.eventMode()) {
             case NONE -> 0;

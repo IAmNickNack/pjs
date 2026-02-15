@@ -1,15 +1,16 @@
 package io.github.iamnicknack.pjs.ffm.device.context;
 
-import io.github.iamnicknack.pjs.ffm.context.method.MethodCaller;
 import io.github.iamnicknack.pjs.ffm.context.NativeContext;
+import io.github.iamnicknack.pjs.ffm.context.method.MethodCaller;
 
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SegmentAllocator;
 import java.lang.foreign.ValueLayout;
+import java.nio.file.Path;
 import java.util.function.BiFunction;
 
-public class FileOperationsImpl implements FileOperations {
+public class FileOperationsImpl implements FileOperations, SysfsOperationsFactory {
 
     private final SegmentAllocator segmentAllocator;
     private final MethodCaller openCreate;
@@ -99,6 +100,11 @@ public class FileOperationsImpl implements FileOperations {
     @Override
     public FileDescriptor createFileDescriptor(int fd) {
         return new FileDescriptor(this, fd);
+    }
+
+    @Override
+    public SysfsOperations createSysfsOperations(String devicePath) {
+        return new SysfsOperationsImpl(Path.of(devicePath), this);
     }
 
     /**
