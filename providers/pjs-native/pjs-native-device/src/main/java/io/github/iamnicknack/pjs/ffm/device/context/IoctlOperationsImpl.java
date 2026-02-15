@@ -54,7 +54,7 @@ public class IoctlOperationsImpl implements IoctlOperations {
         return memorySegmentMapper.value(data, type);
     }
 
-    private static class Descriptors {
+    static class Descriptors {
         static final FunctionDescriptor IOCTL_INT_BY_VALUE = FunctionDescriptor.of(
                 ValueLayout.JAVA_INT,   // return type
                 ValueLayout.JAVA_INT,   // int fd
