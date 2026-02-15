@@ -26,7 +26,7 @@ public class PollingOperationsImpl implements PollingOperations {
         return memorySegmentMapper.value(dataMemorySegment, Poll.class);
     }
 
-    private static class Descriptors {
+    static class Descriptors {
         static final FunctionDescriptor POLL = FunctionDescriptor.of(
                 ValueLayout.JAVA_INT,   // return value
                 ValueLayout.ADDRESS,    // pointer to poll data
