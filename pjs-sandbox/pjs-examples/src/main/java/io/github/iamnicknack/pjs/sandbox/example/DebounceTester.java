@@ -22,8 +22,8 @@ public class DebounceTester implements Runnable {
             .id("GPIO-INPUT")
             .pin(23)
             .portMode(GpioPortMode.INPUT)
-            .eventMode(GpioEventMode.BOTH)
-            .debounceDelay(700)
+            .eventMode(GpioEventMode.FALLING)
+            .debounceDelay(1200)
             .build();
 
     private static final I2CConfig PICO_I2C_CONFIG = I2CConfig.builder()

@@ -18,11 +18,14 @@ import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineConfigAttribute;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineInfo;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineRequest;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.PinFlag;
+import io.github.iamnicknack.pjs.ffm.event.EventPoller;
+import io.github.iamnicknack.pjs.ffm.event.EventPollerFactoryImpl;
 import io.github.iamnicknack.pjs.util.GpioPinMask;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.Arrays;
 
 /**
@@ -42,7 +45,7 @@ public class NativePortProvider implements GpioPortProvider {
     private final ChipInfo chipInfo;
     private final FileOperations fileOperations;
     private final IoctlOperations ioctlOperations;
-    private final PollingOperations pollingOperations;
+    private final EventPoller.Factory eventPollerFactory;
 
     public NativePortProvider(
             ChipInfo chipInfo,
@@ -53,7 +56,13 @@ public class NativePortProvider implements GpioPortProvider {
         this.chipInfo = chipInfo;
         this.fileOperations = fileOperations;
         this.ioctlOperations = ioctlOperations;
-        this.pollingOperations = pollingOperations;
+
+        this.eventPollerFactory = new EventPollerFactoryImpl(Duration.ofMillis(100), pollingOperations, fileOperations);
+    }
+
+    @Override
+    public void close() {
+        eventPollerFactory.close();
     }
 
     @Override
@@ -78,8 +87,7 @@ public class NativePortProvider implements GpioPortProvider {
                             config,
                             fileOperations.createFileDescriptor(lineRequestResult.fd()),
                             ioctlOperations,
-                            fileOperations,
-                            pollingOperations
+                            eventPollerFactory
                     )
                     : new NativePort(
                             config,

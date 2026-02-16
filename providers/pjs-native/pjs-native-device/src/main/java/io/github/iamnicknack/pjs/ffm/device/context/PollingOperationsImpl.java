@@ -15,8 +15,7 @@ public class PollingOperationsImpl implements PollingOperations {
 
     public PollingOperationsImpl(NativeContext nativeContext) {
         this(
-                nativeContext.getCapturedStateMethodCallerFactory()
-                        .create("poll", Descriptors.POLL),
+                nativeContext.getCapturedStateMethodCallerFactory().create("poll", Descriptors.POLL),
                 nativeContext.getMemorySegmentMapper()
         );
     }

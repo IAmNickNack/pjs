@@ -11,7 +11,7 @@ public class FileDescriptor implements AutoCloseable, SerialWriteOperation, Seri
     private final FileOperations fileOperations;
     private final int fd;
 
-    FileDescriptor(FileOperations fileOperations, int fd) {
+    public FileDescriptor(FileOperations fileOperations, int fd) {
         this.fileOperations = fileOperations;
         this.fd = fd;
     }
