@@ -15,7 +15,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
-public class EventPollerFactoryImpl implements EventPoller.Factory, AutoCloseable {
+/**
+ * {@inheritDoc}
+ */
+public class EventPollerFactoryImpl implements EventPoller.Factory {
+
+    private static final MemorySegmentDeserializer<LineEvent> lineEventDeserializer = new LineEvent.Deserializer();
+    private static final long LINE_EVENT_SIZE = LineEvent.LAYOUT.byteSize();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -33,10 +39,12 @@ public class EventPollerFactoryImpl implements EventPoller.Factory, AutoCloseabl
         return thread;
     });
 
-
-    private static final MemorySegmentDeserializer<LineEvent> lineEventDeserializer = new LineEvent.Deserializer();
-    private static final long LINE_EVENT_SIZE = LineEvent.LAYOUT.byteSize();
-
+    /**
+     * Constructor.
+     * @param timeout timeout for the native poll operation
+     * @param pollingOperations polling operations
+     * @param fileOperations file operations
+     */
     public EventPollerFactoryImpl(
             Duration timeout,
             PollingOperations pollingOperations,
@@ -47,16 +55,25 @@ public class EventPollerFactoryImpl implements EventPoller.Factory, AutoCloseabl
         this.fileOperations = fileOperations;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public EventPoller create(FileDescriptor fileDescriptor, PollEventsCallback pollEventsCallback) {
         return new Poller(fileDescriptor, pollEventsCallback);
     }
 
+    /**
+     * Stops the executor service used for executing pollers.
+     */
     @Override
     public void close() {
         executorService.shutdownNow();
     }
 
+    /**
+     * Poller implementation.
+     */
     private class Poller implements EventPoller {
 
         private volatile boolean running;

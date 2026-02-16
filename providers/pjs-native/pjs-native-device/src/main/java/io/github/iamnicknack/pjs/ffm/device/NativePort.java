@@ -53,9 +53,12 @@ class NativePort implements GpioPort, AutoCloseable {
         this.fileDescriptor = fileDescriptor;
         this.ioctlOperations = ioctlOperations;
         this.eventPoller = eventPollerFactory.create(fileDescriptor, this::eventPollerCallback);
-        this.pollEventPredicate = (NativePortProvider.isSoftwareDebounceEnabled())
-                ? new DebounceFilter(config.debounceDelay() * 1000L)
-                : _ -> true;
+        if (NativePortProvider.isSoftwareDebounceEnabled()) {
+            logger.info("Enabling software debounce for GPIO port with debounce delay: {}ms", config.debounceDelay());
+            this.pollEventPredicate = new DebounceFilter(config.debounceDelay() * 1000L);
+        } else {
+            this.pollEventPredicate = _ -> true;
+        }
     }
 
     /**
