@@ -1,5 +1,6 @@
 package io.github.iamnicknack.pjs.ffm.event;
 
+import io.github.iamnicknack.pjs.ffm.device.context.FileDescriptor;
 import io.github.iamnicknack.pjs.ffm.device.context.FileOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.PollingOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineEvent;
@@ -20,7 +21,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class EventPollerTest {
+class EventPollerFactoryImplTest {
 
     private final SegmentAllocator segmentAllocator = Arena.ofAuto();
 
@@ -70,17 +71,12 @@ class EventPollerTest {
                     assertion.set(expectation.predicate.apply(pollEvents));
                 };
 
-                var poller = new EventPollerImpl(
-                        1,
-                        callback,
-                        Duration.ZERO,
-                        pollingOperations,
-                        fileOperations
-                );
+                try (var pollerFactory = new EventPollerFactoryImpl(Duration.ofMillis(100), pollingOperations, fileOperations)) {
+                    var poller = pollerFactory.create(fileOperations.createFileDescriptor(1), callback);
+                    poller.run();
 
-                poller.run();
-
-                assertThat(assertion.get()).isTrue();
+                    assertThat(assertion.get()).isTrue();
+                }
             })
         );
     }
@@ -93,6 +89,11 @@ class EventPollerTest {
 
         LineEventsFileOperations(LineEvent[] events) {
             this.events = events;
+        }
+
+        @Override
+        public FileDescriptor createFileDescriptor(int fd) {
+            return new FileDescriptor(this, fd);
         }
 
         @Override

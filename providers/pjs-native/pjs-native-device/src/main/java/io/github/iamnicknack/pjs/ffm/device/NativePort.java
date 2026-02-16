@@ -3,27 +3,19 @@ package io.github.iamnicknack.pjs.ffm.device;
 import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
 import io.github.iamnicknack.pjs.ffm.device.context.FileDescriptor;
-import io.github.iamnicknack.pjs.ffm.device.context.FileOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperations;
-import io.github.iamnicknack.pjs.ffm.device.context.PollingOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.GpioConstants;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineValues;
 import io.github.iamnicknack.pjs.ffm.event.EventPoller;
-import io.github.iamnicknack.pjs.ffm.event.EventPollerImpl;
 import io.github.iamnicknack.pjs.ffm.event.PollEvent;
 import io.github.iamnicknack.pjs.model.event.GpioChangeEvent;
 import io.github.iamnicknack.pjs.model.event.GpioEventListener;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 
 /**
@@ -40,7 +32,6 @@ class NativePort implements GpioPort, AutoCloseable {
     private final FileDescriptor fileDescriptor;
     private final Set<GpioEventListener<GpioPort>> listeners = new CopyOnWriteArraySet<>();
     private final EventPoller eventPoller;
-    private final ExecutorService eventPollingExecutorService;
 
     private final Predicate<PollEvent> pollEventPredicate;
 
@@ -55,34 +46,13 @@ class NativePort implements GpioPort, AutoCloseable {
             GpioPortConfig config,
             FileDescriptor fileDescriptor,
             IoctlOperations ioctlOperations,
-            @Nullable FileOperations fileOperations,
-            @Nullable PollingOperations pollingOperations
+            EventPoller.Factory eventPollerFactory
 
     ) {
         this.config = config;
         this.fileDescriptor = fileDescriptor;
         this.ioctlOperations = ioctlOperations;
-        if (pollingOperations != null) {
-            this.eventPoller = new EventPollerImpl(
-                    fileDescriptor.fd(),
-                    this::eventPollerCallback,
-                    Duration.ofMillis(100),
-                    pollingOperations,
-                    fileOperations
-            );;
-            this.eventPollingExecutorService = Executors.newSingleThreadExecutor(r -> {
-                Objects.requireNonNull(r);
-                var thread = new Thread(r, "gpio-event-poller-" + config.id());
-                thread.setDaemon(true);
-                thread.setUncaughtExceptionHandler((t, e) ->
-                        logger.error("Error on thread: {}", t.getName(), e)
-                );
-                return thread;
-            });;
-        } else {
-            this.eventPoller = null;
-            this.eventPollingExecutorService = null;
-        }
+        this.eventPoller = eventPollerFactory.create(fileDescriptor, this::eventPollerCallback);
         this.pollEventPredicate = (NativePortProvider.isSoftwareDebounceEnabled())
                 ? new DebounceFilter(config.debounceDelay() * 1000L)
                 : _ -> true;
@@ -99,7 +69,7 @@ class NativePort implements GpioPort, AutoCloseable {
             FileDescriptor fileDescriptor,
             IoctlOperations ioctlOperations
     ) {
-        this(config, fileDescriptor, ioctlOperations, null, null);
+        this(config, fileDescriptor, ioctlOperations, EventPoller.NOOP_FACTORY);
     }
 
     @Override
@@ -121,28 +91,21 @@ class NativePort implements GpioPort, AutoCloseable {
 
     @Override
     public void close() {
-        if (eventPollingExecutorService != null) {
-            eventPollingExecutorService.shutdownNow();
-        }
         logger.debug("Closing GPIO port with file descriptor: {}", fileDescriptor.fd());
         fileDescriptor.close();
     }
 
     @Override
     public void addListener(GpioEventListener<GpioPort> listener) {
-        if ((eventPoller != null) && (listeners.add(listener))) {
-            if (!eventPoller.isRunning()) {
-                eventPollingExecutorService.submit(eventPoller);
-            }
+        if (listeners.add(listener) && !eventPoller.isRunning()) {
+            eventPoller.start();
         }
     }
 
     @Override
     public void removeListener(GpioEventListener<GpioPort> listener) {
-        if ((eventPoller != null) && listeners.remove(listener)) {
-            if (listeners.isEmpty() && eventPoller.isRunning()) {
-                eventPoller.stop();
-            }
+        if (listeners.remove(listener) && listeners.isEmpty() && eventPoller.isRunning()) {
+            eventPoller.stop();
         }
     }
 
