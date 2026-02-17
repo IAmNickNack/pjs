@@ -17,7 +17,8 @@ public class AbstractFileOperations implements FileOperations {
 
     @Override
     public int close(int fd) {
-        throw new UnsupportedOperationException();
+        // do nothing
+        return 0;
     }
 
     @Override
