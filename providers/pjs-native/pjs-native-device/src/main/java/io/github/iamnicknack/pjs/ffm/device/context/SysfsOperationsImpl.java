@@ -1,5 +1,6 @@
 package io.github.iamnicknack.pjs.ffm.device.context;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class SysfsOperationsImpl implements SysfsOperations {
@@ -39,41 +40,11 @@ public class SysfsOperationsImpl implements SysfsOperations {
 
     @Override
     public boolean exists() {
-        return devicePath.toFile().exists();
+        return Files.exists(devicePath);
     }
 
     @Override
     public boolean exists(String path) {
         return devicePath.resolve(path).toFile().exists();
-    }
-
-    @Override
-    public void writeString(String path, String value) {
-        write(path, value.getBytes());
-    }
-
-    @Override
-    public String readString(String path) {
-        return new String(read(path));
-    }
-
-    @Override
-    public void writeLong(String path, long value) {
-        writeString(path, Long.toString(value));
-    }
-
-    @Override
-    public long readLong(String path) {
-        return Long.parseLong(readString(path).trim());
-    }
-
-    @Override
-    public void writeInt(String path, int value) {
-        writeString(path, Integer.toString(value));
-    }
-
-    @Override
-    public long readInt(String path) {
-        return Integer.parseInt(readString(path).trim());
     }
 }

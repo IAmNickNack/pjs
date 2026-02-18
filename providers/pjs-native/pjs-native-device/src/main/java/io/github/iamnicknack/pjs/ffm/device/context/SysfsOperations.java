@@ -19,15 +19,27 @@ public interface SysfsOperations {
 
     boolean exists(String path);
 
-    void writeString(String path, String value);
+    default void writeString(String path, String value) {
+        write(path, value.getBytes());
+    }
 
-    String readString(String path);
+    default String readString(String path) {
+        return new String(read(path));
+    }
 
-    void writeLong(String path, long value);
+    default void writeLong(String path, long value) {
+        writeString(path, Long.toString(value));
+    }
 
-    long readLong(String path);
+    default long readLong(String path) {
+        return Long.parseLong(readString(path).trim());
+    }
 
-    void writeInt(String path, int value);
+    default void writeInt(String path, int value) {
+        writeString(path, Integer.toString(value));
+    }
 
-    long readInt(String path);
+    default long readInt(String path) {
+        return Integer.parseInt(readString(path).trim());
+    }
 }
