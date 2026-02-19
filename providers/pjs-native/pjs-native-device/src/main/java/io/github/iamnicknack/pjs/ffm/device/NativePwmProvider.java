@@ -4,21 +4,16 @@ import io.github.iamnicknack.pjs.device.pwm.Pwm;
 import io.github.iamnicknack.pjs.device.pwm.PwmConfig;
 import io.github.iamnicknack.pjs.device.pwm.PwmProvider;
 import io.github.iamnicknack.pjs.ffm.device.context.SysfsOperationsFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static io.github.iamnicknack.pjs.ffm.device.NativePwm.ENABLE_PATH;
 
 public class NativePwmProvider implements PwmProvider {
 
-
-    private static final String CHIP_PATH = "/sys/class/pwm/pwmchip";
-    private static final String CHIP_EXPORT_PATH = "export";
-    private static final String CHIP_UNEXPORT_PATH = "unexport";
-    private static final String CHIP_NPWM_PATH = "npwm";
-    private static final String PWM_PATH = "pwm";
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    static final String CHIP_PATH = "/sys/class/pwm/pwmchip";
+    static final String CHIP_EXPORT_PATH = "export";
+    static final String CHIP_UNEXPORT_PATH = "unexport";
+    static final String CHIP_NPWM_PATH = "npwm";
+    static final String PWM_PATH = "pwm";
 
     private final SysfsOperationsFactory sysfsOperationsFactory;
 
@@ -28,8 +23,6 @@ public class NativePwmProvider implements PwmProvider {
 
     @Override
     public Pwm create(PwmConfig config) {
-//        var fs = new FileOperationsImpl(nativeContext);
-
         var chip = sysfsOperationsFactory.createSysfsOperations(CHIP_PATH + config.chip());
         if (!chip.exists()) {
             throw new IllegalArgumentException("PWM chip " + config.chip() + " does not exist");
@@ -41,7 +34,6 @@ public class NativePwmProvider implements PwmProvider {
             if (config.channel() < 0 || config.channel() >= pwm) {
                 throw new IllegalArgumentException("PWM channel " + config.channel() + " does not exist on chip " + chip + ".");
             }
-
 
             chip.writeInt(CHIP_EXPORT_PATH, config.channel());
             var timeout = 1000;

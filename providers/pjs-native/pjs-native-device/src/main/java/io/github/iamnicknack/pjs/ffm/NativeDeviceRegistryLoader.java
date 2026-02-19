@@ -11,10 +11,12 @@ import io.github.iamnicknack.pjs.ffm.device.context.FileOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.device.context.GpioOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.device.context.PollingOperationsImpl;
+import io.github.iamnicknack.pjs.ffm.event.EventPollerFactoryImpl;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader;
 import org.jspecify.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -41,13 +43,18 @@ public class NativeDeviceRegistryLoader implements DeviceRegistryLoader {
         var ioctlOperations = new IoctlOperationsImpl(context);
         var gpioOperations = new GpioOperationsImpl(fileOperations, ioctlOperations);
         var pollingOperations = new PollingOperationsImpl(context);
+        var eventPollerFactory = new EventPollerFactoryImpl(
+                Duration.ofMillis(100),
+                pollingOperations,
+                fileOperations
+        );
 
         var i2cProvider = new NativeI2CProvider(fileOperations, ioctlOperations);
         var portProvider = new NativePortProvider(
                 gpioOperations.chipInfo("/dev/gpiochip0"),
                 fileOperations,
                 ioctlOperations,
-                pollingOperations
+                eventPollerFactory
         );
         var pwmProvider = new NativePwmProvider(fileOperations);
         var spiProvider = new NativeSpiProvider(

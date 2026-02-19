@@ -28,6 +28,20 @@ public interface EventPoller extends Runnable {
     @Override
     void run();
 
+    class Noop implements EventPoller {
+        @Override
+        public void start() {}
+
+        @Override
+        public void stop() {}
+
+        @Override
+        public boolean isRunning() { return false; }
+
+        @Override
+        public void run() {}
+    }
+
     /**
      * Factory for creating event pollers
      */
@@ -45,26 +59,22 @@ public interface EventPoller extends Runnable {
          */
         @Override
         default void close() {}
+
+        class Noop implements Factory {
+            @Override
+            public EventPoller create(FileDescriptor fileDescriptor, PollEventsCallback pollEventsCallback) {
+                return NOOP;
+            }
+        }
     }
 
     /**
      * No-op event poller.
      */
-    EventPoller NOOP = new EventPoller() {
-        public void start() {}
-
-        @Override
-        public void stop() {}
-
-        @Override
-        public boolean isRunning() { return false; }
-
-        @Override
-        public void run() {}
-    };
+    EventPoller NOOP = new Noop();
 
     /**
      * No-op factory.
      */
-    Factory NOOP_FACTORY = (_, _) -> NOOP;
+    Factory NOOP_FACTORY = new Factory.Noop();
 }

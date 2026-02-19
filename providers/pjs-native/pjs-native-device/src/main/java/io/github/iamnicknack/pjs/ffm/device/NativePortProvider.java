@@ -9,7 +9,6 @@ import io.github.iamnicknack.pjs.ffm.device.context.FileDescriptor;
 import io.github.iamnicknack.pjs.ffm.device.context.FileOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.FileOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperations;
-import io.github.iamnicknack.pjs.ffm.device.context.PollingOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.ChipInfo;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.GpioConstants;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineAttribute;
@@ -19,13 +18,11 @@ import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineInfo;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineRequest;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.PinFlag;
 import io.github.iamnicknack.pjs.ffm.event.EventPoller;
-import io.github.iamnicknack.pjs.ffm.event.EventPollerFactoryImpl;
 import io.github.iamnicknack.pjs.util.GpioPinMask;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.util.Arrays;
 
 /**
@@ -51,13 +48,12 @@ public class NativePortProvider implements GpioPortProvider {
             ChipInfo chipInfo,
             FileOperations fileOperations,
             IoctlOperations ioctlOperations,
-            PollingOperations pollingOperations
+            EventPoller.Factory eventPollerFactory
     ) {
         this.chipInfo = chipInfo;
         this.fileOperations = fileOperations;
         this.ioctlOperations = ioctlOperations;
-
-        this.eventPollerFactory = new EventPollerFactoryImpl(Duration.ofMillis(100), pollingOperations, fileOperations);
+        this.eventPollerFactory = eventPollerFactory;
     }
 
     @Override
@@ -172,7 +168,7 @@ public class NativePortProvider implements GpioPortProvider {
     /**
      * Check if software debounce is enabled.
      * <p>
-     * Software debounce is enabled by default, but can be disabled by setting the system property
+     * Software debounce is enabled by default but can be disabled by setting the system property
      * `pjs.gpio.debounce.software` to `false`. This is kind of hacky.
      * <ul>
      *     <li>Maybe this toggle should be part of the {@link GpioPortConfig}

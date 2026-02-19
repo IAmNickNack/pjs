@@ -120,7 +120,8 @@ class NativePort implements GpioPort, AutoCloseable {
     }
 
     /**
-     * Stateful predicate, which can be used as a software debouncer
+     * Stateful predicate, which can be used as a software debouncer.
+     * Events are triggered after bouncing has settled for the debounce period.
      */
     static class DebounceFilter implements Predicate<PollEvent> {
 
