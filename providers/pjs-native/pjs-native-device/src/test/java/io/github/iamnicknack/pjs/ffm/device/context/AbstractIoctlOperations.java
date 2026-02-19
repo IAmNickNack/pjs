@@ -2,6 +2,7 @@ package io.github.iamnicknack.pjs.ffm.device.context;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 /**
  * Abstract implementation of {@link IoctlOperations} for testing purposes.
@@ -69,6 +70,10 @@ public abstract class AbstractIoctlOperations implements IoctlOperations {
 
         public Builder addHandler(Long command) {
             return addHandler(command, (_, _, data) -> data);
+        }
+
+        public Builder add(UnaryOperator<Builder> operator) {
+            return operator.apply(this);
         }
 
         public AbstractIoctlOperations build() {

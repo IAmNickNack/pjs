@@ -4,12 +4,6 @@ import java.nio.file.Path;
 
 public abstract class AbstractSysfsOperations implements SysfsOperations {
 
-    public final String devicePath;
-
-    public AbstractSysfsOperations(String devicePath) {
-        this.devicePath = devicePath;
-    }
-
     @Override
     public Path path() {
         throw new UnsupportedOperationException();

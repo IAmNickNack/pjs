@@ -4,8 +4,6 @@ import io.github.iamnicknack.pjs.device.pwm.Pwm;
 import io.github.iamnicknack.pjs.device.pwm.PwmConfig;
 import io.github.iamnicknack.pjs.device.pwm.PwmProvider;
 import io.github.iamnicknack.pjs.ffm.device.context.SysfsOperationsFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static io.github.iamnicknack.pjs.ffm.device.NativePwm.ENABLE_PATH;
 
