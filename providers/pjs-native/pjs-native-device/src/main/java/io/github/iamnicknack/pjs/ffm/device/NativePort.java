@@ -35,8 +35,8 @@ class NativePort implements GpioPort, AutoCloseable {
     private final FileDescriptor fileDescriptor;
     private final Set<GpioEventListener<GpioPort>> listeners = new CopyOnWriteArraySet<>();
     private final EventPoller eventPoller;
+    private final AutoCloseable closeableCallback;
 
-//    private final Predicate<PollEvent> pollEventPredicate;
 
     /**
      * Create a new instance with event polling support
@@ -60,6 +60,11 @@ class NativePort implements GpioPort, AutoCloseable {
             case SOFTWARE_TRAILING_EDGE -> new TrailingEdgeDebounceCallback(this::handleEventCallback, config.debounceDelay() * 1000L);
             case HARDWARE -> this::handleEventCallback;
         };
+        if (pollEventsCallback instanceof AutoCloseable closeable) {
+            this.closeableCallback = closeable;
+        } else {
+            this.closeableCallback = null;
+        }
         this.eventPoller = eventPollerFactory.create(fileDescriptor, pollEventsCallback);
     }
 
@@ -98,6 +103,14 @@ class NativePort implements GpioPort, AutoCloseable {
     public void close() {
         logger.debug("Closing GPIO port with file descriptor: {}", fileDescriptor.fd());
         fileDescriptor.close();
+        if (closeableCallback != null) {
+            try {
+                closeableCallback.close();
+            } catch (Exception e) {
+                logger.warn("Failed to close event poller", e);
+            }
+        }
+        eventPoller.stop();
     }
 
     @Override
