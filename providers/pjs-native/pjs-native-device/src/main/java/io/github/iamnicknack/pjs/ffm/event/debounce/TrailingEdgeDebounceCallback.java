@@ -57,7 +57,7 @@ public class TrailingEdgeDebounceCallback implements PollEventsCallback, AutoClo
                         delegate.callback(poller, filteredEvents);
                     }
                 }
-            }, debounce, TimeUnit.MICROSECONDS);
+            }, debounce, TimeUnit.NANOSECONDS);
         }
     }
 
