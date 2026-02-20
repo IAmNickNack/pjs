@@ -60,6 +60,10 @@ public class EventPollerFactoryImpl implements EventPoller.Factory {
      */
     @Override
     public EventPoller create(FileDescriptor fileDescriptor, PollEventsCallback pollEventsCallback) {
+        logger.debug("Creating poller for fd: {}, with callback type: {}",
+                fileDescriptor.fd(),
+                pollEventsCallback.getClass().getSimpleName()
+        );
         return new Poller(fileDescriptor, pollEventsCallback);
     }
 

@@ -17,6 +17,7 @@ import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineConfigAttribute;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineInfo;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineRequest;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.PinFlag;
+import io.github.iamnicknack.pjs.ffm.event.DebounceStrategy;
 import io.github.iamnicknack.pjs.ffm.event.EventPoller;
 import io.github.iamnicknack.pjs.util.GpioPinMask;
 import org.jspecify.annotations.NonNull;
@@ -30,12 +31,6 @@ import java.util.Arrays;
  * @see <a href="https://docs.kernel.org/userspace-api/gpio/gpio-v2-get-lineinfo-ioctl.html">gpio-v2-get-lineinfo-ioctl</a>
  */
 public class NativePortProvider implements GpioPortProvider {
-
-    /**
-     * System property to enable software debounce.
-     * @see NativePort
-     */
-    public static final String SOFTWARE_DEBOUNCE_PROPERTY = "pjs.gpio.debounce.software";
 
     private final Logger logger = LoggerFactory.getLogger(NativePortProvider.class);
 
@@ -151,7 +146,8 @@ public class NativePortProvider implements GpioPortProvider {
         );
 
         LineConfigAttribute[] attributes;
-        if (config.portMode().isSet(GpioPortMode.INPUT) && eventFlags != 0 && !isSoftwareDebounceEnabled()) {
+        if (config.portMode().isSet(GpioPortMode.INPUT) && eventFlags != 0
+                && DebounceStrategy.fromProperty() == DebounceStrategy.HARDWARE) {
             logger.debug("Enabling hardware debounce filter for port {}", config.id());
             var debounceAttr = new LineAttribute(LineAttribute.Id.DEBOUNCE_PERIOD_US, config.debounceDelay());
             var mask = GpioPinMask.packBits(config.pinNumber());
@@ -163,22 +159,5 @@ public class NativePortProvider implements GpioPortProvider {
 
         var lineConfig = new LineConfig(modeFlags | eventFlags, attributes);
         return new LineRequest(config.pinNumber(), config.id(), lineConfig, 0, 0);
-    }
-
-    /**
-     * Check if software debounce is enabled.
-     * <p>
-     * Software debounce is enabled by default but can be disabled by setting the system property
-     * `pjs.gpio.debounce.software` to `false`. This is kind of hacky.
-     * <ul>
-     *     <li>Maybe this toggle should be part of the {@link GpioPortConfig}
-     *     <li>Which properties should/could be `system properties` and which ought to
-     *             be configurable per device, by the user requires some consideration.
-     * </ul>
-     * @return true if enabled, false otherwise
-     */
-    static boolean isSoftwareDebounceEnabled() {
-        return System.getProperty(SOFTWARE_DEBOUNCE_PROPERTY, "true")
-                .equalsIgnoreCase("true");
     }
 }
