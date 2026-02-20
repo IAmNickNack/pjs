@@ -60,13 +60,6 @@ class NativePort implements GpioPort, AutoCloseable {
         this.ioctlOperations = ioctlOperations;
         this.pollEventsCallback = new StabilityDebounceCallback(this::handleEventCallback, config.debounceDelay());
         this.eventPoller = eventPollerFactory.create(fileDescriptor, this.pollEventsCallback);
-//        this.eventPoller = eventPollerFactory.create(fileDescriptor, this::eventPollerCallback);
-//        if (NativePortProvider.isSoftwareDebounceEnabled()) {
-//            logger.info("Enabling software debounce for GPIO port with debounce delay: {}us", config.debounceDelay());
-//            this.pollEventPredicate = new ThrottleDebounceFilter(config.debounceDelay() * 1000L); // convert to ns
-//        } else {
-//            this.pollEventPredicate = _ -> true;
-//        }
     }
 
     /**
@@ -203,7 +196,7 @@ class NativePort implements GpioPort, AutoCloseable {
                             delegate.callback(poller, filteredEvents);
                         }
                     }
-                }, debounce, TimeUnit.MILLISECONDS);
+                }, debounce, TimeUnit.MICROSECONDS);
             }
         }
 
