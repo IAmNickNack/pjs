@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Waits until the signal/value is unchanged for the debounce window, then emits the change.
  */
-public class StabilityDebounceCallback implements PollEventsCallback, AutoCloseable {
+public class TrailingEdgeDebounceCallback implements PollEventsCallback, AutoCloseable {
 
     private final PollEventsCallback delegate;
     private final long debounce;
@@ -32,7 +32,7 @@ public class StabilityDebounceCallback implements PollEventsCallback, AutoClosea
      * @param delegate the delegate callback
      * @param debounce debounce period in microseconds
      */
-    public StabilityDebounceCallback(PollEventsCallback delegate, long debounce) {
+    public TrailingEdgeDebounceCallback(PollEventsCallback delegate, long debounce) {
         this.delegate = delegate;
         this.debounce = debounce;
         this.eventFilter = new DebounceFilter(debounce);
@@ -53,7 +53,7 @@ public class StabilityDebounceCallback implements PollEventsCallback, AutoClosea
             future = scheduler.schedule(() -> {
                 synchronized (lock) {
                     future = null;
-                    if ((lastEvent.timestamp() / 1000) >= debounce) {
+                    if ((lastEvent.timestamp()) >= debounce) {
                         delegate.callback(poller, filteredEvents);
                     }
                 }

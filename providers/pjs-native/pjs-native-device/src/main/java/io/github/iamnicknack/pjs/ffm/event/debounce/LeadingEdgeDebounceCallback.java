@@ -13,11 +13,11 @@ import java.util.List;
  * (or accept at most one event per window).
  * Useful when an immediate reaction is wanted but limit how often it can re-fire.
  */
-public class ThrottledDebounceCallback implements PollEventsCallback, AutoCloseable {
+public class LeadingEdgeDebounceCallback implements PollEventsCallback, AutoCloseable {
     private final PollEventsCallback delegate;
     private final DebounceFilter eventFilter;
 
-    public ThrottledDebounceCallback(PollEventsCallback delegate, long debounce) {
+    public LeadingEdgeDebounceCallback(PollEventsCallback delegate, long debounce) {
         this.delegate = delegate;
         this.eventFilter = new DebounceFilter(debounce);
     }

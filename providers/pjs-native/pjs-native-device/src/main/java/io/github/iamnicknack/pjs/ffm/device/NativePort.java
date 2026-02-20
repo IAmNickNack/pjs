@@ -10,8 +10,8 @@ import io.github.iamnicknack.pjs.ffm.event.DebounceStrategy;
 import io.github.iamnicknack.pjs.ffm.event.EventPoller;
 import io.github.iamnicknack.pjs.ffm.event.PollEvent;
 import io.github.iamnicknack.pjs.ffm.event.PollEventsCallback;
-import io.github.iamnicknack.pjs.ffm.event.debounce.StabilityDebounceCallback;
-import io.github.iamnicknack.pjs.ffm.event.debounce.ThrottledDebounceCallback;
+import io.github.iamnicknack.pjs.ffm.event.debounce.TrailingEdgeDebounceCallback;
+import io.github.iamnicknack.pjs.ffm.event.debounce.LeadingEdgeDebounceCallback;
 import io.github.iamnicknack.pjs.model.event.GpioChangeEvent;
 import io.github.iamnicknack.pjs.model.event.GpioEventListener;
 import org.slf4j.Logger;
@@ -56,8 +56,8 @@ class NativePort implements GpioPort, AutoCloseable {
         this.fileDescriptor = fileDescriptor;
         this.ioctlOperations = ioctlOperations;
         PollEventsCallback pollEventsCallback = switch (DebounceStrategy.fromProperty()) {
-            case SOFTWARE_LEADING_EDGE -> new ThrottledDebounceCallback(this::handleEventCallback, config.debounceDelay());
-            case SOFTWARE_TRAILING_EDGE -> new StabilityDebounceCallback(this::handleEventCallback, config.debounceDelay());
+            case SOFTWARE_LEADING_EDGE -> new LeadingEdgeDebounceCallback(this::handleEventCallback, config.debounceDelay() * 1000L);
+            case SOFTWARE_TRAILING_EDGE -> new TrailingEdgeDebounceCallback(this::handleEventCallback, config.debounceDelay() * 1000L);
             case HARDWARE -> this::handleEventCallback;
         };
         this.eventPoller = eventPollerFactory.create(fileDescriptor, pollEventsCallback);
