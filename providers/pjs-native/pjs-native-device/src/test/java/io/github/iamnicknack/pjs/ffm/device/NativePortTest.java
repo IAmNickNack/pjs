@@ -8,6 +8,7 @@ import io.github.iamnicknack.pjs.ffm.device.context.FileDescriptor;
 import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.GpioConstants;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineValues;
+import io.github.iamnicknack.pjs.ffm.event.DebounceStrategy;
 import io.github.iamnicknack.pjs.ffm.event.EventPoller;
 import io.github.iamnicknack.pjs.ffm.event.PollEvent;
 import io.github.iamnicknack.pjs.ffm.event.PollEventType;
@@ -20,7 +21,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static io.github.iamnicknack.pjs.ffm.device.NativePortProvider.SOFTWARE_DEBOUNCE_PROPERTY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class NativePortTest {
@@ -33,7 +33,7 @@ class NativePortTest {
 
     @Test
     void beforeEach() {
-        System.setProperty(SOFTWARE_DEBOUNCE_PROPERTY, "true");
+        System.setProperty(DebounceStrategy.PROPERTY_KEY, DebounceStrategy.SOFTWARE_LEADING_EDGE.name());
     }
 
     @Test
@@ -64,7 +64,7 @@ class NativePortTest {
 
     @Test
     void softwareDebounceIsNotActive() {
-        System.setProperty(SOFTWARE_DEBOUNCE_PROPERTY, "false");
+        System.setProperty(DebounceStrategy.PROPERTY_KEY, DebounceStrategy.HARDWARE.name());
         var pollerFactory = new FakeEventPollerFactory();
         var config = GpioPortConfig.builder()
                 .pin(1)
