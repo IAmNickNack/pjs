@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 
 class NativePwm extends PwmBean implements Pwm, AutoCloseable {
 
-    private static final long NANOS_PER_SECOND = TimeUnit.NANOSECONDS.convert(1, TimeUnit.SECONDS);
     static final String ENABLE_PATH = "enable";
     static final String DUTY_CYCLE_PATH = "duty_cycle";
     static final String PERIOD_PATH = "period";

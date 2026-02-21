@@ -107,10 +107,10 @@ public class PwmBean implements Device<Pwm>, Pwm {
         this.isOn = true;
     }
 
-    @Override
     /**
      * {@inheritDoc}
      */
+    @Override
     public void off() {
         this.isOn = false;
     }
