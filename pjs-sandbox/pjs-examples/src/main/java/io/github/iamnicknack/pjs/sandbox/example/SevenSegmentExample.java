@@ -23,7 +23,7 @@ public class SevenSegmentExample implements Runnable {
             .chip(0)
             .channel(2)
             .frequency(220)
-            .dutyCycle(50)
+            .dutyRatio(0.5)
             .build();
 
     private static final SpiConfig SPI_CONFIG = SpiConfig.builder()

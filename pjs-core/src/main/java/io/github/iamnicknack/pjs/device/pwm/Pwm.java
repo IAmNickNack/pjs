@@ -25,11 +25,11 @@ public interface Pwm extends Pin, Device<Pwm> {
      */
     default void setDutyRatio(double dutyRatio) {
         if (dutyRatio > 1) {
-            throw new IllegalArgumentException("dutyCycle must be <= 1");
+            throw new IllegalArgumentException("dutyCycle must be <= 1: " + dutyRatio + " > 1");
         }
 
         if (dutyRatio < 0) {
-            throw new IllegalArgumentException("dutyCycle must be >= 0");
+            throw new IllegalArgumentException("dutyCycle must be >= 0: " + dutyRatio + " < 0");
         }
 
         setDutyCycle(dutyCycleFromRatio(dutyRatio, getPeriod()));

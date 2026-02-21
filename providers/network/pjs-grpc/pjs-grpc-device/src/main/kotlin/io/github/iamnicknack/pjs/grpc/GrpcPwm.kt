@@ -22,7 +22,15 @@ class GrpcPwm(
     }
 
     override fun setDutyCycle(dutyCycle: Long) {
-        super.setPeriod(stub.setDutyCycle(this.config.asLongRequest(dutyCycle)).value)
+        super.setDutyCycle(stub.setDutyCycle(this.config.asLongRequest(dutyCycle)).value)
+    }
+
+    override fun getPeriod(): Long {
+        return stub.getPeriod(this.config.asDeviceRequest()).value
+    }
+
+    override fun setPeriod(period: Long) {
+        super.setPeriod(stub.setPeriod(this.config.asLongRequest(period)).value)
     }
 
     override fun getPolarity(): Pwm.Polarity {

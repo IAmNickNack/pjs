@@ -2,7 +2,6 @@ package io.github.iamnicknack.pjs.sandbox.example;
 
 import io.github.iamnicknack.pjs.device.pwm.Pwm;
 import io.github.iamnicknack.pjs.device.pwm.PwmConfig;
-import io.github.iamnicknack.pjs.model.WriteOperation;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
 import io.github.iamnicknack.pjs.model.pin.Pin;
 import io.github.iamnicknack.pjs.model.port.Port;
@@ -10,6 +9,7 @@ import io.github.iamnicknack.pjs.model.port.Port;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.DoubleUnaryOperator;
+import java.util.stream.Stream;
 
 public class PwmExample implements Runnable {
 
@@ -17,7 +17,7 @@ public class PwmExample implements Runnable {
             .chip(0)
             .channel(2)
             .frequency(220)
-            .dutyCycle(50)
+            .dutyRatio(0.5)
             .build();
 
     private final DeviceRegistry deviceRegistry;
@@ -38,76 +38,44 @@ public class PwmExample implements Runnable {
         });
 
         dutyCycleRange.forEach(dutyCycle -> {
-            pwm.setDutyCycle((double)(50 - dutyCycle) / 100.0);
+            pwm.setDutyRatio((double)dutyCycle / 100.0);
             sleep(10);
         });
         dutyCycleRange.forEach(dutyCycle -> {
-            pwm.setDutyCycle(dutyCycle);
+            pwm.setDutyRatio((double)dutyCycle / 100.0);
             sleep(50);
         });
 
         pwm.off();
     }
 
-//    private void usePortApi(Pwm pwm) {
-//        var portsPwm = new PortsPwm(pwm);
-//
-//        portsPwm.enablePin.high();
-//
-//        frequencyRange.forEach(frequency -> {
-//            portsPwm.frequencyPort.write(frequency);
-//            sleep(100);
-//        });
-//
-//        dutyCycleRange.forEach(dutyCycle -> {
-//            portsPwm.dutyCyclePort.write(50 - dutyCycle);
-//            sleep(10);
-//        });
-//        dutyCycleRange.forEach(dutyCycle -> {
-//            portsPwm.dutyCyclePort.write(dutyCycle);
-//            sleep(50);
-//        });
-//
-//        portsPwm.enablePin.low();
-//    }
+    private void usePortApi(Pwm pwm) {
+        var portsPwm = new PortsPwm(pwm);
 
-//    private void usePwmGeneric(Pwm pwm) {
-//        genericExample(pwm::setFrequency, pwm::setDutyCycle, pwm::setEnabled);
-//    }
-//
-//    private void usePortGeneric(Pwm pwm) {
-//        var portsPwm = new PortsPwm(pwm);
-//        genericExample(portsPwm.frequencyPort, portsPwm.dutyCyclePort, portsPwm.enablePin);
-//    }
-
-    private void genericExample(
-            WriteOperation<Integer> frequencyFn,
-            WriteOperation<Integer> dutyCycleFn,
-            WriteOperation<Boolean> enabledFn
-    ) {
-        enabledFn.write(true);
+        portsPwm.enablePin.high();
 
         frequencyRange.forEach(frequency -> {
-            frequencyFn.write(frequency);
+            portsPwm.frequencyPort.write(frequency);
             sleep(100);
         });
 
         dutyCycleRange.forEach(dutyCycle -> {
-            dutyCycleFn.write(50 - dutyCycle);
+            portsPwm.dutyRatioPort.write((double)dutyCycle / 100.0);
             sleep(10);
         });
         dutyCycleRange.forEach(dutyCycle -> {
-            dutyCycleFn.write(dutyCycle);
+            portsPwm.dutyRatioPort.write((double)dutyCycle / 100.0);
             sleep(50);
         });
 
-        enabledFn.write(false);
+        portsPwm.enablePin.low();
     }
 
     @Override
     public void run() {
         var pwm = deviceRegistry.create(PWM_CONFIG);
-        usePwmApi(pwm);
+//        usePwmApi(pwm);
+        usePortApi(pwm);
     }
 
     private static void sleep(long millis) {
@@ -120,19 +88,19 @@ public class PwmExample implements Runnable {
 
     /**
      * Wrapper around a port which exposes all properties as individual ports.
-     * @param dutyCyclePort the duty cycle port.
+     * @param dutyRatioPort the duty cycle port.
      * @param frequencyPort the frequency port.
      * @param enablePin the enable pin.
      */
     record PortsPwm(
-            Port<Long> dutyCyclePort,
+            Port<Double> dutyRatioPort,
             Port<Integer> frequencyPort,
             Pin enablePin,
             Pin inversePolarityPin
     ) {
         public PortsPwm(Pwm delegate) {
             this(
-                    Port.composite(delegate::getDutyCycle, delegate::setDutyCycle),
+                    Port.composite(delegate::getDutyRatio, delegate::setDutyRatio),
                     Port.composite(delegate::getFrequency, delegate::setFrequency),
                     Port.composite(delegate::isEnabled, delegate::setEnabled).pin(true, false),
                     Port.composite(delegate::getPolarity, delegate::setPolarity).pin(Pwm.Polarity.INVERTED, Pwm.Polarity.NORMAL)
@@ -186,6 +154,12 @@ public class PwmExample implements Runnable {
                     return value;
                 }
             };
+        }
+
+        public Stream<Integer> stream() {
+            return Stream.iterate(start, i -> i < end, i -> i + 1)
+                    .limit(steps)
+                    .map(i -> (int) Math.round(start + easing.applyAsDouble((double) i / (steps - 1)) * (end - start)));
         }
 
         private static double clamp(double v, double lo, double hi) {
