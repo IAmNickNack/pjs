@@ -18,7 +18,7 @@ class HttpPwmProvider(
     fun PwmConfig.asPwmConfigPayload() = PwmHandler.PwmConfigPayload(
         chip,
         channel,
-        frequency,
+        period,
         polarity,
         dutyCycle
     )

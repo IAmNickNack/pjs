@@ -26,14 +26,14 @@ class HttpPwmHandler(
         httpClient.put("/api/v1/pwm/$deviceId/off") {}
     }
 
-    override suspend fun setDutyCycle(deviceId: String, dutyCycle: Int) {
+    override suspend fun setDutyCycle(deviceId: String, dutyCycle: Long) {
         httpClient.put("/api/v1/pwm/$deviceId/duty-cycle/$dutyCycle")
     }
 
-    override suspend fun getDutyCycle(deviceId: String): Int =
+    override suspend fun getDutyCycle(deviceId: String): Long =
         httpClient
             .get("/api/v1/pwm/$deviceId/duty-cycle")
-            .body<Int>()
+            .body<Long>()
 
     override suspend fun setPolarity(deviceId: String, polarity: Pwm.Polarity) {
         httpClient.put("/api/v1/pwm/$deviceId/polarity/${polarity.name.lowercase()}")
@@ -53,4 +53,14 @@ class HttpPwmHandler(
         httpClient
             .get("/api/v1/pwm/$deviceId/frequency")
             .body<Int>()
+
+    override suspend fun setPeriod(deviceId: String, period: Long) {
+        httpClient.put("/api/v1/pwm/$deviceId/period/$period")
+    }
+
+    override suspend fun getPeriod(deviceId: String): Long =
+        httpClient
+            .get("/api/v1/pwm/$deviceId/period")
+            .body<Long>()
+
 }

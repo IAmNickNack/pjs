@@ -21,12 +21,10 @@ public class Pi4jPwmProvider implements PwmProvider {
     @Override
     public Pwm create(PwmConfig config) {
         com.pi4j.io.pwm.PwmConfig pi4jPwmConfig = PwmConfigBuilder.newInstance(pi4jContext)
-//                .chip(config.channel())
-//                .channel(config.chip())
                 .chip(config.chip())
                 .channel(config.channel())
                 .frequency(config.frequency())
-                .dutyCycle(config.dutyCycle())
+                .dutyCycle(config.dutyCyclePercent())
                 .build();
 
         com.pi4j.io.pwm.Pwm pi4jPwm = pi4jContext.create(pi4jPwmConfig);

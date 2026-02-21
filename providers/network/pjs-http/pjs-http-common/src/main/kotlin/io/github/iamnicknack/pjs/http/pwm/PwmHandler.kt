@@ -14,14 +14,17 @@ interface PwmHandler : ConfigHandler<Pwm> {
     suspend fun on(deviceId: String)
     suspend fun off(deviceId: String)
 
-    suspend fun setDutyCycle(deviceId: String, dutyCycle: Int)
-    suspend fun getDutyCycle(deviceId: String): Int
+    suspend fun setDutyCycle(deviceId: String, dutyCycle: Long)
+    suspend fun getDutyCycle(deviceId: String): Long
 
     suspend fun setPolarity(deviceId: String, polarity: Pwm.Polarity)
     suspend fun getPolarity(deviceId: String): Pwm.Polarity
 
     suspend fun setFrequency(deviceId: String, frequency: Int)
     suspend fun getFrequency(deviceId: String): Int
+
+    suspend fun setPeriod(deviceId: String, period: Long)
+    suspend fun getPeriod(deviceId: String): Long
 
     /**
      * Configuration payload for a PWM device
@@ -30,15 +33,15 @@ interface PwmHandler : ConfigHandler<Pwm> {
     class PwmConfigPayload(
         val chip: Int?,
         val channel: Int?,
-        val frequency: Int?,
+        val period: Long?,
         val polarity: Pwm.Polarity?,
-        val dutyCycle: Int?
+        val dutyCycle: Long?
     ) : ConfigHandler.DeviceConfigPayload<Pwm> {
         override fun asDeviceConfig(deviceId: String?): DeviceConfig<Pwm> = PwmConfig.builder()
             .id(deviceId ?: "PWM[${chip ?: 0}.${channel ?: 0}]")
             .chip(chip ?: 0)
             .channel(channel ?: 0)
-            .frequency(frequency ?: 440)
+            .period(period ?: 1000) // TODO: set this to 440hz
             .polarity(polarity ?: Pwm.Polarity.NORMAL)
             .dutyCycle(dutyCycle ?: 50)
             .build()

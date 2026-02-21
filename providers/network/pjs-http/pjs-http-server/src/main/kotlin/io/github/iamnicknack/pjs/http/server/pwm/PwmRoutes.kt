@@ -46,7 +46,7 @@ fun Route.pwmRoutes(handler: PwmHandler) {
          * Set the duty cycle of the PWM pin
          */
         put("/duty-cycle/{dutyCycle}") {
-            handler.setDutyCycle(call.deviceId, call.parameters["dutyCycle"]!!.toInt())
+            handler.setDutyCycle(call.deviceId, call.parameters["dutyCycle"]!!.toLong())
             call.respond(HttpStatusCode.OK)
         }
 

@@ -38,7 +38,7 @@ public class PwmExample implements Runnable {
         });
 
         dutyCycleRange.forEach(dutyCycle -> {
-            pwm.setDutyCycle(50 - dutyCycle);
+            pwm.setDutyCycle((double)(50 - dutyCycle) / 100.0);
             sleep(10);
         });
         dutyCycleRange.forEach(dutyCycle -> {
@@ -49,36 +49,36 @@ public class PwmExample implements Runnable {
         pwm.off();
     }
 
-    private void usePortApi(Pwm pwm) {
-        var portsPwm = new PortsPwm(pwm);
+//    private void usePortApi(Pwm pwm) {
+//        var portsPwm = new PortsPwm(pwm);
+//
+//        portsPwm.enablePin.high();
+//
+//        frequencyRange.forEach(frequency -> {
+//            portsPwm.frequencyPort.write(frequency);
+//            sleep(100);
+//        });
+//
+//        dutyCycleRange.forEach(dutyCycle -> {
+//            portsPwm.dutyCyclePort.write(50 - dutyCycle);
+//            sleep(10);
+//        });
+//        dutyCycleRange.forEach(dutyCycle -> {
+//            portsPwm.dutyCyclePort.write(dutyCycle);
+//            sleep(50);
+//        });
+//
+//        portsPwm.enablePin.low();
+//    }
 
-        portsPwm.enablePin.high();
-
-        frequencyRange.forEach(frequency -> {
-            portsPwm.frequencyPort.write(frequency);
-            sleep(100);
-        });
-
-        dutyCycleRange.forEach(dutyCycle -> {
-            portsPwm.dutyCyclePort.write(50 - dutyCycle);
-            sleep(10);
-        });
-        dutyCycleRange.forEach(dutyCycle -> {
-            portsPwm.dutyCyclePort.write(dutyCycle);
-            sleep(50);
-        });
-
-        portsPwm.enablePin.low();
-    }
-
-    private void usePwmGeneric(Pwm pwm) {
-        genericExample(pwm::setFrequency, pwm::setDutyCycle, pwm::setEnabled);
-    }
-
-    private void usePortGeneric(Pwm pwm) {
-        var portsPwm = new PortsPwm(pwm);
-        genericExample(portsPwm.frequencyPort, portsPwm.dutyCyclePort, portsPwm.enablePin);
-    }
+//    private void usePwmGeneric(Pwm pwm) {
+//        genericExample(pwm::setFrequency, pwm::setDutyCycle, pwm::setEnabled);
+//    }
+//
+//    private void usePortGeneric(Pwm pwm) {
+//        var portsPwm = new PortsPwm(pwm);
+//        genericExample(portsPwm.frequencyPort, portsPwm.dutyCyclePort, portsPwm.enablePin);
+//    }
 
     private void genericExample(
             WriteOperation<Integer> frequencyFn,
@@ -107,7 +107,7 @@ public class PwmExample implements Runnable {
     @Override
     public void run() {
         var pwm = deviceRegistry.create(PWM_CONFIG);
-        usePortGeneric(pwm);
+        usePwmApi(pwm);
     }
 
     private static void sleep(long millis) {
@@ -125,7 +125,7 @@ public class PwmExample implements Runnable {
      * @param enablePin the enable pin.
      */
     record PortsPwm(
-            Port<Integer> dutyCyclePort,
+            Port<Long> dutyCyclePort,
             Port<Integer> frequencyPort,
             Pin enablePin,
             Pin inversePolarityPin

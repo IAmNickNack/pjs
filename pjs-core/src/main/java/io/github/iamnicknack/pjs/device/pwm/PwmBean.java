@@ -10,15 +10,16 @@ public class PwmBean implements Device<Pwm>, Pwm {
 
     protected final PwmConfig config;
 
-    private int dutyCycle;
-    private int frequency;
+    private long dutyCycle;
+    private long period;
+
     private Polarity polarity = Polarity.NORMAL;
     private boolean isOn;
 
     public PwmBean(PwmConfig config) {
         this.config = config;
         this.dutyCycle = config.dutyCycle();
-        this.frequency = config.frequency();
+        this.period = config.period();
         this.isOn = false;
     }
 
@@ -34,10 +35,7 @@ public class PwmBean implements Device<Pwm>, Pwm {
      * {@inheritDoc}
      */
     @Override
-    public void setDutyCycle(int dutyCycle) {
-        if (dutyCycle < 0 || dutyCycle > 100) {
-            throw new IllegalArgumentException("dutyCycle must be 0..100");
-        }
+    public void setDutyCycle(long dutyCycle) {
         this.dutyCycle = dutyCycle;
     }
 
@@ -45,8 +43,24 @@ public class PwmBean implements Device<Pwm>, Pwm {
      * {@inheritDoc}
      */
     @Override
-    public int getDutyCycle() {
+    public long getDutyCycle() {
         return dutyCycle;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setPeriod(long period) {
+        this.period = period;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getPeriod() {
+        return this.period;
     }
 
     /**
@@ -57,7 +71,7 @@ public class PwmBean implements Device<Pwm>, Pwm {
         if (frequency <= 0) {
             throw new IllegalArgumentException("frequency must be > 0");
         }
-        this.frequency = frequency;
+        this.period = 1_000_000_000 / frequency;
     }
 
     /**
@@ -65,7 +79,7 @@ public class PwmBean implements Device<Pwm>, Pwm {
      */
     @Override
     public int getFrequency() {
-        return frequency;
+        return this.period == 0 ? 0 : (int) (1_000_000_000 / period);
     }
 
     /**

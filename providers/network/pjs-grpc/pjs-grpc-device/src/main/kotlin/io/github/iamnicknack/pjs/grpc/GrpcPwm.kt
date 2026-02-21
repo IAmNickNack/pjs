@@ -17,20 +17,12 @@ class GrpcPwm(
         return this.config
     }
 
-    override fun getFrequency(): Int {
-        return stub.getFrequency(this.config.asDeviceRequest()).value
-    }
-
-    override fun setFrequency(frequency: Int) {
-        super.setFrequency(stub.setFrequency(this.config.asIntegerRequest(frequency)).value)
-    }
-
-    override fun getDutyCycle(): Int {
+    override fun getDutyCycle(): Long {
         return stub.getDutyCycle(this.config.asDeviceRequest()).value
     }
 
-    override fun setDutyCycle(dutyCycle: Int) {
-        super.setDutyCycle(stub.setDutyCycle(this.config.asIntegerRequest(dutyCycle)).value)
+    override fun setDutyCycle(dutyCycle: Long) {
+        super.setPeriod(stub.setDutyCycle(this.config.asLongRequest(dutyCycle)).value)
     }
 
     override fun getPolarity(): Pwm.Polarity {

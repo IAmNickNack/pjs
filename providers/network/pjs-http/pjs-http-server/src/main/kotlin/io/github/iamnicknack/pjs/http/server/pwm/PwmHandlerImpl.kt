@@ -2,8 +2,8 @@ package io.github.iamnicknack.pjs.http.server.pwm
 
 import io.github.iamnicknack.pjs.device.pwm.Pwm
 import io.github.iamnicknack.pjs.http.config.ConfigHandler
-import io.github.iamnicknack.pjs.http.server.deviceOrThrow
 import io.github.iamnicknack.pjs.http.pwm.PwmHandler
+import io.github.iamnicknack.pjs.http.server.deviceOrThrow
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 
 class PwmHandlerImpl(
@@ -17,12 +17,12 @@ class PwmHandlerImpl(
     override suspend fun off(deviceId: String) =
         deviceRegistry.deviceOrThrow<Pwm>(deviceId).off()
 
-    override suspend fun setDutyCycle(deviceId: String, dutyCycle: Int) {
+    override suspend fun setDutyCycle(deviceId: String, dutyCycle: Long) {
         deviceRegistry.deviceOrThrow<Pwm>(deviceId)
             .dutyCycle = dutyCycle
     }
 
-    override suspend fun getDutyCycle(deviceId: String): Int =
+    override suspend fun getDutyCycle(deviceId: String): Long =
         deviceRegistry.deviceOrThrow<Pwm>(deviceId)
             .dutyCycle
 
@@ -43,4 +43,14 @@ class PwmHandlerImpl(
     override suspend fun getFrequency(deviceId: String): Int =
         deviceRegistry.deviceOrThrow<Pwm>(deviceId)
             .frequency
+
+    override suspend fun setPeriod(deviceId: String, period: Long) {
+        deviceRegistry.deviceOrThrow<Pwm>(deviceId)
+            .period = period
+    }
+
+    override suspend fun getPeriod(deviceId: String): Long {
+        return deviceRegistry.deviceOrThrow<Pwm>(deviceId)
+            .period
+    }
 }

@@ -24,14 +24,25 @@ class NativePwm extends PwmBean implements Pwm, AutoCloseable {
 
     // Synchronized to avoid races with on/off
     @Override
-    public synchronized void setDutyCycle(int dutyCycle) {
+    public synchronized void setDutyCycle(long dutyCycle) {
         super.setDutyCycle(dutyCycle);
         applySettings(); // write through to sysfs immediately
     }
 
     @Override
-    public synchronized int getDutyCycle() {
+    public synchronized long getDutyCycle() {
         return super.getDutyCycle();
+    }
+
+    @Override
+    public void setPeriod(long period) {
+        super.setPeriod(period);
+        applySettings();
+    }
+
+    @Override
+    public long getPeriod() {
+        return super.getPeriod();
     }
 
     @Override

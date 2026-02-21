@@ -22,12 +22,27 @@ public class Pi4jPwm implements Pwm {
     }
 
     @Override
-    public void setDutyCycle(int dutyCycle) {
-        pwm.setDutyCycle(dutyCycle);
+    public void setDutyCycle(double dutyCycle) {
+        pwm.setDutyCycle((int)(dutyCycle * 100.0));
     }
 
     @Override
-    public int getDutyCycle() {
+    public void setPeriod(long period) {
+        throw new UnsupportedOperationException("Setting period is not supported by pi4j");
+    }
+
+    @Override
+    public long getPeriod() {
+        throw new UnsupportedOperationException("Getting period is not supported by pi4j");
+    }
+
+    @Override
+    public void setDutyCycle(long dutyCycle) {
+        throw new UnsupportedOperationException("Setting duty cycle is not supported by pi4j");
+    }
+
+    @Override
+    public long getDutyCycle() {
         return pwm.getDutyCycle();
     }
 
@@ -43,7 +58,7 @@ public class Pi4jPwm implements Pwm {
 
     @Override
     public void setPolarity(Polarity polarity) {
-        // not supported by pi4j
+        throw new UnsupportedOperationException("Setting polarity is not supported by pi4j");
     }
 
     @Override

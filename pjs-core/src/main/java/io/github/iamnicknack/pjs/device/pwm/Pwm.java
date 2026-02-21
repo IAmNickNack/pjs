@@ -9,25 +9,57 @@ import io.github.iamnicknack.pjs.model.pin.Pin;
 public interface Pwm extends Pin, Device<Pwm> {
     /**
      * Set the duty cycle of the PWM.
-     * @param dutyCycle The duty cycle as a percentage.
+     * @param dutyCycle The duty cycle in nanos.
      */
-    void setDutyCycle(int dutyCycle);
+    void setDutyCycle(long dutyCycle);
 
     /**
      * Get the current duty cycle as a percentage.
      */
-    int getDutyCycle();
+    long getDutyCycle();
+
+    default void setDutyCycle(double dutyCycle) {
+        if (dutyCycle > 1) {
+            throw new IllegalArgumentException("dutyCycle must be <= 1");
+        }
+
+        if (dutyCycle < 0) {
+            throw new IllegalArgumentException("dutyCycle must be >= 0");
+        }
+
+        if (getPeriod() == 0) {
+            throw new IllegalStateException("Period must be set before setting duty cycle");
+        }
+
+        setDutyCycle((long) (dutyCycle * getPeriod()));
+    }
+
+    /**
+     * Set the period of the PWM in nanos.
+     * @param period The period in nanos.
+     */
+    void setPeriod(long period);
+
+    /**
+     * Get the current period in nanos.
+     * @return The period in nanos.
+     */
+    long getPeriod();
 
     /**
      * Set the frequency of the PWM.
      * @param frequency The frequency in Hz.
      */
-    void setFrequency(int frequency);
+    default void setFrequency(int frequency) {
+        setPeriod(1_000_000_000 / frequency);
+    }
 
     /**
      * Get the current frequency in Hz.
      */
-    int getFrequency();
+    default int getFrequency() {
+        return (int) (1_000_000_000 / getPeriod());
+    }
 
     /**
      * Set the signal polarity.
