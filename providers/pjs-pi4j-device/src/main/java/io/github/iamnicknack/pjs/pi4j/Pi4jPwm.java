@@ -22,8 +22,8 @@ public class Pi4jPwm implements Pwm {
     }
 
     @Override
-    public void setDutyCycle(double dutyCycle) {
-        pwm.setDutyCycle((int)(dutyCycle * 100.0));
+    public void setDutyRatio(double dutyRatio) {
+        pwm.setDutyCycle((int)(dutyRatio * 100.0));
     }
 
     @Override
