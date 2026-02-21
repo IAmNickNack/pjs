@@ -67,25 +67,6 @@ public class PwmBean implements Device<Pwm>, Pwm {
      * {@inheritDoc}
      */
     @Override
-    public void setFrequency(int frequency) {
-        if (frequency <= 0) {
-            throw new IllegalArgumentException("frequency must be > 0");
-        }
-        this.period = 1_000_000_000 / frequency;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getFrequency() {
-        return this.period == 0 ? 0 : (int) (1_000_000_000 / period);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void setPolarity(Polarity polarity) {
         this.polarity = polarity;
     }

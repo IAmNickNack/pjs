@@ -35,7 +35,10 @@ public record PwmConfig(
         private int chip;
         private int channel;
         private long period = 0;
+        private int frequency = 440;
         private long dutyCycle = 0; // Default duty cycle nanos
+        private double dutyRatio = 0.5;
+
         private Pwm.Polarity polarity = Pwm.Polarity.NORMAL;
         @Nullable
         private String id = null;
@@ -55,13 +58,21 @@ public record PwmConfig(
             return this;
         }
 
+        public Builder dutyRatio(double ratio) {
+            if (ratio < 0 || ratio > 1) {
+                throw new IllegalArgumentException("Duty cycle ratio must be between 0 and 1");
+            }
+            this.dutyRatio = ratio;
+            return this;
+        }
+
         public Builder dutyCycle(long dutyCycle) {
             this.dutyCycle = dutyCycle;
             return this;
         }
 
-        public Builder frequency(long frequency) {
-            this.period = 1_000_000_000 / frequency;
+        public Builder frequency(int frequency) {
+            this.frequency = frequency;
             return this;
         }
 
@@ -77,6 +88,15 @@ public record PwmConfig(
 
         public PwmConfig build() {
             var id = (this.id != null) ? this.id : String.format("PWM-%d-%d", chip, channel);
+
+            if (period == 0) {
+                period = (frequency > 0) ?  (1_000_000_000 / frequency) : 0;
+            }
+
+            if (dutyCycle == 0) {
+                dutyCycle = (long) (period * dutyRatio);
+            }
+
             return new PwmConfig(chip, channel, period, dutyCycle, polarity, id);
         }
     }

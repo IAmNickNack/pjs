@@ -15,23 +15,32 @@ public interface Pwm extends Pin, Device<Pwm> {
 
     /**
      * Get the current duty cycle as a percentage.
+     * @return The duty cycle as a percentage.
      */
     long getDutyCycle();
 
-    default void setDutyCycle(double dutyCycle) {
-        if (dutyCycle > 1) {
+    /**
+     * Set the duty cycle as a ratio of the period.
+     * @param dutyRatio The duty cycle as a ratio of the period.
+     */
+    default void setDutyRatio(double dutyRatio) {
+        if (dutyRatio > 1) {
             throw new IllegalArgumentException("dutyCycle must be <= 1");
         }
 
-        if (dutyCycle < 0) {
+        if (dutyRatio < 0) {
             throw new IllegalArgumentException("dutyCycle must be >= 0");
         }
 
-        if (getPeriod() == 0) {
-            throw new IllegalStateException("Period must be set before setting duty cycle");
-        }
+        setDutyCycle(dutyCycleFromRatio(dutyRatio, getPeriod()));
+    }
 
-        setDutyCycle((long) (dutyCycle * getPeriod()));
+    /**
+     * Get the current duty cycle as a ratio of the period.
+     * @return The duty cycle as a ratio of the period.
+     */
+    default double getDutyRatio() {
+        return ratioFromDutyCycle(getDutyCycle(), getPeriod());
     }
 
     /**
@@ -51,14 +60,18 @@ public interface Pwm extends Pin, Device<Pwm> {
      * @param frequency The frequency in Hz.
      */
     default void setFrequency(int frequency) {
-        setPeriod(1_000_000_000 / frequency);
+        if (frequency <= 0) {
+            throw new IllegalArgumentException("frequency must be > 0");
+        }
+        setPeriod(periodFromFrequency(frequency));
     }
 
     /**
      * Get the current frequency in Hz.
+     * @return The frequency in Hz.
      */
     default int getFrequency() {
-        return (int) (1_000_000_000 / getPeriod());
+        return frequencyFromPeriod(getPeriod());
     }
 
     /**
@@ -120,5 +133,25 @@ public interface Pwm extends Pin, Device<Pwm> {
         Polarity(String value) {
             this.value = value;
         }
+    }
+
+    static long periodFromFrequency(int frequency) {
+        return 1_000_000_000 / frequency;
+    }
+
+    static int frequencyFromPeriod(long period) {
+        return (period != 0)
+                ? (int) (1_000_000_000 / period)
+                : 0;
+    }
+
+    static long dutyCycleFromRatio(double ratio, long period) {
+        return (long) (ratio * period);
+    }
+
+    static double ratioFromDutyCycle(long dutyCycle, long period) {
+        return (period != 0)
+                ? (double) dutyCycle / period
+                : 0.0;
     }
 }
