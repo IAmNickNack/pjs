@@ -43,6 +43,21 @@ fun Route.pwmRoutes(handler: PwmHandler) {
         }
 
         /**
+         * Set the frequency of the PWM pin
+         */
+        put("/period/{period}") {
+            handler.setPeriod(call.deviceId, call.parameters["period"]!!.toLong())
+            call.respond(HttpStatusCode.OK)
+        }
+
+        /**
+         * Read the current frequency of the PWM pin
+         */
+        get("/period") {
+            call.respond(handler.getPeriod(call.deviceId))
+        }
+
+        /**
          * Set the duty cycle of the PWM pin
          */
         put("/duty-cycle/{dutyCycle}") {
