@@ -26,21 +26,21 @@ fun Route.pwmRoutes(handler: PwmHandler) {
             handler.off(call.deviceId)
             call.respond(HttpStatusCode.OK)
         }
-
-        /**
-         * Set the frequency of the PWM pin
-         */
-        put("/frequency/{frequency}") {
-            handler.setFrequency(call.deviceId, call.parameters["frequency"]!!.toInt())
-            call.respond(HttpStatusCode.OK)
-        }
-
-        /**
-         * Read the current frequency of the PWM pin
-         */
-        get("/frequency") {
-            call.respond(handler.getFrequency(call.deviceId))
-        }
+//
+//        /**
+//         * Set the frequency of the PWM pin
+//         */
+//        put("/frequency/{frequency}") {
+//            handler.setFrequency(call.deviceId, call.parameters["frequency"]!!.toInt())
+//            call.respond(HttpStatusCode.OK)
+//        }
+//
+//        /**
+//         * Read the current frequency of the PWM pin
+//         */
+//        get("/frequency") {
+//            call.respond(handler.getFrequency(call.deviceId))
+//        }
 
         /**
          * Set the frequency of the PWM pin
