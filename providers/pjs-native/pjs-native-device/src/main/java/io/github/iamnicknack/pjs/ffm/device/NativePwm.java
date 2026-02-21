@@ -111,8 +111,8 @@ class NativePwm extends PwmBean implements Pwm, AutoCloseable {
      * - if was enabled, re-enable
      */
     private void applySettings() {
-        long nanos = NANOS_PER_SECOND / super.getFrequency();
-        long dutyNanos = (nanos * super.getDutyCycle()) / 100;
+//        long nanos = NANOS_PER_SECOND / super.getFrequency();
+//        long dutyNanos = (nanos * super.getDutyCycle()) / 100;
 
         try {
             // If currently enabled, disable first to satisfy drivers that require it.
@@ -124,8 +124,8 @@ class NativePwm extends PwmBean implements Pwm, AutoCloseable {
             // Many drivers require duty <= period or require disabled writes.
             // Writing duty=0 first avoids transient invalid values.
             channelOperations.writeLong(DUTY_CYCLE_PATH, 0);
-            channelOperations.writeLong(PERIOD_PATH, nanos);
-            channelOperations.writeLong(DUTY_CYCLE_PATH, dutyNanos);
+            channelOperations.writeLong(PERIOD_PATH, this.getPeriod());
+            channelOperations.writeLong(DUTY_CYCLE_PATH, this.getDutyCycle());
             channelOperations.writeString(POLARITY_PATH, getPolarity().value);
 
             if (wasEnabled) {
