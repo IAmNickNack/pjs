@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 
 class NativePwm extends PwmBean implements Pwm, AutoCloseable {
 
-    private static final long NANOS_PER_SECOND = TimeUnit.NANOSECONDS.convert(1, TimeUnit.SECONDS);
     static final String ENABLE_PATH = "enable";
     static final String DUTY_CYCLE_PATH = "duty_cycle";
     static final String PERIOD_PATH = "period";
@@ -24,14 +23,25 @@ class NativePwm extends PwmBean implements Pwm, AutoCloseable {
 
     // Synchronized to avoid races with on/off
     @Override
-    public synchronized void setDutyCycle(int dutyCycle) {
+    public synchronized void setDutyCycle(long dutyCycle) {
         super.setDutyCycle(dutyCycle);
         applySettings(); // write through to sysfs immediately
     }
 
     @Override
-    public synchronized int getDutyCycle() {
+    public synchronized long getDutyCycle() {
         return super.getDutyCycle();
+    }
+
+    @Override
+    public void setPeriod(long period) {
+        super.setPeriod(period);
+        applySettings();
+    }
+
+    @Override
+    public long getPeriod() {
+        return super.getPeriod();
     }
 
     @Override
@@ -100,8 +110,8 @@ class NativePwm extends PwmBean implements Pwm, AutoCloseable {
      * - if was enabled, re-enable
      */
     private void applySettings() {
-        long nanos = NANOS_PER_SECOND / super.getFrequency();
-        long dutyNanos = (nanos * super.getDutyCycle()) / 100;
+//        long nanos = NANOS_PER_SECOND / super.getFrequency();
+//        long dutyNanos = (nanos * super.getDutyCycle()) / 100;
 
         try {
             // If currently enabled, disable first to satisfy drivers that require it.
@@ -113,8 +123,8 @@ class NativePwm extends PwmBean implements Pwm, AutoCloseable {
             // Many drivers require duty <= period or require disabled writes.
             // Writing duty=0 first avoids transient invalid values.
             channelOperations.writeLong(DUTY_CYCLE_PATH, 0);
-            channelOperations.writeLong(PERIOD_PATH, nanos);
-            channelOperations.writeLong(DUTY_CYCLE_PATH, dutyNanos);
+            channelOperations.writeLong(PERIOD_PATH, this.getPeriod());
+            channelOperations.writeLong(DUTY_CYCLE_PATH, this.getDutyCycle());
             channelOperations.writeString(POLARITY_PATH, getPolarity().value);
 
             if (wasEnabled) {

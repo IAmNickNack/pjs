@@ -17,14 +17,25 @@ public class LoggingPwm implements Pwm, WithDelegateDevice<Pwm> {
     }
 
     @Override
-    public void setDutyCycle(int dutyCycle) {
+    public void setDutyCycle(long dutyCycle) {
         logger.debug("Setting duty cycle: {}", dutyCycle);
         delegate.setDutyCycle(dutyCycle);
     }
 
     @Override
-    public int getDutyCycle() {
+    public long getDutyCycle() {
         return delegate.getDutyCycle();
+    }
+
+    @Override
+    public void setPeriod(long period) {
+        logger.debug("Setting period: {}", period);
+        delegate.setPeriod(period);
+    }
+
+    @Override
+    public long getPeriod() {
+        return delegate.getPeriod();
     }
 
     @Override

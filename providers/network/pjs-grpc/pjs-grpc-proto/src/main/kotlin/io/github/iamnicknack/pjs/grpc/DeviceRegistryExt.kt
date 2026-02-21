@@ -104,7 +104,7 @@ fun PwmConfig.asPwmConfigPayload(): PwmConfigPayload {
         .setChip(this.chip)
         .setChannel(this.channel)
         .setDutyCycle(this.dutyCycle)
-        .setFrequency(this.frequency)
+        .setPeriod(this.period)
         .build()
 }
 
@@ -114,7 +114,7 @@ fun PwmConfigPayload.asPwmConfig(): PwmConfig {
         .chip(this.chip)
         .channel(this.channel)
         .dutyCycle(this.dutyCycle)
-        .frequency(this.frequency)
+        .period(this.period)
         .build()
 }
 

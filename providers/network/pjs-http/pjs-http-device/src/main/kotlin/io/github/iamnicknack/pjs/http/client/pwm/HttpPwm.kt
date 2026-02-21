@@ -13,13 +13,13 @@ class HttpPwm(
 
     private var isEnabled: Boolean = false
 
-    override fun setDutyCycle(dutyCycle: Int) = runBlocking { pwmHandler.setDutyCycle(config.id, dutyCycle) }
+    override fun setDutyCycle(dutyCycle: Long) = runBlocking { pwmHandler.setDutyCycle(config.id, dutyCycle) }
 
-    override fun getDutyCycle(): Int = runBlocking { pwmHandler.getDutyCycle(config.id) }
+    override fun getDutyCycle(): Long = runBlocking { pwmHandler.getDutyCycle(config.id) }
 
-    override fun setFrequency(frequency: Int) = runBlocking { pwmHandler.setFrequency(config.id, frequency) }
+    override fun setPeriod(period: Long) = runBlocking { pwmHandler.setPeriod(config.id, period) }
 
-    override fun getFrequency(): Int = runBlocking { pwmHandler.getFrequency(config.id) }
+    override fun getPeriod(): Long = runBlocking { pwmHandler.getPeriod(config.id) }
 
     override fun setPolarity(polarity: Pwm.Polarity) = runBlocking { pwmHandler.setPolarity(config.id, polarity) }
 

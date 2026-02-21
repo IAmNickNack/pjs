@@ -25,8 +25,8 @@ class NativePwmProviderTest {
 
         try (var provider = new NativePwmProvider(factory);
              var device = provider.create(PwmConfig.builder().chip(0).channel(0).build())) {
-            device.setDutyCycle(50);
             device.setFrequency(440);
+            device.setDutyRatio(0.50);
             device.setPolarity(Pwm.Polarity.NORMAL);
             device.on();
             assertThat(device.read()).isTrue();

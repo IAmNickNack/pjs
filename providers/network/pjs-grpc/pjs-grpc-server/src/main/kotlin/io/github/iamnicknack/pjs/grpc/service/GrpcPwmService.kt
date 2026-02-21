@@ -2,6 +2,7 @@ package io.github.iamnicknack.pjs.grpc.service
 
 import io.github.iamnicknack.pjs.device.pwm.Pwm
 import io.github.iamnicknack.pjs.grpc.asIntegerResponse
+import io.github.iamnicknack.pjs.grpc.asLongResponse
 import io.github.iamnicknack.pjs.grpc.asPolarity
 import io.github.iamnicknack.pjs.grpc.asPolarityResponse
 import io.github.iamnicknack.pjs.grpc.asPwmPolarity
@@ -13,6 +14,8 @@ import io.github.iamnicknack.pjs.grpc.gen.v1.types.DeviceRequest
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.Empty
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.IntegerRequest
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.IntegerResponse
+import io.github.iamnicknack.pjs.grpc.gen.v1.types.LongRequest
+import io.github.iamnicknack.pjs.grpc.gen.v1.types.LongResponse
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 
 class GrpcPwmService(
@@ -29,22 +32,22 @@ class GrpcPwmService(
         return Empty.getDefaultInstance()
     }
 
-    override suspend fun setFrequency(request: IntegerRequest): IntegerResponse {
-        deviceRegistry.deviceOrThrow<Pwm>(request.deviceId).setFrequency(request.value)
-        return request.asIntegerResponse()
+    override suspend fun setPeriod(request: LongRequest): LongResponse {
+        deviceRegistry.deviceOrThrow<Pwm>(request.deviceId).setPeriod(request.value)
+        return request.asLongResponse()
     }
 
-    override suspend fun getFrequency(request: DeviceRequest): IntegerResponse {
-        return deviceRegistry.deviceOrThrow<Pwm>(request.deviceId).getFrequency().asIntegerResponse()
+    override suspend fun getPeriod(request: DeviceRequest): LongResponse {
+        return deviceRegistry.deviceOrThrow<Pwm>(request.deviceId).getPeriod().asLongResponse()
     }
 
-    override suspend fun setDutyCycle(request: IntegerRequest): IntegerResponse {
+    override suspend fun setDutyCycle(request: LongRequest): LongResponse {
         deviceRegistry.deviceOrThrow<Pwm>(request.deviceId).setDutyCycle(request.value)
-        return request.asIntegerResponse()
+        return request.asLongResponse()
     }
 
-    override suspend fun getDutyCycle(request: DeviceRequest): IntegerResponse {
-        return deviceRegistry.deviceOrThrow<Pwm>(request.deviceId).getDutyCycle().asIntegerResponse()
+    override suspend fun getDutyCycle(request: DeviceRequest): LongResponse {
+        return deviceRegistry.deviceOrThrow<Pwm>(request.deviceId).getDutyCycle().asLongResponse()
     }
 
     override suspend fun setPolarity(request: PolarityRequest): PolarityResponse {

@@ -7,8 +7,8 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
 import io.github.iamnicknack.pjs.device.pwm.Pwm
 import io.github.iamnicknack.pjs.device.pwm.PwmConfig
-import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import io.github.iamnicknack.pjs.mock.MockPwm
+import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -30,7 +30,7 @@ class GrpcPwmTest {
         val device = localRegistry.create(config)
         assertThat(device.config.id).isEqualTo(config.id)
         assertThat(device.dutyCycle).isEqualTo(config.dutyCycle)
-        assertThat(device.frequency).isEqualTo(config.frequency)
+        assertThat(device.frequency).isEqualTo((1_000_000_000 / config.period).toInt())
 
         val remoteDevice = remoteRegistry.device<Pwm>(config.id) as? MockPwm ?: fail("cannot find device")
         assertThat(remoteDevice).isNotNull()

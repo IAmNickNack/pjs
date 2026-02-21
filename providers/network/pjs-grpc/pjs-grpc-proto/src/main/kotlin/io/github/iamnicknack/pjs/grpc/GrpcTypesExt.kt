@@ -10,10 +10,21 @@ import io.github.iamnicknack.pjs.grpc.gen.v1.types.DataResponse
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.DeviceRequest
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.IntegerRequest
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.IntegerResponse
+import io.github.iamnicknack.pjs.grpc.gen.v1.types.LongRequest
+import io.github.iamnicknack.pjs.grpc.gen.v1.types.LongResponse
 import io.github.iamnicknack.pjs.model.device.DeviceConfig
 
 fun DeviceConfig<*>.asDeviceRequest(): DeviceRequest = DeviceRequest.newBuilder()
     .setDeviceId(this.id)
+    .build()
+
+fun DeviceConfig<*>.asLongRequest(value: Long): LongRequest = LongRequest.newBuilder()
+    .setDeviceId(this.id)
+    .setValue(value)
+    .build()
+
+fun LongRequest.asLongResponse(): LongResponse = LongResponse.newBuilder()
+    .setValue(this.value)
     .build()
 
 fun DeviceConfig<*>.asIntegerRequest(value: Int): IntegerRequest = IntegerRequest.newBuilder()
@@ -47,6 +58,10 @@ fun PolarityRequest.asPolarityResponse(): PolarityResponse = PolarityResponse.ne
 
 fun PwmPolarity.asPolarityResponse(): PolarityResponse = PolarityResponse.newBuilder()
     .setPolarity(this)
+    .build()
+
+fun Long.asLongResponse(): LongResponse = LongResponse.newBuilder()
+    .setValue(this)
     .build()
 
 fun Int.asIntegerResponse(): IntegerResponse = IntegerResponse.newBuilder()

@@ -319,11 +319,11 @@ paths:
             '*/*':
               schema:
                 type: "object"
-  /api/v1/pwm/{deviceId}/frequency:
+  /api/v1/pwm/{deviceId}/period:
     get:
       tags:
         - PWM
-      description: "Read the current frequency of the PWM pin"
+      description: "Read the current period of the PWM pin"
       parameters:
         - name: "deviceId"
           in: "path"
@@ -337,18 +337,18 @@ paths:
             '*/*':
               schema:
                 type: "integer"
-                format: "int32"
-  /api/v1/pwm/{deviceId}/frequency/{frequency}:
+                format: "int64"
+  /api/v1/pwm/{deviceId}/period/{period}:
     put:
       tags:
         - PWM
-      description: "Set the frequency of the PWM pin"
+      description: "Set the period of the PWM pin"
       parameters:
-        - name: "frequency"
+        - name: "period"
           in: "path"
           required: true
           schema:
-            type: "string"
+            type: "int64"
         - name: "deviceId"
           in: "path"
           required: true
