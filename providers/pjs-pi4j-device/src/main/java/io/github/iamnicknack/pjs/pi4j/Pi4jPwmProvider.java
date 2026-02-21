@@ -2,6 +2,7 @@ package io.github.iamnicknack.pjs.pi4j;
 
 import com.pi4j.context.Context;
 import com.pi4j.io.pwm.PwmConfigBuilder;
+import com.pi4j.io.pwm.PwmType;
 import io.github.iamnicknack.pjs.device.pwm.Pwm;
 import io.github.iamnicknack.pjs.device.pwm.PwmConfig;
 import io.github.iamnicknack.pjs.device.pwm.PwmProvider;
@@ -25,6 +26,7 @@ public class Pi4jPwmProvider implements PwmProvider {
                 .channel(config.channel())
                 .frequency(config.frequency())
                 .dutyCycle(config.dutyCyclePercent())
+                .pwmType(PwmType.HARDWARE)
                 .build();
 
         com.pi4j.io.pwm.Pwm pi4jPwm = pi4jContext.create(pi4jPwmConfig);

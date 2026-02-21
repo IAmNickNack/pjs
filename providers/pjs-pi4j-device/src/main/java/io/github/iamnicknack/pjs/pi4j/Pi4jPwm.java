@@ -63,7 +63,7 @@ public class Pi4jPwm implements Pwm {
 
     @Override
     public void setPolarity(Polarity polarity) {
-        throw new UnsupportedOperationException("Setting polarity is not supported by pi4j");
+        throw new UnsupportedOperationException("Setting polarity at runtime is not supported by pi4j");
     }
 
     @Override
