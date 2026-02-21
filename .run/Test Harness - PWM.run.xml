@@ -2,7 +2,7 @@
   <configuration default="false" name="Test Harness - PWM" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="io.github.iamnicknack.pjs.sandbox.Main" />
     <module name="pjs-sandbox.pjs-examples.main" />
-    <option name="PROGRAM_PARAMETERS" value="--plugin grpc --grpc-host 10.0.0.2 --grpc-port 9090 --pwm" />
+    <option name="PROGRAM_PARAMETERS" value="--plugin grpc --grpc-host 10.0.0.2 --grpc-port 9090 --pwm --logging" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="io.github.iamnicknack.pjs.sandbox.*" />
