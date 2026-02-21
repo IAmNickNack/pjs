@@ -11,7 +11,7 @@ dependencies {
     api(project(":pjs-native-context"))
     api(libs.slf4j.api)
     testRuntimeOnly(libs.logback.classic)
-    testImplementation("com.google.jimfs:jimfs:1.3.1")
+    testImplementation(libs.jimfs)
 }
 
 tasks.withType<Test> {
