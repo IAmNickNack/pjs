@@ -22,28 +22,13 @@ public class Pi4jPwm implements Pwm {
     }
 
     @Override
-    public void setDutyRatio(double dutyRatio) {
-        pwm.setDutyCycle((int)(dutyRatio * 100.0));
-    }
-
-    @Override
     public void setPeriod(long period) {
-        throw new UnsupportedOperationException("Setting period is not supported by pi4j");
+        setFrequency(Pwm.frequencyFromPeriod(period));
     }
 
     @Override
     public long getPeriod() {
-        throw new UnsupportedOperationException("Getting period is not supported by pi4j");
-    }
-
-    @Override
-    public void setDutyCycle(long dutyCycle) {
-        throw new UnsupportedOperationException("Setting duty cycle is not supported by pi4j");
-    }
-
-    @Override
-    public long getDutyCycle() {
-        return pwm.getDutyCycle();
+        return Pwm.periodFromFrequency(getFrequency());
     }
 
     @Override
@@ -54,6 +39,26 @@ public class Pi4jPwm implements Pwm {
     @Override
     public int getFrequency() {
         return pwm.getFrequency();
+    }
+
+    @Override
+    public void setDutyCycle(long dutyCycle) {
+        setDutyRatio(Pwm.ratioFromDutyCycle(dutyCycle, getPeriod()));
+    }
+
+    @Override
+    public long getDutyCycle() {
+        return pwm.getDutyCycle();
+    }
+
+    @Override
+    public void setDutyRatio(double dutyRatio) {
+        pwm.setDutyCycle((int)(dutyRatio * 100.0));
+    }
+
+    @Override
+    public double getDutyRatio() {
+        return (double)pwm.getDutyCycle() / 100.0;
     }
 
     @Override
