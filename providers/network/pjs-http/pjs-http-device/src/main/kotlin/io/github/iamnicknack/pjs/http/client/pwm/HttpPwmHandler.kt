@@ -45,15 +45,6 @@ class HttpPwmHandler(
             .body<String>()
             .let { Pwm.Polarity.valueOf(it.uppercase()) }
 
-//    override suspend fun setFrequency(deviceId: String, frequency: Int) {
-//        httpClient.put("/api/v1/pwm/$deviceId/frequency/$frequency")
-//    }
-//
-//    override suspend fun getFrequency(deviceId: String): Int =
-//        httpClient
-//            .get("/api/v1/pwm/$deviceId/frequency")
-//            .body<Int>()
-//
     override suspend fun setPeriod(deviceId: String, period: Long) {
         httpClient.put("/api/v1/pwm/$deviceId/period/$period")
     }

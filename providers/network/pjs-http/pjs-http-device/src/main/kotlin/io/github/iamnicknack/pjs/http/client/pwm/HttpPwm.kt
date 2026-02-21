@@ -21,10 +21,6 @@ class HttpPwm(
 
     override fun getPeriod(): Long = runBlocking { pwmHandler.getPeriod(config.id) }
 
-//    override fun setFrequency(frequency: Int) = runBlocking { pwmHandler.setFrequency(config.id, frequency) }
-//
-//    override fun getFrequency(): Int = runBlocking { pwmHandler.getFrequency(config.id) }
-//
     override fun setPolarity(polarity: Pwm.Polarity) = runBlocking { pwmHandler.setPolarity(config.id, polarity) }
 
     override fun getPolarity(): Pwm.Polarity = runBlocking { pwmHandler.getPolarity(config.id) }

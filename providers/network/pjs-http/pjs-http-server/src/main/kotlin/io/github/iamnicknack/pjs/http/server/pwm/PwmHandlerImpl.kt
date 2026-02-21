@@ -34,15 +34,6 @@ class PwmHandlerImpl(
     override suspend fun getPolarity(deviceId: String): Pwm.Polarity =
         deviceRegistry.deviceOrThrow<Pwm>(deviceId)
             .polarity
-//
-//    override suspend fun setFrequency(deviceId: String, frequency: Int) {
-//        deviceRegistry.deviceOrThrow<Pwm>(deviceId)
-//            .frequency = frequency
-//    }
-//
-//    override suspend fun getFrequency(deviceId: String): Int =
-//        deviceRegistry.deviceOrThrow<Pwm>(deviceId)
-//            .frequency
 
     override suspend fun setPeriod(deviceId: String, period: Long) {
         deviceRegistry.deviceOrThrow<Pwm>(deviceId)

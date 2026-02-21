@@ -19,9 +19,6 @@ interface PwmHandler : ConfigHandler<Pwm> {
 
     suspend fun setPolarity(deviceId: String, polarity: Pwm.Polarity)
     suspend fun getPolarity(deviceId: String): Pwm.Polarity
-//
-//    suspend fun setFrequency(deviceId: String, frequency: Int)
-//    suspend fun getFrequency(deviceId: String): Int
 
     suspend fun setPeriod(deviceId: String, period: Long)
     suspend fun getPeriod(deviceId: String): Long
