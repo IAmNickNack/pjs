@@ -1,6 +1,5 @@
 package io.github.iamnicknack.pjs.ffm.context.method;
 
-import java.lang.foreign.AddressLayout;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
 import java.lang.foreign.MemoryLayout;
@@ -23,15 +22,14 @@ public class CapturedStateMethodCallerFactory implements MethodCallerFactory {
     // Captured state for errno
     private static final StructLayout CAPTURED_STATE_LAYOUT = Linker.Option.captureStateLayout();
     // Errno var handle
-    private static final VarHandle ERRNO_HANDLE =
-            CAPTURED_STATE_LAYOUT.varHandle(MemoryLayout.PathElement.groupElement("errno"));
-    // Pointer to string error function result
-    private static final AddressLayout POINTER = ValueLayout.ADDRESS.withTargetLayout(
-            MemoryLayout.sequenceLayout(1024, ValueLayout.JAVA_BYTE));
-    // Strerror method handle
-    private static final MethodHandle STR_ERROR = Linker.nativeLinker().downcallHandle(
-            Linker.nativeLinker().defaultLookup().find("strerror").orElseThrow(),
-            FunctionDescriptor.of(POINTER, ValueLayout.JAVA_INT));
+    private static final VarHandle ERRNO_HANDLE = CAPTURED_STATE_LAYOUT
+            .varHandle(MemoryLayout.PathElement.groupElement("errno"));
+    // Strerror method handle (returns char* as an ADDRESS)
+    private static final MethodHandle STR_ERROR = Linker.nativeLinker()
+            .downcallHandle(
+                    Linker.nativeLinker().defaultLookup().find("strerror").orElseThrow(),
+                    FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT)
+            );
 
     private final SegmentAllocator segmentAllocator;
     private final SymbolLookup symbolLookup;
