@@ -8,6 +8,6 @@ plugins {
 
 dependencies {
     api(project(":pjs-core"))
-    compileOnly(libs.pi4j.core)
+    compileOnly(libs.pi4j.core) // allow the pi4j version to be specified by the user
     testImplementation(libs.pi4j.plugin.mock)
 }
