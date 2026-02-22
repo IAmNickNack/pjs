@@ -8,7 +8,7 @@ plugins {
 
 dependencies {
     api(project(":pjs-core"))
-    api(libs.pi4j.core)
-    implementation(libs.bundles.pi4j.plugins)
+    compileOnly(libs.pi4j.core)
+    compileOnly(libs.bundles.pi4j.plugins)
     testImplementation(libs.pi4j.plugin.mock)
 }
