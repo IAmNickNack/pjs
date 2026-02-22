@@ -2,12 +2,15 @@ package io.github.iamnicknack.pjs.sandbox.example;
 
 import io.github.iamnicknack.pjs.device.i2c.I2CConfig;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.DrawingOperations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Driver;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Operations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.TextOperations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.impl.DefaultDrawingOperations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.impl.DirtyTrackingDisplayBuffer;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.impl.StackedDisplayBuffer;
+
+import java.util.function.BiConsumer;
 
 public class OledExample implements Runnable {
 
@@ -58,17 +61,17 @@ public class OledExample implements Runnable {
         // Subtractive drawing operations to remove the drawn data without affecting the text
         var subtractiveDrawOperations = new DefaultDrawingOperations(subtractiveDisplayOperations);
 
+        BiConsumer<Integer, DrawingOperations> drawBar = (i, drawingOperations) -> {
+//            drawingOperations.fillRectangle(i, 28, Math.min(i + 2, 255), 42);
+//            if (i > 6 && i < 249)
+                drawingOperations.fillCircle(i, 36, 6);
+        };
+
         // Move a bar across the text
         for (int i = 0; i < 256; i++) {
-            additiveDrawOperations.drawLine(i, 28, i, 44);
-            if ((i + 1) % 128 != 0) {
-                additiveDrawOperations.drawLine(i + 1, 28, i + 1, 44);
-            }
+            drawBar.accept(i, additiveDrawOperations);
             additiveDisplayOperations.copyTo(deviceOperations);
-            subtractiveDrawOperations.drawLine(i, 28, i, 44);
-            if ((i + 1) % 128 != 0) {
-                subtractiveDrawOperations.drawLine(i + 1, 28, i + 1, 44);
-            }
+            drawBar.accept(i, subtractiveDrawOperations);
         }
         additiveDisplayOperations.copyTo(deviceOperations);
      }

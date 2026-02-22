@@ -6,6 +6,25 @@ import io.github.iamnicknack.pjs.sandbox.device.sh1106.DisplayOperations;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * {@link BufferedDisplayOperations} implementation which tracks which blocks of data have been modified.
+ * <p>
+ * The physical display is eight pages by 128 columns. The dirty tracker divides each page into an arbitrary
+ * number of "blocks", each containing a specified number of columns, dictated by the block size.
+ * <p>
+ * For example, with a block size of 16, each page is divided into 8 blocks of 16 columns each. The entire display
+ * is divided into 8 pages, so there are 8 * 8 = 64 blocks in total.
+ * <p>
+ * When a redraw is requested, rather than redrawing the entire display and sending 1024 bytes of data for every frame,
+ * only the blocks which contain modified data are redrawn. This can significantly reduce the amount of serial data
+ * that needs to be sent to the display, improving performance.
+ * <p>
+ * If a single pixel on the display is updated, only the block containing that pixel is redrawn. With a block size of
+ * 16, for example, only 16 bytes of data need to be sent to the display. In practice, an additional 6 bytes are
+ * required to specify the page and column for the block start position. Contiguous blocks per page only need to send
+ * this data for the first block as the position for later blocks is implied by the end position of the previous block.
+ * <p>
+ */
 public class DirtyTrackingDisplayBuffer implements BufferedDisplayOperations {
 
     /**
