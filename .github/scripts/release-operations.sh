@@ -11,7 +11,7 @@ is_snapshot() {
 
 # `true` if gh release list contains "v${BUILD_VERSION}"
 release_exists() {
-  if gh release list | grep -qF "v${BUILD_VERSION}"; then
+  if gh release list | grep -qF "^v${BUILD_VERSION}$"; then
     return 0
   else
     return 1
@@ -39,6 +39,7 @@ create_github_release() {
       gh release create "v${BUILD_VERSION}" --title "v${BUILD_VERSION}" --notes "Automated snapshot release for version ${BUILD_VERSION}" --prerelease
       RC=$?
     else
+      echo "Creating release for version ${BUILD_VERSION}"
       gh release create "v${BUILD_VERSION}" --title "v${BUILD_VERSION}" --notes "Release for version ${BUILD_VERSION}"
       RC=$?
     fi
