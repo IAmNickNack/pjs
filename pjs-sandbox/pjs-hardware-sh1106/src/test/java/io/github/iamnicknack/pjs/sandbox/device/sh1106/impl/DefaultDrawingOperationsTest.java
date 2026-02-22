@@ -1,6 +1,7 @@
 package io.github.iamnicknack.pjs.sandbox.device.sh1106.impl;
 
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
 import java.util.stream.Stream;
@@ -23,5 +24,24 @@ class DefaultDrawingOperationsTest {
             drawingOperations.drawLine(1, 1, 1, 2);
             assertEquals(6, buffer.getPointValue(0, 1));
         }));
+    }
+
+
+    @Test
+    void canDrawVerticalLine() {
+        var buffer = new DefaultDisplayBuffer() {
+            @Override
+            public void orData (int page, int column, byte[] data, int offset, int length) {
+                switch (page) {
+                    case 0 -> assertEquals(0b1100_0000, data[0] & 0xff);
+                    case 1 -> assertEquals(0b1111_1111, data[0] & 0xff);
+                    case 2 -> assertEquals(0b0000_0011, data[0] & 0xff);
+                    default -> throw new IllegalStateException();
+                }
+            }
+        };
+
+        var operations = new DefaultDrawingOperations(buffer);
+        operations.drawVerticalLine(0, 6, 18);
     }
 }

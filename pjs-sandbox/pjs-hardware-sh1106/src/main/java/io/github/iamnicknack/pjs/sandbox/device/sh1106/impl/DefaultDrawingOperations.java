@@ -3,6 +3,8 @@ package io.github.iamnicknack.pjs.sandbox.device.sh1106.impl;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.BufferedDisplayOperations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.DrawingOperations;
 
+import java.util.Arrays;
+
 /**
  * Naive implementation of {@link DrawingOperations} which are not optimised for the page layout of the SH1106.
  */
@@ -30,14 +32,12 @@ public class DefaultDrawingOperations implements DrawingOperations {
         var dx = end.x() - start.x();
         var dy = end.y() - start.y();
 
-        if (dx == 0) {
-            for (int y = start.y(); y <= end.y(); y++) {
-                drawPixel(new Point(start.x(), y));
-            }
+        if (dx == 0 && dy == 0) {
+            drawPixel(start);
+        } else if (dx == 0) {
+            drawVerticalLine(start.x(), start.y(), end.y());
         } else if (dy == 0) {
-            for (int x = start.x(); x <= end.x(); x++) {
-                drawPixel(new Point(x, start.y()));
-            }
+            drawHorizontalLine(start.x(), end.x(), start.y());
         } else if (dx > 0) {
             for (int x = start.x(); x < end.x(); x++) {
                 var y = start.y() + (x - start.x()) * dy / dx;
@@ -51,13 +51,44 @@ public class DefaultDrawingOperations implements DrawingOperations {
         }
     }
 
+    public void drawHorizontalLine(int x1, int x2, int y) {
+        var buffer = new byte[x2 - x1 + 1];
+        var pixel = (byte) (1 << (y % 8));
+        Arrays.fill(buffer, pixel);
+        displayOperations.orData(y / PAGE_HEIGHT, x1, buffer, 0, buffer.length);
+    }
+
+    public void drawVerticalLine(int x, int y1, int y2) {
+        long mask = 0xffffffffffffffffL;
+        long low = mask << y1;
+        long high = mask >>> (64 - y2);
+        long value = low & high;
+
+        for (int i = 0; i < 8 && value != 0; i++) {
+            var pageValue = value & 0xff;
+            if (pageValue != 0) {
+                displayOperations.orData(i, x, new byte[] {(byte) pageValue}, 0, 1);
+            }
+            value >>= 8;
+        }
+    }
+
     @Override
     public void drawCircle(Point center, int radius) {
+        renderCircle(center.addX(128), radius, this::plot8WaySymmetry);
+    }
+
+    @Override
+    public void fillCircle(Point center, int radius) {
+        renderCircle(center.addX(128), radius, this::fill8WaySymmetry);
+    }
+
+    private void renderCircle(Point center, int radius, PointsConsumer consumer) {
         int x = 0;
         int y = radius;
         int d = 1 - radius;   // decision parameter
 
-        plot8WaySymmetry(center.x(), center.y(), x, y);
+        consumer.accept(center.x(), center.y(), x, y);
 
         while (x < y) {
             x++;
@@ -71,7 +102,7 @@ public class DefaultDrawingOperations implements DrawingOperations {
                 d += 2 * (x - y) + 1;
             }
 
-            plot8WaySymmetry(center.x(), center.y(), x, y);
+            consumer.accept(center.x(), center.y(), x, y);
         }
     }
 
@@ -86,8 +117,19 @@ public class DefaultDrawingOperations implements DrawingOperations {
         drawPixel(cx - y, cy - x);
     }
 
+    private void fill8WaySymmetry(int cx, int cy, int x, int y) {
+        drawLine(cx - x, cy - y, cx - x, cy + y);
+        drawLine(cx + x, cy - y, cx + x, cy + y);
+        drawLine(cx - y, cy - x, cx - y, cy + x);
+        drawLine(cx + y, cy - x, cx + y, cy + x);
+    }
+
     @Override
     public void drawEllipse(Point center, int rx, int ry) {
+        renderEllipse(center, rx, ry, this::plot4WaySymmetry);
+    }
+
+    private void renderEllipse(Point center, int rx, int ry, PointsConsumer consumer) {
         int x = 0;
         int y = ry;
 
@@ -102,7 +144,7 @@ public class DefaultDrawingOperations implements DrawingOperations {
 
         // Region 1: slope > -1
         while (dx < dy) {
-            plot4WaySymmetry(center.x(), center.y(), x, y);
+            consumer.accept(center.x(), center.y(), x, y);
 
             x++;
             dx += 2 * ry2;
@@ -122,7 +164,7 @@ public class DefaultDrawingOperations implements DrawingOperations {
                 - rx2 * ry2;
 
         while (y >= 0) {
-            plot4WaySymmetry(center.x(), center.y(), x, y);
+            consumer.accept(center.x(), center.y(), x, y);
 
             y--;
             dy -= 2 * rx2;
@@ -142,5 +184,10 @@ public class DefaultDrawingOperations implements DrawingOperations {
         drawPixel(cx - x, cy + y);
         drawPixel(cx + x, cy - y);
         drawPixel(cx - x, cy - y);
+    }
+
+    @FunctionalInterface
+    private interface PointsConsumer {
+        void accept(int x1, int y1, int x2, int y2);
     }
 }
