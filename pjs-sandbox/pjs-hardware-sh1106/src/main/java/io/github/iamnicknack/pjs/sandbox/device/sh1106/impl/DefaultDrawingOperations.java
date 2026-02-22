@@ -107,10 +107,10 @@ public class DefaultDrawingOperations implements DrawingOperations {
     }
 
     private void plot8WaySymmetry(int cx, int cy, int x, int y) {
-        drawPixel(cx + x, cy + y); //
-        drawPixel(cx - x, cy + y); //
-        drawPixel(cx + x, cy - y); //
-        drawPixel(cx - x, cy - y); //
+        drawPixel(cx + x, cy + y);
+        drawPixel(cx - x, cy + y);
+        drawPixel(cx + x, cy - y);
+        drawPixel(cx - x, cy - y);
         drawPixel(cx + y, cy + x);
         drawPixel(cx - y, cy + x);
         drawPixel(cx + y, cy - x);
