@@ -13,7 +13,7 @@ public class CommandLineOptions {
             .build();
 
     public static final CommandLineArgument PI4J_MODE = new CommandLineArgument.Builder()
-            .name("pi4j-portMode")
+            .name("pi4j-mode")
             .defaultValue("auto")
             .description("The Pi4J portMode to use. (`mock`, `grpc`, `ffm`, `auto`)")
             .property("pjs.pi4j.portMode")
