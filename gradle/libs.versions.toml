@@ -21,7 +21,7 @@ publish-vanniktech = "0.36.0"
 dokka = "2.1.0"
 
 pi4j = "4.0.0"
-pi4j-grpc = "0.0.1-SNAPSHOT"
+pi4j-grpc = "0.1.0"
 
 ktor = "3.4.0"
 koin = "4.1.1"
@@ -83,4 +83,3 @@ logging = ["logback-classic", "slf4j-api"]
 pi4j-plugins = ["pi4j-plugin-ffm", "pi4j-plugin-grpc", "pi4j-plugin-mock"]
 
 [plugins]
-
