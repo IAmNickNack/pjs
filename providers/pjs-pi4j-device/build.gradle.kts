@@ -9,6 +9,5 @@ plugins {
 dependencies {
     api(project(":pjs-core"))
     compileOnly(libs.pi4j.core)
-    compileOnly(libs.bundles.pi4j.plugins)
     testImplementation(libs.pi4j.plugin.mock)
 }
