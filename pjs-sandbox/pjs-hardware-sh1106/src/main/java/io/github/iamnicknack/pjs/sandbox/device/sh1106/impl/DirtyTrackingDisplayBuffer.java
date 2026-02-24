@@ -1,7 +1,7 @@
 package io.github.iamnicknack.pjs.sandbox.device.sh1106.impl;
 
-import io.github.iamnicknack.pjs.sandbox.device.sh1106.BufferedDisplayOperations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.DisplayOperations;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.buffer.BufferedDisplayOperations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,8 +82,26 @@ public class DirtyTrackingDisplayBuffer implements BufferedDisplayOperations {
 
         while (off < length) {
             int col = (column + off) % PAGE_SIZE;
+            // data before modification
+            byte[] before = new byte[length - off];
+            getData(page, col, before, 0, before.length);
             operation.apply(page, col, data, off, Math.min(dirtyDisplay.blockSize, length - off));
-            dirtyDisplay.blocksIndex[page][col].dirty = true;
+            // data after modification
+            byte[] after = new byte[length - off];
+            getData(page, col, after, 0, before.length);
+
+            // compare before and after
+            boolean isDirty = false;
+            for (int i = 0; i < before.length; i++) {
+                if (before[i] != after[i]) {
+                    isDirty = true;
+                    break;
+                }
+            }
+
+            if (isDirty) {
+                dirtyDisplay.blocksIndex[page][col].dirty = true;
+            }
             off += dirtyDisplay.blockSize;
         }
     }
@@ -106,6 +124,11 @@ public class DirtyTrackingDisplayBuffer implements BufferedDisplayOperations {
     @Override
     public void xorData(int page, int column, byte[] data, int offset, int length) {
         modifyData(page, column, data, offset, length, this.delegate::xorData);
+    }
+
+    @Override
+    public void andNotData(int page, int column, byte[] data, int offset, int length) {
+        modifyData(page, column, data, offset, length, this.delegate::andNotData);
     }
 
     @Override

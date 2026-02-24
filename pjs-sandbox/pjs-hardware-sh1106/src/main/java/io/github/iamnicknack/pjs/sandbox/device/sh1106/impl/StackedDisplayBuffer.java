@@ -1,6 +1,6 @@
 package io.github.iamnicknack.pjs.sandbox.device.sh1106.impl;
 
-import io.github.iamnicknack.pjs.sandbox.device.sh1106.BufferedDisplayOperations;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.buffer.BufferedDisplayOperations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.DisplayOperations;
 
 /**
@@ -59,6 +59,14 @@ public class StackedDisplayBuffer implements BufferedDisplayOperations {
     }
 
     @Override
+    public void andNotData(int page, int column, byte[] data, int offset, int length) {
+        for (int i = 0; i < length; i++) {
+            var group = pixelGroups[page][(column + i) % PAGE_SIZE];
+            group.setValue((byte) (group.getValue() & ~data[offset + i]));
+        }
+    }
+
+    @Override
     public void getData(int page, int column, byte[] buffer, int offset, int length) {
         for (int i = 0; i < length; i++) {
             buffer[offset + i] = pixelGroups[page][(column + i) % PAGE_SIZE].getValue();
@@ -72,7 +80,11 @@ public class StackedDisplayBuffer implements BufferedDisplayOperations {
 
     @Override
     public void copyTo(DisplayOperations other) {
-        BufferedDisplayOperations.super.copyTo(other);
+        for (int page = 0; page < PAGE_COUNT; page++) {
+            for (int column = 0; column < PAGE_SIZE; column++) {
+                other.setData(page, column, new byte[]{pixelGroups[page][column].getValue()}, 0, 1);
+            }
+        }
     }
 
     /**
@@ -153,6 +165,11 @@ public class StackedDisplayBuffer implements BufferedDisplayOperations {
         @Override
         public void xorData(int page, int column, byte[] data, int offset, int length) {
             StackedDisplayBuffer.this.xorData(page, column, data, offset, length);
+        }
+
+        @Override
+        public void andNotData(int page, int column, byte[] data, int offset, int length) {
+            StackedDisplayBuffer.this.andNotData(page, column, data, offset, length);
         }
 
         @Override

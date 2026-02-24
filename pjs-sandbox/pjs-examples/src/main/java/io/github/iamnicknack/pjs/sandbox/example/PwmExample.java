@@ -5,6 +5,7 @@ import io.github.iamnicknack.pjs.device.pwm.PwmConfig;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
 import io.github.iamnicknack.pjs.model.pin.Pin;
 import io.github.iamnicknack.pjs.model.port.Port;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -109,7 +110,7 @@ public class PwmExample implements Runnable {
     }
 
     /**
-     * Range generator which can implement easing functions.
+     * Range generator which implements easing functions.
      */
     private static class EasedRange implements Iterable<Integer> {
 
@@ -135,7 +136,7 @@ public class PwmExample implements Runnable {
         }
 
         @Override
-        public Iterator<Integer> iterator() {
+        public @NonNull Iterator<Integer> iterator() {
             return new Iterator<>() {
                 private int idx = 0;
 
@@ -163,7 +164,7 @@ public class PwmExample implements Runnable {
         }
 
         private static double clamp(double v, double lo, double hi) {
-            return v < lo ? lo : (v > hi ? hi : v);
+            return Math.max(lo, Math.min(v, hi));
         }
     }
 }
