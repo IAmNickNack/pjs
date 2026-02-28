@@ -11,7 +11,7 @@ is_snapshot() {
 
 # `true` if gh release list contains "v${BUILD_VERSION}"
 release_exists() {
-  if gh release list | grep -qF "^v${BUILD_VERSION}$"; then
+  if gh release list | grep -q "^v${BUILD_VERSION}\b"; then
     return 0
   else
     return 1
