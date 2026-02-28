@@ -12,7 +12,7 @@ dependencyResolutionManagement {
     }
 }
 
-val pjsVersion: String = settings.providers.gradleProperty("pjs.version").get()
+val pjsVersion: String = settings.providers.gradleProperty("version").get()
 
 includeBuild("..") {
     dependencySubstitution {
