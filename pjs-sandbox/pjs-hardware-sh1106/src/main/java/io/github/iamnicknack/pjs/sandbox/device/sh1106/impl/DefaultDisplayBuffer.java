@@ -1,6 +1,7 @@
 package io.github.iamnicknack.pjs.sandbox.device.sh1106.impl;
 
-import io.github.iamnicknack.pjs.sandbox.device.sh1106.BufferedDisplayOperations;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.buffer.BufferedDisplayOperations;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.DisplayOperations;
 
 /**
  * Default implementation of {@link BufferedDisplayOperations} that uses a byte array as the display buffer.
@@ -53,11 +54,23 @@ public class DefaultDisplayBuffer implements BufferedDisplayOperations {
         modifyData(page, column, data, offset, length, (current, operand) -> (byte) (current & operand));
     }
 
+    @Override
+    public void andNotData(int page, int column, byte[] data, int offset, int length) {
+        modifyData(page, column, data, offset, length, (current, operand) -> (byte) (current & ~operand));
+    }
+
     private void modifyData(int page, int column, byte[] data, int offset, int length, ModifyOperator modifier) {
         byte[] pageData = buffer[page];
         for (int i = 0; i < length; i++) {
             int index = (column + i) % PAGE_SIZE;
             pageData[index] = modifier.modify(pageData[index], data[(offset + i)]);
+        }
+    }
+
+    @Override
+    public void copyTo(DisplayOperations other) {
+        for (int page = 0; page < PAGE_COUNT; page++) {
+            other.setData(page, 0, this.buffer[page], 0, PAGE_SIZE);
         }
     }
 

@@ -1,6 +1,6 @@
 package io.github.iamnicknack.pjs.sandbox.device.sh1106.impl;
 
-import io.github.iamnicknack.pjs.sandbox.device.sh1106.BufferedDisplayOperations;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.buffer.BufferedDisplayOperations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.DrawingOperations;
 
 import java.util.Arrays;

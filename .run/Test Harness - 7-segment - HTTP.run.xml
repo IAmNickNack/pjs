@@ -4,7 +4,7 @@
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="MAIN_CLASS_NAME" value="io.github.iamnicknack.pjs.sandbox.Main" />
     <module name="pjs-sandbox.pjs-examples.main" />
-    <option name="PROGRAM_PARAMETERS" value="--plugin http --grpc-host localhost --grpc-port 8080 --seven-segment" />
+    <option name="PROGRAM_PARAMETERS" value="--plugin http --grpc-host 10.0.0.2 --grpc-port 8080 --seven-segment" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="io.github.iamnicknack.pjs.sandbox.*" />
