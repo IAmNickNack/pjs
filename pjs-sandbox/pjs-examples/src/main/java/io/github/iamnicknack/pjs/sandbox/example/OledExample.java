@@ -2,9 +2,10 @@ package io.github.iamnicknack.pjs.sandbox.example;
 
 import io.github.iamnicknack.pjs.device.i2c.I2CConfig;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Driver;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.impl.DefaultSh1106Driver;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.DisplayOperations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.DrawingOperations;
-import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Driver;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Operations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.TextOperations;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.impl.DefaultDisplayBuffer;
@@ -27,7 +28,7 @@ public class OledExample implements Runnable {
 
     public OledExample(DeviceRegistry registry) {
         var i2c = registry.create(I2C_CONFIG);
-        driver = new Sh1106Driver(i2c, 0x3c);
+        driver = new DefaultSh1106Driver(i2c, 0x3c);
         deviceOperations = new Sh1106Operations(driver);
     }
 
