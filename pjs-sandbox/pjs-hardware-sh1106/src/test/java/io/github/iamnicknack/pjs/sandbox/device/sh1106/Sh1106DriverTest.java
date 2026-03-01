@@ -7,6 +7,7 @@ import io.github.iamnicknack.pjs.model.SerialWriteOperation;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Driver.Command;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Driver.CommandSequence;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.impl.DefaultSh1106Driver;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -86,7 +87,7 @@ class Sh1106DriverTest {
                 var device = new LoggingI2C(registry.create(oledConfig));
                 assertNotNull(device);
 
-                Sh1106Driver oled = new Sh1106Driver(device, 0x3c);
+                Sh1106Driver oled = new DefaultSh1106Driver(device, 0x3c);
                 oled.command(Sh1106Driver.DEFAULT_STARTUP_SEQUENCE);
 
                 oled.command(new CommandSequence().append(Command.DISPLAY_ON_OFF, 1));
@@ -123,7 +124,7 @@ class Sh1106DriverTest {
         void writeText() {
             try (var registry = DeviceRegistryLoader.defaultRegistry()) {
                 var device = new LoggingI2C(registry.create(oledConfig));
-                var oled = new Sh1106Driver(device, 0x3c);
+                var oled = new DefaultSh1106Driver(device, 0x3c);
 
                 oled.command(Sh1106Driver.DEFAULT_STARTUP_SEQUENCE);
                 oled.command(new CommandSequence().append(Command.DISPLAY_ON_OFF, 1));
@@ -152,7 +153,7 @@ class Sh1106DriverTest {
         void displayOperations() {
             try (var registry = DeviceRegistryLoader.defaultRegistry()) {
                 var device = new LoggingI2C(registry.create(oledConfig));
-                var oled = new Sh1106Driver(device, 0x3c);
+                var oled = new DefaultSh1106Driver(device, 0x3c);
                 var operations = new Sh1106Operations(oled);
 
                 operations.init();

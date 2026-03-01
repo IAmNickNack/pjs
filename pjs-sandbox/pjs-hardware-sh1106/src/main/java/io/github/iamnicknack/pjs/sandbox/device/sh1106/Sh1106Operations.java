@@ -1,6 +1,7 @@
 package io.github.iamnicknack.pjs.sandbox.device.sh1106;
 
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Driver.CommandSequence;
+import io.github.iamnicknack.pjs.sandbox.device.sh1106.impl.DefaultSh1106Driver;
 
 import static io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Driver.DEFAULT_STARTUP_SEQUENCE;
 
@@ -21,16 +22,12 @@ public class Sh1106Operations implements DisplayOperations, ControlOperations, T
 
     @Override
     public void displayOn() {
-        new CommandSequence()
-                .append(Sh1106Driver.Command.DISPLAY_ON_OFF, 1)
-                .writeTo(display.getCommandWriteOperation());
+        display.command(DefaultSh1106Driver.Command.DISPLAY_ON_OFF, 1);
     }
 
     @Override
     public void displayOff() {
-        new CommandSequence()
-                .append(Sh1106Driver.Command.DISPLAY_ON_OFF, 0)
-                .writeTo(display.getCommandWriteOperation());
+        display.command(DefaultSh1106Driver.Command.DISPLAY_ON_OFF, 0);
     }
 
     @Override
@@ -65,10 +62,10 @@ public class Sh1106Operations implements DisplayOperations, ControlOperations, T
     }
 
     public void setPosition(int page, int column) {
-        new CommandSequence()
-                .append(Sh1106Driver.Command.PAGE_ADDRESS, page)
-                .append(Sh1106Driver.Command.DISPLAY_COLUMN_HIGH, (column + 2) >> 4)
-                .append(Sh1106Driver.Command.DISPLAY_COLUMN_LOW, (column + 2) & 0x0f)
-                .writeTo(display.getCommandWriteOperation());
+        display.command(new CommandSequence()
+                .append(DefaultSh1106Driver.Command.PAGE_ADDRESS, page)
+                .append(DefaultSh1106Driver.Command.DISPLAY_COLUMN_HIGH, (column + 2) >> 4)
+                .append(DefaultSh1106Driver.Command.DISPLAY_COLUMN_LOW, (column + 2) & 0x0f)
+        );
     }
 }
