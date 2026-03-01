@@ -47,8 +47,7 @@ public class Sh1106Operations implements DisplayOperations, ControlOperations, T
 
     @Override
     public void setData(int page, int column, byte[] data, int offset, int length) {
-        setPosition(page, column);
-        display.display(data, offset, length);
+        display.display(page, column, data, offset, length);
     }
 
     @Override

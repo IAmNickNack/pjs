@@ -123,12 +123,17 @@ public class Sh1106Driver {
      */
     private final SerialWriteOperation displayWriteOperation;
 
+    private final I2C i2c;
+    private final int address;
+
     /**
      * Constructor.
      * @param delegate the I2C delegate to use for communication.
      * @param address the I2C address of the OLED display.
      */
     public Sh1106Driver(I2C delegate, int address) {
+        this.i2c = delegate;
+        this.address = address;
         var delegatePort = new I2CSerialPort(address, delegate);
         this.commandWriteOperation = new DeviceRegisterWriteOperation(0, delegatePort);
         this.displayWriteOperation = new DeviceRegisterWriteOperation(0x40, delegatePort);
@@ -175,13 +180,40 @@ public class Sh1106Driver {
      * @param length the number of bytes to write
      */
     public void display(int page, int column, byte[] data, int offset, int length) {
-        command(new CommandSequence()
+        class MessageBuildingSerialWriteOperation implements SerialWriteOperation {
+            private final ByteBuffer buffer = ByteBuffer.allocate(1024);
+
+            public MessageBuildingSerialWriteOperation(int register) {
+                buffer.put((byte)register);
+            }
+
+            @Override
+            public void writeBytes(byte[] buffer, int offset, int length) {
+                this.buffer.put(buffer, offset, length);
+            }
+
+            public I2C.Message buildMessage() {
+                var bytes = new byte[buffer.position()];
+                buffer.flip();
+                buffer.get(bytes);
+                return I2C.Message.write(address, bytes, 0, bytes.length);
+            }
+        }
+
+        var commandMessageWriter = new MessageBuildingSerialWriteOperation(0);
+        var displayMessageWriter = new MessageBuildingSerialWriteOperation(0x40);
+
+        new CommandSequence()
                 .append(Command.PAGE_ADDRESS, page)
                 .append(Command.DISPLAY_COLUMN_HIGH, (column + 2) >> 4)
                 .append(Command.DISPLAY_COLUMN_LOW, (column + 2) & 0x0f)
-        );
+                .writeTo(commandMessageWriter);
 
-        displayWriteOperation.writeBytes(data, offset, length);
+        displayMessageWriter.writeBytes(data, offset, length);
+        var commandMessage = commandMessageWriter.buildMessage();
+        var displayMessage = displayMessageWriter.buildMessage();
+
+        i2c.transfer(commandMessage, displayMessage);
     }
 
     /**
@@ -193,7 +225,6 @@ public class Sh1106Driver {
     public void display(byte[] data, int offset, int length) {
         displayWriteOperation.writeBytes(data, offset, length);
     }
-
 
     /**
      * Builder for a sequence of commands to be sent to the OLED display.
