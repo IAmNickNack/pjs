@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":pjs-pi4j-device"))
     implementation(project(":pjs-mock-device"))
     implementation(project(":pjs-utils"))
+    implementation(libs.apache.cli)
     implementation(libs.bundles.logging)
     implementation(libs.grpc.inprocess)
     runtimeOnly(libs.bundles.pi4j.plugins)

@@ -21,7 +21,7 @@ dependencies {
 
     implementation(libs.bundles.logging)
     implementation(libs.bundles.pi4j.plugins)
-    implementation("commons-cli:commons-cli:1.11.0")
+    implementation(libs.apache.cli)
 }
 
 application {

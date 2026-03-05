@@ -28,8 +28,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.github.iamnicknack.pjs.sandbox.CommandLineOptions.*;
-
 public class Main {
 
     static final Logger logger = LoggerFactory.getLogger(Main.class);
@@ -81,6 +79,7 @@ public class Main {
                     new OptionGroup()
                             .addOption(new Option(null, "gpio", false, "Run the GPIO example"))
                             .addOption(new Option(null, "i2c", false, "Run the I2C example"))
+                            .addOption(new Option(null, "seven-segment", false, "Run the seven-segment example"))
                             .addOption(new Option(null, "spi", false, "Run the SPI example"))
                             .addOption(new Option(null, "eeprom", false, "Run the EEPROM example"))
                             .addOption(new Option(null, "328", false, "Run the three-to-eight decoder example"))
@@ -149,25 +148,25 @@ public class Main {
                     : registry;
 
             Runnable example;
-            if (commandLineArgs.hasOption(GPIO_EXAMPLE.getName())) {
+            if (commandLineArgs.hasOption("gpio")) {
                 example = new GpioExample(registryDelegate);
-            } else if (commandLineArgs.hasOption(I2C_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption("i2c")) {
                 example = new I2CExample(registryDelegate);
-            } else if (commandLineArgs.hasOption(SEVEN_SEGMENT_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption("seven-segment")) {
                 example = new SevenSegmentExample(registryDelegate);
-            } else if (commandLineArgs.hasOption(SPI_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption("spi")) {
                 example = new SpiExample(registryDelegate);
-            } else if (commandLineArgs.hasOption(EEPROM_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption("eeprom")) {
                 example = new EepromExample(registryDelegate);
-            } else if (commandLineArgs.hasOption(THREE2EIGHT_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption("328")) {
                 example = new ThreeToEightExample(registryDelegate);
-            } else if (commandLineArgs.hasOption(PWM_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption("pwm")) {
                 example = new PwmExample(registryDelegate);
-            } else if (commandLineArgs.hasOption(MCP_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption("mcp")) {
                 example = new McpInterruptExample(registryDelegate);
-            } else if (commandLineArgs.hasOption(OLED_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption("oled")) {
                 example = new OledExample(registryDelegate);
-            } else if (commandLineArgs.hasOption(DEBOUNCE_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption("debounce")) {
                 example = new DebounceTester(registryDelegate);
             } else {
                 example = () -> logger.info("No example selected");

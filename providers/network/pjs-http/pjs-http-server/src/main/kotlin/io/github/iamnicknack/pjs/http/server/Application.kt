@@ -32,6 +32,7 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.swagger.*
 import io.ktor.server.routing.*
 import io.ktor.server.sse.*
+import org.apache.commons.cli.help.HelpFormatter
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.koin.ktor.ext.get
@@ -41,9 +42,9 @@ fun main(args: Array<String>) {
     StartupUtils.loadApplicationProperties()
     val config = ServerConfiguration.createFromCommandLine(args)
     if (config.help) {
-        ServerConfiguration.parser.help(System.out)
+        HelpFormatter.builder().setShowSince(false).get()
+            .also { it.printOptions(ServerConfiguration.options) }
     } else {
-
         val registryProvider: DeviceRegistryProvider = ConfigurableDeviceRegistryProvider(config)
 
         embeddedServer(

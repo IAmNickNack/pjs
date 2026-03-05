@@ -10,5 +10,6 @@ dependencies {
     implementation(project(":pjs-utils"))
     implementation(project(":pjs-mock-device"))
     implementation(libs.slf4j.api)
+    implementation(libs.apache.cli)
 }
 

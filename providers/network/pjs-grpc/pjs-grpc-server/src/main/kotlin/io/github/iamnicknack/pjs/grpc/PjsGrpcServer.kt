@@ -6,18 +6,19 @@ import io.github.iamnicknack.pjs.server.ServerConfiguration
 import io.github.iamnicknack.pjs.util.LoggingUtils
 import io.github.iamnicknack.pjs.util.StartupUtils
 import io.grpc.ServerBuilder
+import org.apache.commons.cli.help.HelpFormatter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 object PjsGrpcServer {
     val logger: Logger = LoggerFactory.getLogger(PjsGrpcServer::class.java)
 
-
     fun execute(args: Array<String>): Int {
         val config = ServerConfiguration.createFromCommandLine(args)
 
         if (config.help) {
-            ServerConfiguration.parser.help(System.out)
+            HelpFormatter.builder().setShowSince(false).get()
+                .also { it.printOptions(ServerConfiguration.options) }
         } else {
             val port = config.port ?: 9090
             val serverProvider = DefaultGrpcServer.ServerBuilderProvider  { ServerBuilder.forPort(port) }
