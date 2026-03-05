@@ -19,6 +19,8 @@ dependencies {
     implementation(project(":pjs-mock-device"))
     implementation(project(":pjs-utils"))
     implementation(libs.apache.cli)
+
+    runtimeOnly(libs.bundles.pi4j.plugins)
 }
 
 application {
