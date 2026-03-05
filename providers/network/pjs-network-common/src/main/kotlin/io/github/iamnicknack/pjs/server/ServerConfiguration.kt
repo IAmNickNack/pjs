@@ -14,7 +14,7 @@ data class ServerConfiguration(
 ) {
 
     enum class Mode {
-        NATIVE,
+        FFM,
         GRPC,
         HTTP,
         MOCK;
@@ -58,16 +58,16 @@ data class ServerConfiguration(
                 .get()
             )
             .addOption(Option.builder()
-                    .longOpt("logging")
-                    .type(Boolean::class.java)
-                    .hasArg()
-                    .desc("Enables logging. Defaults to false.")
-                    .get()
+                .longOpt("logging")
+                .type(Boolean::class.java)
+                .desc("Enables logging. Defaults to false.")
+                .get()
             )
             .addOption(Option.builder()
-                    .longOpt("help")
-                    .desc("Prints this help message.")
-                    .get()
+                .longOpt("help")
+                .type(Boolean::class.java)
+                .desc("Prints this help message.")
+                .get()
             )
 
         fun createFromCommandLine(args: Array<String>): ServerConfiguration {
