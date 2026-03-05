@@ -17,7 +17,8 @@ data class ServerConfiguration(
         FFM,
         GRPC,
         HTTP,
-        MOCK;
+        MOCK,
+        PI4J;
 
         companion object {
             fun fromString(value: String): Mode {
