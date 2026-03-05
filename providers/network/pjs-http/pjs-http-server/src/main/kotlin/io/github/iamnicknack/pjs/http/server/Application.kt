@@ -23,6 +23,7 @@ import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import io.github.iamnicknack.pjs.server.ConfigurableDeviceRegistryProvider
 import io.github.iamnicknack.pjs.server.DeviceRegistryProvider
 import io.github.iamnicknack.pjs.server.ServerConfiguration
+import io.github.iamnicknack.pjs.util.LoggingUtils
 import io.github.iamnicknack.pjs.util.StartupUtils
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
@@ -40,6 +41,7 @@ import org.koin.ktor.plugin.Koin
 
 fun main(args: Array<String>) {
     StartupUtils.loadApplicationProperties()
+    LoggingUtils.setLogbackLevelsFromProperties(System.getProperties())
     val config = ServerConfiguration.createFromCommandLine(args)
     if (config.help) {
         HelpFormatter.builder().setShowSince(false).get()

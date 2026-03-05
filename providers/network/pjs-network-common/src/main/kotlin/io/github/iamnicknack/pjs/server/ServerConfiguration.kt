@@ -50,6 +50,7 @@ data class ServerConfiguration(
             )
             .addOption(Option.builder()
                 .longOpt("proxy-host")
+                .desc("Hostname of the server to use when running in proxy mode.")
                 .type(String::class.java)
                 .get()
             )
@@ -84,5 +85,4 @@ data class ServerConfiguration(
             )
         }
     }
-
 }
