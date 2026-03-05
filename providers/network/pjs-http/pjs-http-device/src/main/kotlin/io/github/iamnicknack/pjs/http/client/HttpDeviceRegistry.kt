@@ -47,6 +47,8 @@ class HttpDeviceRegistry(
         }
     )
 
+    constructor(host: String, port: Int) : this("http://$host:$port")
+
     init {
         registerProvider(
             HttpGpioPortProvider(

@@ -12,11 +12,21 @@ import io.github.iamnicknack.pjs.mock.MockDeviceRegistry;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
 import io.github.iamnicknack.pjs.pi4j.Pi4jDeviceRegistryLoader;
 import io.github.iamnicknack.pjs.sandbox.example.*;
-import io.github.iamnicknack.pjs.util.args.CommandLineParser;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.github.iamnicknack.pjs.sandbox.CommandLineOptions.*;
 
@@ -24,81 +34,140 @@ public class Main {
 
     static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-    static final CommandLineParser commandLineParser = new CommandLineParser.Builder()
-            .arg(PLUGIN)
-            .arg(GRPC_HOST)
-            .arg(GRPC_PORT)
-            .arg(GPIO_EXAMPLE)
-            .arg(I2C_EXAMPLE)
-            .arg(SEVEN_SEGMENT_EXAMPLE)
-            .arg(SPI_EXAMPLE)
-            .arg(EEPROM_EXAMPLE)
-            .arg(THREE2EIGHT_EXAMPLE)
-            .arg(PWM_EXAMPLE)
-            .arg(MCP_EXAMPLE)
-            .arg(OLED_EXAMPLE)
-            .arg(DEBOUNCE_EXAMPLE)
-            .arg(PI4J_MODE)
-            .arg(LOGGING)
-            .arg(HELP)
-            .build();
+    enum Mode  {
+        MOCK, GRPC, FFM, PI4J;
 
-    public static void main(String[] args) {
-        var commandLineArgs = commandLineParser.parse(args);
+        public static Mode fromString(String value) {
+            return switch (value.toLowerCase()) {
+                case "mock" -> MOCK;
+                case "grpc" -> GRPC;
+                case "ffm" -> FFM;
+                case "pi4j" -> PI4J;
+                default -> throw new IllegalArgumentException("Unknown mode: " + value);
+            };
+        }
+    }
 
-        if (commandLineArgs.flag(HELP)) {
-            commandLineParser.help(System.out);
+    static final Options options = new Options()
+            .addOption(Option.builder()
+                    .option("p")
+                    .longOpt("plugin")
+                    .desc("Which plugin to load. (`mock`, `grpc`, `ffm`, `pi4j`)")
+                    .hasArg()
+                    .type(Mode.class)
+                    .converter(Mode::fromString)
+                    .get()
+            )
+            .addOption("G", "grpc-host", true, "The gRPC host to connect to.")
+            .addOption(Option.builder()
+                    .option("P")
+                    .longOpt("grpc-port")
+                    .desc("The gRPC port to connect to.")
+                    .hasArg()
+                    .type(Integer.class)
+                    .get()
+            )
+            .addOption(Option.builder()
+                    .option("m")
+                    .longOpt("mode")
+                    .desc("The mode to run in. (`mock`, `grpc`, `ffm`, `pi4j`)")
+                    .hasArg()
+                    .type(Mode.class)
+                    .converter(Mode::fromString)
+                    .get()
+            )
+            .addOption("l", "logging", false, "Enable debug logging for IO operations")
+            .addOptionGroup(
+                    new OptionGroup()
+                            .addOption(new Option(null, "gpio", false, "Run the GPIO example"))
+                            .addOption(new Option(null, "i2c", false, "Run the I2C example"))
+                            .addOption(new Option(null, "spi", false, "Run the SPI example"))
+                            .addOption(new Option(null, "eeprom", false, "Run the EEPROM example"))
+                            .addOption(new Option(null, "328", false, "Run the three-to-eight decoder example"))
+                            .addOption(new Option(null, "pwm", false, "Run the PWM example"))
+                            .addOption(new Option(null, "mcp", false, "Run the MCP23017 example"))
+                            .addOption(new Option(null, "oled", false, "Run the OLED example"))
+                            .addOption(new Option(null, "debounce", false, "Run the debounce example"))
+            )
+            .addOption("h", "help", false, "Display help information");
+
+    static Map<String, Object> optionsAsSystemProperties(CommandLine commandLine) {
+        var map = new HashMap<String, Object>();
+        if (commandLine.hasOption("grpc-host")) {
+            map.put("pjs.grpc.host", commandLine.getOptionValue("grpc-host"));
+        }
+        if (commandLine.hasOption("grpc-port")) {
+            map.put("pjs.grpc.port", commandLine.getOptionValue("grpc-port"));
+        }
+        if (commandLine.hasOption("mode")) {
+            map.put("pjs.mode", commandLine.getOptionValue("mode"));
+        }
+        return map;
+    }
+
+    static void main(String[] args) throws ParseException, IOException {
+        var commandLineArgs = new DefaultParser()
+                .parse(options, args);
+
+        if (commandLineArgs.hasOption("help")) {
+            var helpFormatter = HelpFormatter.builder()
+                    .setShowSince(false)
+                    .get();
+            helpFormatter.printOptions(options);
             return;
         }
 
-        try(DeviceRegistry registry = switch (commandLineArgs.value(PLUGIN)) {
+        try(DeviceRegistry registry = switch (commandLineArgs.getOptionValue("plugin")) {
             case "grpc" -> {
                 var channel = Grpc.newChannelBuilderForAddress(
-                        commandLineArgs.value(GRPC_HOST),
-                        Integer.parseInt(commandLineArgs.value(GRPC_PORT)),
+                        commandLineArgs.getOptionValue("grpc-host", "localhost"),
+                        commandLineArgs.getParsedOptionValue("grpc-port", 9090),
                         InsecureChannelCredentials.create()
                 ).build();
 
                 yield new GrpcDeviceRegistry(channel);
             }
-            case "http" -> new HttpDeviceRegistry("http://" + commandLineArgs.value(GRPC_HOST) + ":" + commandLineArgs.value(GRPC_PORT) + "/");
-            case "ffm" -> new NativeDeviceRegistryLoader().load(commandLineArgs.asMap());
+            case "http" -> new HttpDeviceRegistry(
+                    commandLineArgs.getOptionValue("grpc-host"),
+                    commandLineArgs.getParsedOptionValue("grpc-port", 9090)
+            );
+            case "ffm" -> new NativeDeviceRegistryLoader().load();
             case "pi4j" -> {
-                Class<? extends Plugin> pluginClass = switch (commandLineArgs.valueOrNull(PI4J_MODE)) {
+                Class<? extends Plugin> pluginClass = switch (commandLineArgs.getOptionValue("mode")) {
                     case "mock" -> MockPlugin.class;
                     case "ffm" -> FFMPlugin.class;
                     case "grpc" -> GrpcPlugin.class;
                     case null, default -> null;
                 };
                 var loader = new Pi4jDeviceRegistryLoader(pluginClass);
-                yield loader.load(commandLineArgs.asMap());
+                yield loader.load(optionsAsSystemProperties(commandLineArgs));
             }
             default -> new MockDeviceRegistry();
         }) {
-            var registryDelegate = (commandLineArgs.flag(LOGGING))
+            var registryDelegate = (commandLineArgs.hasOption("logging"))
                     ? new LoggingDeviceRegistry(registry)
                     : registry;
 
             Runnable example;
-            if (commandLineArgs.flag(GPIO_EXAMPLE.getName())) {
+            if (commandLineArgs.hasOption(GPIO_EXAMPLE.getName())) {
                 example = new GpioExample(registryDelegate);
-            } else if (commandLineArgs.flag(I2C_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption(I2C_EXAMPLE.getName())) {
                 example = new I2CExample(registryDelegate);
-            } else if (commandLineArgs.flag(SEVEN_SEGMENT_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption(SEVEN_SEGMENT_EXAMPLE.getName())) {
                 example = new SevenSegmentExample(registryDelegate);
-            } else if (commandLineArgs.flag(SPI_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption(SPI_EXAMPLE.getName())) {
                 example = new SpiExample(registryDelegate);
-            } else if (commandLineArgs.flag(EEPROM_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption(EEPROM_EXAMPLE.getName())) {
                 example = new EepromExample(registryDelegate);
-            } else if (commandLineArgs.flag(THREE2EIGHT_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption(THREE2EIGHT_EXAMPLE.getName())) {
                 example = new ThreeToEightExample(registryDelegate);
-            } else if (commandLineArgs.flag(PWM_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption(PWM_EXAMPLE.getName())) {
                 example = new PwmExample(registryDelegate);
-            } else if (commandLineArgs.flag(MCP_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption(MCP_EXAMPLE.getName())) {
                 example = new McpInterruptExample(registryDelegate);
-            } else if (commandLineArgs.flag(OLED_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption(OLED_EXAMPLE.getName())) {
                 example = new OledExample(registryDelegate);
-            } else if (commandLineArgs.flag(DEBOUNCE_EXAMPLE.getName())) {
+            } else if (commandLineArgs.hasOption(DEBOUNCE_EXAMPLE.getName())) {
                 example = new DebounceTester(registryDelegate);
             } else {
                 example = () -> logger.info("No example selected");
