@@ -23,6 +23,7 @@ import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import io.github.iamnicknack.pjs.server.ConfigurableDeviceRegistryProvider
 import io.github.iamnicknack.pjs.server.DeviceRegistryProvider
 import io.github.iamnicknack.pjs.server.ServerConfiguration
+import io.github.iamnicknack.pjs.util.LoggingUtils
 import io.github.iamnicknack.pjs.util.StartupUtils
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
@@ -32,6 +33,7 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.swagger.*
 import io.ktor.server.routing.*
 import io.ktor.server.sse.*
+import org.apache.commons.cli.help.HelpFormatter
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.koin.ktor.ext.get
@@ -39,11 +41,12 @@ import org.koin.ktor.plugin.Koin
 
 fun main(args: Array<String>) {
     StartupUtils.loadApplicationProperties()
+    LoggingUtils.setLogbackLevelsFromProperties(System.getProperties())
     val config = ServerConfiguration.createFromCommandLine(args)
     if (config.help) {
-        ServerConfiguration.parser.help(System.out)
+        HelpFormatter.builder().setShowSince(false).get()
+            .also { it.printOptions(ServerConfiguration.options) }
     } else {
-
         val registryProvider: DeviceRegistryProvider = ConfigurableDeviceRegistryProvider(config)
 
         embeddedServer(

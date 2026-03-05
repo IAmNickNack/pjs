@@ -1,7 +1,8 @@
 package io.github.iamnicknack.pjs.server
 
-import io.github.iamnicknack.pjs.util.args.CommandLineArgument
-import io.github.iamnicknack.pjs.util.args.CommandLineParser
+import org.apache.commons.cli.DefaultParser
+import org.apache.commons.cli.Option
+import org.apache.commons.cli.Options
 
 data class ServerConfiguration(
     val port: Int?,
@@ -12,72 +13,76 @@ data class ServerConfiguration(
     val help: Boolean
 ) {
 
-    companion object {
+    enum class Mode {
+        FFM,
+        GRPC,
+        HTTP,
+        MOCK,
+        PI4J;
 
-        private val modeArg = CommandLineArgument(
-            "mode",
-            "mock",
-            property = "pjs.mode",
-            description = "Preferred mode for running the device service. " +
-                    "Valid values are 'native', 'grpc', 'http' and 'mock'. " +
-                    "Defaults to 'native' if the native library is available, `mock` if not."
-        )
-
-        private val portArg = CommandLineArgument(
-            "port",
-            property = "pjs.port",
-            description = "Port to listen on."
-        )
-
-        private val proxyHostArg = CommandLineArgument(
-            "proxy-host",
-            property = "pjs.proxy.host",
-            description = "Host name of the gRPC backend to use when running in proxy mode."
-        )
-
-        private val proxyPortArg = CommandLineArgument(
-            "proxy-port",
-            property = "pjs.proxy.port",
-            description = "Port of the gRPC server to use when running in proxy mode."
-        )
-
-        private val loggingArg = CommandLineArgument(
-            "logging",
-            "false",
-            isFlag = true,
-            property = "pjs.logging",
-            description = "Enables logging. Defaults to false."
-        )
-
-        private val helpArg = CommandLineArgument(
-            "help",
-            defaultValue = "false",
-            isFlag = true,
-            description = "Prints this help message."
-        )
-
-        val parser: CommandLineParser = CommandLineParser.Builder()
-            .arg(modeArg)
-            .arg(portArg)
-            .arg(proxyHostArg)
-            .arg(proxyPortArg)
-            .arg(loggingArg)
-            .arg(helpArg)
-            .build()
-
-        fun createFromCommandLine(args: Array<String>): ServerConfiguration {
-
-            val parseResult = parser.parse(args)
-
-            return ServerConfiguration(
-                port = parseResult.valueOrNull<Int>(portArg),
-                preferredMode = parseResult.valueOrNull<String>(modeArg),
-                proxyHost = parseResult.valueOrNull<String>(proxyHostArg),
-                proxyPort = parseResult.valueOrNull<Int>(proxyPortArg),
-                logging = parseResult.value<Boolean>(loggingArg),
-                help = parseResult.value<Boolean>(helpArg)
-            )
+        companion object {
+            fun fromString(value: String): Mode {
+                return entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
+                    ?: throw IllegalArgumentException("Invalid mode: $value")
+            }
         }
     }
 
+    companion object {
+
+        val options: Options = Options()
+            .addOption(Option.builder()
+                .longOpt("mode")
+                .type(Mode::class.java)
+                .converter(Mode::fromString)
+                .hasArg()
+                .desc("Preferred mode for running the device service. " +
+                        "Valid values are 'native', 'grpc', 'http' and 'mock'. " +
+                        "Defaults to 'native' if the native library is available, `mock` if not.")
+                .get()
+            )
+            .addOption(Option.builder()
+                .longOpt("port")
+                .type(Int::class.java)
+                .hasArg()
+                .desc("Port to listen on.")
+                .get()
+            )
+            .addOption(Option.builder()
+                .longOpt("proxy-host")
+                .desc("Hostname of the server to use when running in proxy mode.")
+                .type(String::class.java)
+                .get()
+            )
+            .addOption(Option.builder()
+                .longOpt("proxy-port")
+                .desc("Port of the server to use when running in proxy mode.")
+                .get()
+            )
+            .addOption(Option.builder()
+                .longOpt("logging")
+                .type(Boolean::class.java)
+                .desc("Enables logging. Defaults to false.")
+                .get()
+            )
+            .addOption(Option.builder()
+                .longOpt("help")
+                .type(Boolean::class.java)
+                .desc("Prints this help message.")
+                .get()
+            )
+
+        fun createFromCommandLine(args: Array<String>): ServerConfiguration {
+            val commandLine = DefaultParser().parse(options, args)
+
+            return ServerConfiguration(
+                port = commandLine.getParsedOptionValue<Int>("port"),
+                preferredMode = commandLine.getParsedOptionValue<Mode>("mode")?.name?.lowercase(),
+                proxyHost = commandLine.getParsedOptionValue<String>("proxy-host"),
+                proxyPort = commandLine.getParsedOptionValue<Int>("proxy-port"),
+                logging = commandLine.getParsedOptionValue("logging", false),
+                help = commandLine.hasOption("help")
+            )
+        }
+    }
 }
