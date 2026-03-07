@@ -24,16 +24,78 @@ public class FileOperationsImpl implements FileOperations, SysfsOperationsFactor
     public FileOperationsImpl(NativeContext nativeContext) {
         this.segmentAllocator = nativeContext.getSegmentAllocator();
 
-        var methodCallerFactory = nativeContext.getMethodCallerFactory();
-        var capturedStateMethodCallerFactory = nativeContext.getCapturedStateMethodCallerFactory();
+        var methodCallerFactory = new MethodCallerFactoryImpl(nativeContext.getSegmentAllocator());
 
-        this.openCreate = capturedStateMethodCallerFactory.create("open", Descriptors.OPEN_CREATE);
-        this.open = capturedStateMethodCallerFactory.create("open", Descriptors.OPEN);
-        this.close = capturedStateMethodCallerFactory.create("close", Descriptors.CLOSE);
-        this.read = capturedStateMethodCallerFactory.create("read", Descriptors.READ);
-        this.write = capturedStateMethodCallerFactory.create("write", Descriptors.WRITE);
-        this.access = methodCallerFactory.create("access", Descriptors.ACCESS);
-        this.fcntl = methodCallerFactory.create("fcntl", Descriptors.FCNTL);
+        this.openCreate = nativeContext.getMethodCallerCustomizer()
+                .customize(
+                        "open",
+                        methodCallerFactory.createCapturedState(
+                                "open",
+                                Descriptors.OPEN_CREATE,
+                                (methodHandle, capturedState, args) ->
+                                        (int)methodHandle.invokeExact(capturedState, (MemorySegment)args[0], (int)args[1], (int)args[2])
+                        )
+                );
+        this.open = nativeContext.getMethodCallerCustomizer()
+                .customize(
+                        "open",
+                        methodCallerFactory.createCapturedState(
+                                "open",
+                                Descriptors.OPEN,
+                                (methodHandle, capturedState, args) ->
+                                        (int)methodHandle.invokeExact(capturedState, (MemorySegment)args[0], (int)args[1])
+                        )
+                );
+        this.close = nativeContext.getMethodCallerCustomizer()
+                .customize(
+                        "close",
+                        methodCallerFactory.createCapturedState(
+                                "close",
+                                Descriptors.CLOSE,
+                                (methodHandle, capturedState, args) ->
+                                        (int)methodHandle.invokeExact(capturedState, (int)args[0])
+                        )
+                );
+        this.read = nativeContext.getMethodCallerCustomizer()
+                .customize(
+                        "read",
+                        methodCallerFactory.createCapturedState(
+                                "read",
+                                Descriptors.READ,
+                                (methodHandle, capturedState, args) ->
+                                        (int)methodHandle.invokeExact(capturedState, (int)args[0], (MemorySegment)args[1], (int)args[2])
+                        )
+                );
+        this.write = nativeContext.getMethodCallerCustomizer()
+                .customize(
+                        "write",
+                        methodCallerFactory.createCapturedState(
+                                "write",
+                                Descriptors.WRITE,
+                                (methodHandle, capturedState, args) ->
+                                        (int)methodHandle.invokeExact(capturedState, (int)args[0], (MemorySegment)args[1], (int)args[2])
+                        )
+                );
+        this.access = nativeContext.getMethodCallerCustomizer()
+                .customize(
+                        "access",
+                        methodCallerFactory.createNonCapture(
+                                "access",
+                                Descriptors.ACCESS,
+                                (methodHandle, args) ->
+                                        (int)methodHandle.invokeExact((MemorySegment)args[0], (int)args[1])
+                        )
+                );
+        this.fcntl = nativeContext.getMethodCallerCustomizer()
+                .customize(
+                        "fcntl",
+                        methodCallerFactory.createNonCapture(
+                                "fcntl",
+                                Descriptors.FCNTL,
+                                (methodHandle, args) ->
+                                        (int)methodHandle.invokeExact((int)args[0], (int)args[1])
+                        )
+                );
     }
 
     @Override

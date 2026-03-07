@@ -6,6 +6,7 @@ import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapper;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.Poll;
 
 import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
 public class PollingOperationsImpl implements PollingOperations {
@@ -15,7 +16,16 @@ public class PollingOperationsImpl implements PollingOperations {
 
     public PollingOperationsImpl(NativeContext nativeContext) {
         this(
-                nativeContext.getCapturedStateMethodCallerFactory().create("poll", Descriptors.POLL),
+                nativeContext.getMethodCallerCustomizer().customize(
+                        "poll",
+                        new MethodCallerFactoryImpl(nativeContext.getSegmentAllocator())
+                                .createCapturedState(
+                                        "poll",
+                                        Descriptors.POLL,
+                                        (methodHandle, capturedState, args) ->
+                                                (int)methodHandle.invokeExact(capturedState, (MemorySegment)args[0], (int)args[1], (int)args[2])
+                                )
+                ),
                 nativeContext.getMemorySegmentMapper()
         );
     }

@@ -83,7 +83,7 @@ class FileOperationsImplTest {
         void canOpenCreateFile() {
             performTest(
                     builder -> builder
-                            .addMethodCaller("open", FileOperationsImpl.Descriptors.OPEN_CREATE, args -> {
+                            .addMethodCaller("open", args -> {
                                 assertThat(args[0]).isInstanceOf(MemorySegment.class);
                                 assertThat(args[1]).isEqualTo(FileOperations.Flags.O_CREAT);
                                 assertThat(args[2]).isEqualTo(0644);
@@ -97,7 +97,7 @@ class FileOperationsImplTest {
         void canOpenFile() {
             performTest(
                     builder -> builder
-                            .addMethodCaller("open", FileOperationsImpl.Descriptors.OPEN, args -> {
+                            .addMethodCaller("open", args -> {
                                 assertThat(args[0]).isInstanceOf(MemorySegment.class);
                                 assertThat(args[1]).isEqualTo(FileOperations.Flags.O_RDONLY);
                                 return 2;
@@ -110,7 +110,7 @@ class FileOperationsImplTest {
         void canCloseFile() {
             performTest(
                     builder -> builder
-                            .addMethodCaller("close", FileOperationsImpl.Descriptors.CLOSE, args -> {
+                            .addMethodCaller("close", args -> {
                                 assertThat(args[0]).isEqualTo(2);
                                 return 0;
                             }),
@@ -122,7 +122,7 @@ class FileOperationsImplTest {
         void canReadFile() {
             performTest(
                     builder -> builder
-                            .addMethodCaller("read", FileOperationsImpl.Descriptors.READ, args -> {
+                            .addMethodCaller("read", args -> {
                                 ((MemorySegment)args[1]).copyFrom(MemorySegment.ofArray(new byte[] { 1, 2, 3 }));
                                 return 3;
                             }),
@@ -138,7 +138,7 @@ class FileOperationsImplTest {
         void canReadIntoOffset() {
             performTest(
                     builder -> builder
-                            .addMethodCaller("read", FileOperationsImpl.Descriptors.READ, args -> {
+                            .addMethodCaller("read", args -> {
                                 ((MemorySegment)args[1]).copyFrom(MemorySegment.ofArray(new byte[] { 3 }));
                                 return 1;
                             }),
@@ -154,7 +154,7 @@ class FileOperationsImplTest {
         void canReadEmptyFile() {
             performTest(
                     builder -> builder
-                            .addMethodCaller("read", FileOperationsImpl.Descriptors.READ, args -> 0),
+                            .addMethodCaller("read", args -> 0),
                     fileOperations ->
                             assertThat(fileOperations.read(0, new byte[0], 0, 0))
                                     .isEqualTo(0)
@@ -165,7 +165,7 @@ class FileOperationsImplTest {
         void canWriteToFile() {
             performTest(
                     builder -> builder
-                            .addMethodCaller("write", FileOperationsImpl.Descriptors.WRITE, args -> {
+                            .addMethodCaller("write", args -> {
                                 var buffer = ((MemorySegment)args[1]).toArray(ValueLayout.JAVA_BYTE);
                                 assertThat(buffer).containsExactly(1, 2, 3);
                                 return 3;
@@ -180,7 +180,7 @@ class FileOperationsImplTest {
         void canWriteSliceToFile() {
             performTest(
                     builder -> builder
-                            .addMethodCaller("write", FileOperationsImpl.Descriptors.WRITE, args -> {
+                            .addMethodCaller("write", args -> {
                                 var buffer = ((MemorySegment)args[1]).toArray(ValueLayout.JAVA_BYTE);
                                 assertThat(buffer).containsExactly(2);
                                 return 1;
@@ -195,7 +195,7 @@ class FileOperationsImplTest {
         void canCheckFileExists() {
             performTest(
                     builder -> builder
-                            .addMethodCaller("access", FileOperationsImpl.Descriptors.ACCESS, args -> {
+                            .addMethodCaller("access", args -> {
                                 var memorySegment = (MemorySegment)args[0];
                                 var filename = memorySegment.getString(0);
                                 assertThat(filename).isEqualTo("tmp.txt");
@@ -210,12 +210,12 @@ class FileOperationsImplTest {
         void canCheckFileIsValid() {
             performTest(
                     builder -> builder
-                            .addMethodCaller("fcntl", FileOperationsImpl.Descriptors.FCNTL, args -> {
+                            .addMethodCaller("fcntl", args -> {
                                 assertThat(args[0]).isEqualTo(2);
                                 assertThat(args[1]).isEqualTo(1);
                                 return 1;
                             })
-                            .addMethodCaller("close", FileOperationsImpl.Descriptors.CLOSE, args -> {
+                            .addMethodCaller("close", args -> {
                                 assertThat(args[0]).isEqualTo(2);
                                 return 0;
                             }),
@@ -235,18 +235,18 @@ class FileOperationsImplTest {
             var fileOperations = new FileOperationsImpl(context);
             verifier.accept(fileOperations);
 
-            var methodCallerFactory = (FakeMethodCallerFactory)context.getMethodCallerFactory();
+            var methodCallerFactory = (FakeMethodCallerCustomizer)context.getMethodCallerCustomizer();
             methodCallerFactory.assertInvoked();
         }
     }
 
     static UnaryOperator<FakeNativeContext.Builder> defaultFileOperations(String filename) {
         return builder -> builder
-                .addMethodCaller("open", FileOperationsImpl.Descriptors.OPEN, args -> {
+                .addMethodCaller("open", args -> {
                     assertThat(((MemorySegment)args[0]).getString(0)).isEqualTo(filename);
                     return 1;
                 })
-                .addMethodCaller("fcntl", FileOperationsImpl.Descriptors.FCNTL, args -> 1)
-                .addMethodCaller("close", FileOperationsImpl.Descriptors.CLOSE, args -> 0);
+                .addMethodCaller("close", _ -> 0)
+                .addMethodCaller("fcntl", _ -> 1);
     }
 }

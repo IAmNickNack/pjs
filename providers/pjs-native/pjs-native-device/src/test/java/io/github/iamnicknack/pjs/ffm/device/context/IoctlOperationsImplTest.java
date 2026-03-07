@@ -21,7 +21,7 @@ class IoctlOperationsImplTest {
     void canCallIoctlWithIntData() {
         performTest(
                 builder -> builder
-                        .addMethodCaller("ioctl", IoctlOperationsImpl.Descriptors.IOCTL_INT_BY_REFERENCE, args -> {
+                        .addMethodCaller("ioctl", args -> {
                             assertThat(args).hasSize(3);
                             assertThat(args[0]).isEqualTo(1);
                             assertThat(args[1]).isEqualTo(2L);
@@ -42,7 +42,7 @@ class IoctlOperationsImplTest {
     void canCallIoctlWithJavaObject() {
         performTest(
                 builder -> builder
-                        .addMethodCaller("ioctl", IoctlOperationsImpl.Descriptors.IOCTL_INT_BY_REFERENCE, args -> {
+                        .addMethodCaller("ioctl", args -> {
                             assertThat(args[0]).isEqualTo(1);
                             assertThat(args[1]).isEqualTo(2L);
                             assertThat((MemorySegment)args[2]).matches(segment -> {
@@ -60,7 +60,7 @@ class IoctlOperationsImplTest {
     void canCallIoctlForObjectResult() {
         performTest(
                 builder -> builder
-                        .addMethodCaller("ioctl", IoctlOperationsImpl.Descriptors.IOCTL_INT_BY_REFERENCE, args -> {
+                        .addMethodCaller("ioctl", args -> {
                             var segment = (MemorySegment)args[2];
                             segment.set(ValueLayout.JAVA_INT, 0, 3);
                             return 0;
@@ -79,8 +79,8 @@ class IoctlOperationsImplTest {
         var fileOperations = new IoctlOperationsImpl(context);
         verifier.accept(fileOperations);
 
-        var methodCallerFactory = (FakeMethodCallerFactory)context.getMethodCallerFactory();
-        methodCallerFactory.assertInvoked();
+        var methodCallerCustomizer = (FakeMethodCallerCustomizer)context.getMethodCallerCustomizer();
+        methodCallerCustomizer.assertInvoked();
     }
 
     @SerializeUsing(TestObject.Serializer.class)

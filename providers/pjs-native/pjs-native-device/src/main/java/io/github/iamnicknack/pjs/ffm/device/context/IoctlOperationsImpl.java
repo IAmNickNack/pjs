@@ -34,7 +34,10 @@ public class IoctlOperationsImpl implements IoctlOperations {
     public IoctlOperationsImpl(NativeContext nativeContext) {
         this(
                 nativeContext.getSegmentAllocator(),
-                new IntByReferenceMethodCaller(new CapturedStateWrapper(nativeContext.getSegmentAllocator())),
+                nativeContext.getMethodCallerCustomizer().customize(
+                        IntByReferenceMethodCaller.METHOD_NAME,
+                        new IntByReferenceMethodCaller(new CapturedStateWrapper(nativeContext.getSegmentAllocator()))
+                ),
                 nativeContext.getMemorySegmentMapper()
         );
     }
@@ -83,6 +86,9 @@ public class IoctlOperationsImpl implements IoctlOperations {
      * {@link MethodHandle#invokeExact(Object...)}.
      */
     public static class IntByReferenceMethodCaller implements MethodCaller {
+
+        public static final String METHOD_NAME = "ioctl";
+
         private final CapturedStateWrapper capturedStateWrapper;
         private final MethodHandle methodHandle;
 
@@ -94,7 +100,7 @@ public class IoctlOperationsImpl implements IoctlOperations {
             this.capturedStateWrapper = capturedStateWrapper;
             this.methodHandle = Linker.nativeLinker()
                     .downcallHandle(
-                            Linker.nativeLinker().defaultLookup().find("ioctl").orElseThrow(),
+                            Linker.nativeLinker().defaultLookup().find(METHOD_NAME).orElseThrow(),
                             IOCTL_INT_BY_REFERENCE,
                             Linker.Option.captureCallState("errno")
                     );

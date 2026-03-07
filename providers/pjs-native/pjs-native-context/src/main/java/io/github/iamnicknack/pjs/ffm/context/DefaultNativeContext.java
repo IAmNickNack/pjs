@@ -1,8 +1,5 @@
 package io.github.iamnicknack.pjs.ffm.context;
 
-import io.github.iamnicknack.pjs.ffm.context.method.CapturedStateMethodCallerFactory;
-import io.github.iamnicknack.pjs.ffm.context.method.DefaultMethodCallerFactory;
-import io.github.iamnicknack.pjs.ffm.context.method.MethodCallerFactory;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapper;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapperImpl;
 
@@ -20,23 +17,17 @@ public class DefaultNativeContext implements NativeContext {
 
     private final MemorySegmentMapper memorySegmentMapper;
 
-    private final MethodCallerFactory methodCallerFactory;
-
-    private final MethodCallerFactory capturedStateMethodCallerFactory;
-
     public DefaultNativeContext() {
         this(Arena.ofAuto());
     }
 
     public DefaultNativeContext(SegmentAllocator segmentAllocator) {
-        this(segmentAllocator, Linker.nativeLinker().defaultLookup(), new MemorySegmentMapperImpl(segmentAllocator));
+        this(segmentAllocator, new MemorySegmentMapperImpl(segmentAllocator));
     }
 
-    public DefaultNativeContext(SegmentAllocator segmentAllocator, SymbolLookup symbolLookup, MemorySegmentMapper memorySegmentMapper) {
+    public DefaultNativeContext(SegmentAllocator segmentAllocator, MemorySegmentMapper memorySegmentMapper) {
         this.segmentAllocator = segmentAllocator;
         this.memorySegmentMapper = memorySegmentMapper;
-        this.methodCallerFactory = new DefaultMethodCallerFactory(symbolLookup);
-        this.capturedStateMethodCallerFactory = new CapturedStateMethodCallerFactory(segmentAllocator, symbolLookup);
     }
 
     @Override
@@ -48,16 +39,4 @@ public class DefaultNativeContext implements NativeContext {
     public MemorySegmentMapper getMemorySegmentMapper() {
         return memorySegmentMapper;
     }
-
-    @Override
-    public MethodCallerFactory getMethodCallerFactory() {
-        return methodCallerFactory;
-    }
-
-    @Deprecated(forRemoval = true)
-    @Override
-    public MethodCallerFactory getCapturedStateMethodCallerFactory() {
-        return capturedStateMethodCallerFactory;
-    }
-
 }

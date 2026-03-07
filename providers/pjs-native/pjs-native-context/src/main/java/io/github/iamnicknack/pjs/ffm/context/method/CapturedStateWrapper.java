@@ -14,10 +14,10 @@ import java.util.concurrent.Callable;
 
 public class CapturedStateWrapper {
 
-    private static final StructLayout CAPTURED_STATE_LAYOUT = Linker.Option.captureStateLayout();
-    private static final VarHandle ERRNO_HANDLE = CAPTURED_STATE_LAYOUT
+    public static final StructLayout CAPTURED_STATE_LAYOUT = Linker.Option.captureStateLayout();
+    public static final VarHandle ERRNO_HANDLE = CAPTURED_STATE_LAYOUT
             .varHandle(MemoryLayout.PathElement.groupElement("errno"));
-    private static final MethodHandle STR_ERROR = Linker.nativeLinker()
+    public static final MethodHandle STR_ERROR = Linker.nativeLinker()
             .downcallHandle(
                     Linker.nativeLinker().defaultLookup().find("strerror").orElseThrow(),
                     FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT)
@@ -41,6 +41,8 @@ public class CapturedStateWrapper {
             }
             
             return result;
+        } catch (CapturedStateException e) {
+            throw e;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
