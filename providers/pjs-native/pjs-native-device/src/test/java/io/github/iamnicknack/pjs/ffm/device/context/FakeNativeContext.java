@@ -39,6 +39,7 @@ public class FakeNativeContext implements NativeContext {
         return methodCallerFactory;
     }
 
+    @Deprecated(forRemoval = true)
     @Override
     @NonNull
     public MethodCallerFactory getCapturedStateMethodCallerFactory() {

@@ -27,7 +27,7 @@ public class SevenSegmentExample implements Runnable {
             .build();
 
     private static final SpiConfig SPI_CONFIG = SpiConfig.builder()
-            .baudRate(100_000)
+            .baudRate(10_000_000)
             .mode(0)
             .bus(1)
             .chipSelect(0)
@@ -48,7 +48,7 @@ public class SevenSegmentExample implements Runnable {
         display.reset();
         display.on();
 
-        IntStream.range(0, 1000).forEach(display::write);
+        IntStream.range(0, 100000).forEach(display::write);
 
         display.off();
     }

@@ -1,12 +1,19 @@
 package io.github.iamnicknack.pjs.ffm.device.context;
 
 import io.github.iamnicknack.pjs.ffm.context.NativeContext;
+import io.github.iamnicknack.pjs.ffm.context.method.CapturedStateWrapper;
 import io.github.iamnicknack.pjs.ffm.context.method.MethodCaller;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapper;
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker;
+import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SegmentAllocator;
 import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
+
+import static io.github.iamnicknack.pjs.ffm.device.context.IoctlOperationsImpl.Descriptors.IOCTL_INT_BY_REFERENCE;
 
 public class IoctlOperationsImpl implements IoctlOperations {
 
@@ -27,8 +34,7 @@ public class IoctlOperationsImpl implements IoctlOperations {
     public IoctlOperationsImpl(NativeContext nativeContext) {
         this(
                 nativeContext.getSegmentAllocator(),
-                nativeContext.getCapturedStateMethodCallerFactory()
-                        .create("ioctl", Descriptors.IOCTL_INT_BY_REFERENCE),
+                new IntByReferenceMethodCaller(new CapturedStateWrapper(nativeContext.getSegmentAllocator())),
                 nativeContext.getMemorySegmentMapper()
         );
     }
@@ -62,26 +68,49 @@ public class IoctlOperationsImpl implements IoctlOperations {
     }
 
     static class Descriptors {
-        static final FunctionDescriptor IOCTL_INT_BY_VALUE = FunctionDescriptor.of(
-                ValueLayout.JAVA_INT,   // return type
-                ValueLayout.JAVA_INT,   // int fd
-                ValueLayout.JAVA_LONG,  // unsigned long request
-                ValueLayout.JAVA_LONG   // unsigned long arg
-        );
-
         static final FunctionDescriptor IOCTL_INT_BY_REFERENCE = FunctionDescriptor.of(
                 ValueLayout.JAVA_INT,   // return type
                 ValueLayout.JAVA_INT,   // int fd
                 ValueLayout.JAVA_LONG,  // unsigned long request
                 ValueLayout.ADDRESS     // void *argp
         );
+    }
 
-        static final FunctionDescriptor IOCTL_LONG_BY_REFERENCE = FunctionDescriptor.of(
-                ValueLayout.JAVA_LONG,  // return type
-                ValueLayout.JAVA_INT,   // int fd
-                ValueLayout.JAVA_LONG,  // unsigned long request
-                ValueLayout.ADDRESS     // void *argp
-        );
+    /**
+     * Method caller for ioctl(int fd, long command, void * pointer)
+     * <p>
+     * A specific implementation avoids use of {@link MethodHandle#invokeWithArguments(Object...)} in favor of
+     * {@link MethodHandle#invokeExact(Object...)}.
+     */
+    public static class IntByReferenceMethodCaller implements MethodCaller {
+        private final CapturedStateWrapper capturedStateWrapper;
+        private final MethodHandle methodHandle;
+
+        public IntByReferenceMethodCaller() {
+            this(new CapturedStateWrapper(Arena.ofAuto()));
+        }
+
+        public IntByReferenceMethodCaller(CapturedStateWrapper capturedStateWrapper) {
+            this.capturedStateWrapper = capturedStateWrapper;
+            this.methodHandle = Linker.nativeLinker()
+                    .downcallHandle(
+                            Linker.nativeLinker().defaultLookup().find("ioctl").orElseThrow(),
+                            IOCTL_INT_BY_REFERENCE,
+                            Linker.Option.captureCallState("errno")
+                    );
+        }
+
+        @Override
+        public Object call(Object... args) {
+            return capturedStateWrapper.wrap(capturedState ->
+                    (int)methodHandle.invokeExact(
+                            capturedState,
+                            (int)args[0],
+                            (long)args[1],
+                            (MemorySegment)args[2]
+                    )
+            );
+        }
     }
 
 }

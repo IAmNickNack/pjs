@@ -54,6 +54,7 @@ public class DefaultNativeContext implements NativeContext {
         return methodCallerFactory;
     }
 
+    @Deprecated(forRemoval = true)
     @Override
     public MethodCallerFactory getCapturedStateMethodCallerFactory() {
         return capturedStateMethodCallerFactory;

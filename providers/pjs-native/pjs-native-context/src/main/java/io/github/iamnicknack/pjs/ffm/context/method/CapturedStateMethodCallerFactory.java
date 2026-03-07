@@ -17,6 +17,7 @@ import java.lang.invoke.VarHandle;
  * It automatically allocates a CapturedState instance and prepends it to the argument list
  * when invoking the native method.
  */
+@Deprecated(forRemoval = true)
 public class CapturedStateMethodCallerFactory implements MethodCallerFactory {
 
     // Captured state for errno
