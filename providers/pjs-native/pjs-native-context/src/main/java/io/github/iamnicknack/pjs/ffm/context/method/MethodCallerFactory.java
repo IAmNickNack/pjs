@@ -46,7 +46,7 @@ public interface MethodCallerFactory {
 
     /**
      * Create a capturing method caller, capable of capturing error state.
-     * This uses {@link MethodHandle#invokeWithArguments(Object...)} which incurrs a performance overhead.
+     * This uses {@link MethodHandle#invokeWithArguments(Object...)} which incurs a performance overhead.
      * Prefer {@link #createCapturedState(String, FunctionDescriptor, InvocationWithCapturedState)}.
      * @param name the name of the method
      * @param descriptor the descriptor of the method
