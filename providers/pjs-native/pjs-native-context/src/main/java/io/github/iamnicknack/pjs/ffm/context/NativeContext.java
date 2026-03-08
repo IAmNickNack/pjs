@@ -1,6 +1,5 @@
 package io.github.iamnicknack.pjs.ffm.context;
 
-import io.github.iamnicknack.pjs.ffm.context.method.MethodCallerFactory;
 import io.github.iamnicknack.pjs.ffm.context.method.MethodCallerCustomizer;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapper;
 
