@@ -34,11 +34,6 @@ public record Poll(
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
             ValueLayout.JAVA_INT.withName("fd"),
             ValueLayout.JAVA_SHORT.withName("events"),
-/*
- * Pi4j FFM has 2 bytes of padding here.
- * Padding doesn't work here, so commenting it out.
- */
-//            MemoryLayout.paddingLayout(2),
             ValueLayout.JAVA_SHORT.withName("revents")
     );
 

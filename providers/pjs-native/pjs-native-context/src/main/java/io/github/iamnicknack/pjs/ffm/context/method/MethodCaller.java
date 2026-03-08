@@ -22,4 +22,8 @@ public interface MethodCaller {
             return methodName;
         }
     }
+
+    MethodCaller UNIMPLEMENTED = (Object... _) -> {
+        throw new MethodCallerException("UNIMPLEMENTED", new UnsupportedOperationException("This method is not implemented"));
+    };
 }

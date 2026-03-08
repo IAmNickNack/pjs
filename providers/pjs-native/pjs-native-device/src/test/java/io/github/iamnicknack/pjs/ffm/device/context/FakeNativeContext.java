@@ -39,12 +39,6 @@ public class FakeNativeContext implements NativeContext {
         return methodCallerFactory;
     }
 
-    @Override
-    @NonNull
-    public MethodCallerFactory getCapturedStateMethodCallerFactory() {
-        return methodCallerFactory;
-    }
-
     public static Builder builder() {
         return new Builder();
     }

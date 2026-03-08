@@ -41,6 +41,15 @@ public class FakeMethodCallerFactory implements MethodCallerFactory {
     }
 
     @Override
+    public MethodCaller createNonCapture(String name, FunctionDescriptor descriptor, Invocation invocation) {
+        return create(name, descriptor);
+    }
+
+    @Override
+    public MethodCaller createCapturedState(String name, FunctionDescriptor descriptor, InvocationWithCapturedState invocation) {
+        return create(name, descriptor);
+    }
+
     public MethodCaller create(String name, FunctionDescriptor functionDescriptor) {
         return args -> {
             var key = new Key(name, functionDescriptor);

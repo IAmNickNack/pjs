@@ -32,9 +32,7 @@ class IoctlOperationsImplTest {
                             });
                             return 0;
                         }),
-                ioctlOperations -> {
-                    ioctlOperations.ioctl(1, 2, 3);
-                }
+                ioctlOperations -> ioctlOperations.ioctl(1, 2, 3)
         );
     }
 

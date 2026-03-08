@@ -2,11 +2,15 @@ package io.github.iamnicknack.pjs.ffm.device.context;
 
 import io.github.iamnicknack.pjs.ffm.context.NativeContext;
 import io.github.iamnicknack.pjs.ffm.context.method.MethodCaller;
+import io.github.iamnicknack.pjs.ffm.context.method.MethodCallerFactory;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapper;
 
 import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SegmentAllocator;
 import java.lang.foreign.ValueLayout;
+
+import static io.github.iamnicknack.pjs.ffm.device.context.IoctlOperationsImpl.Descriptors.IOCTL_INT_BY_REFERENCE;
 
 public class IoctlOperationsImpl implements IoctlOperations {
 
@@ -25,12 +29,12 @@ public class IoctlOperationsImpl implements IoctlOperations {
     }
 
     public IoctlOperationsImpl(NativeContext nativeContext) {
-        this(
-                nativeContext.getSegmentAllocator(),
-                nativeContext.getCapturedStateMethodCallerFactory()
-                        .create("ioctl", Descriptors.IOCTL_INT_BY_REFERENCE),
-                nativeContext.getMemorySegmentMapper()
-        );
+        MethodCallerFactory.InvocationWithCapturedState invocation = (methodHandle, capturedState, args) ->
+                (int)methodHandle.invokeExact(capturedState, (int)args[0], (long)args[1], (MemorySegment)args[2]);
+        MethodCaller methodCaller = nativeContext.getMethodCallerFactory()
+                .createCapturedState("ioctl", IOCTL_INT_BY_REFERENCE, invocation);
+
+        this(nativeContext.getSegmentAllocator(), methodCaller, nativeContext.getMemorySegmentMapper());
     }
 
     @Override
@@ -62,26 +66,11 @@ public class IoctlOperationsImpl implements IoctlOperations {
     }
 
     static class Descriptors {
-        static final FunctionDescriptor IOCTL_INT_BY_VALUE = FunctionDescriptor.of(
-                ValueLayout.JAVA_INT,   // return type
-                ValueLayout.JAVA_INT,   // int fd
-                ValueLayout.JAVA_LONG,  // unsigned long request
-                ValueLayout.JAVA_LONG   // unsigned long arg
-        );
-
         static final FunctionDescriptor IOCTL_INT_BY_REFERENCE = FunctionDescriptor.of(
                 ValueLayout.JAVA_INT,   // return type
                 ValueLayout.JAVA_INT,   // int fd
                 ValueLayout.JAVA_LONG,  // unsigned long request
                 ValueLayout.ADDRESS     // void *argp
         );
-
-        static final FunctionDescriptor IOCTL_LONG_BY_REFERENCE = FunctionDescriptor.of(
-                ValueLayout.JAVA_LONG,  // return type
-                ValueLayout.JAVA_INT,   // int fd
-                ValueLayout.JAVA_LONG,  // unsigned long request
-                ValueLayout.ADDRESS     // void *argp
-        );
     }
-
 }

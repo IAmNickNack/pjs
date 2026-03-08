@@ -53,9 +53,4 @@ public interface NativeContext {
      * Common {@link MethodCallerFactory}
      */
     MethodCallerFactory getMethodCallerFactory();
-
-    /**
-     * Common {@link MethodCallerFactory} for capturing error state.
-     */
-    MethodCallerFactory getCapturedStateMethodCallerFactory();
 }

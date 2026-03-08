@@ -1,36 +1,87 @@
 package io.github.iamnicknack.pjs.ffm.context.method;
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
+import java.lang.foreign.SegmentAllocator;
 import java.lang.foreign.SymbolLookup;
 
 /**
- * Creates a MethodCaller for the specified native method name and function descriptor.
+ * Default implementation of {@link MethodCallerFactory}
  */
 public class DefaultMethodCallerFactory implements MethodCallerFactory {
 
+    private final CapturedStateWrapper capturedStateWrapper;
     private final SymbolLookup symbolLookup;
+    private final Linker.Option capturedStateOption;
 
-    public DefaultMethodCallerFactory(SymbolLookup symbolLookup) {
-        this.symbolLookup = symbolLookup;
+    /**
+     * Default constructor using auto arena, default linker lookup and default call state.
+     */
+    public DefaultMethodCallerFactory() {
+        this(Arena.ofAuto());
     }
 
     /**
-     * Creates a MethodCaller for the specified native method name and function descriptor.
-     * @param name the name of the native method
-     * @param functionDescriptor the function descriptor of the native method
-     * @return a MethodCaller instance for invoking the native method
+     * Constructor using the provided segment allocator, default linker-lookup and default call state.
+     * @param segmentAllocator the segment allocator to use
      */
+    public DefaultMethodCallerFactory(SegmentAllocator segmentAllocator) {
+        this(segmentAllocator, Linker.nativeLinker().defaultLookup(), Linker.Option.captureCallState("errno"));
+    }
+
+    /**
+     * Constructor using the provided segment allocator, linker-lookup and call state option.
+     * @param segmentAllocator the segment allocator to use
+     * @param symbolLookup the linker lookup to use
+     * @param capturedStateOption the call state option to use
+     */
+    public DefaultMethodCallerFactory(
+            SegmentAllocator segmentAllocator,
+            SymbolLookup symbolLookup,
+            Linker.Option capturedStateOption
+    ) {
+        this.capturedStateWrapper = new CapturedStateWrapper(segmentAllocator);
+        this.symbolLookup = symbolLookup;
+        this.capturedStateOption = capturedStateOption;
+    }
+
     @Override
-    public MethodCaller create(String name, FunctionDescriptor functionDescriptor) {
+    public MethodCaller createNonCapture(String name, FunctionDescriptor descriptor, Invocation invocation) {
         var methodHandle = Linker.nativeLinker()
-                .downcallHandle(symbolLookup.find(name).orElseThrow(), functionDescriptor);
+                .downcallHandle(
+                        symbolLookup
+                                .find(name)
+                                .orElseThrow(),
+                        descriptor
+                );
+
         return args -> {
             try {
-                return methodHandle.invokeWithArguments(args);
+                return invocation.invoke(methodHandle, args);
             } catch (Throwable e) {
                 throw new MethodCaller.MethodCallerException(name, e);
             }
         };
+    }
+
+    @Override
+    public MethodCaller createCapturedState(String name, FunctionDescriptor descriptor, InvocationWithCapturedState invocation) {
+        var methodHandle = Linker.nativeLinker()
+                .downcallHandle(
+                        symbolLookup
+                                .find(name)
+                                .orElseThrow(),
+                        descriptor,
+                        capturedStateOption
+                );
+
+        return args -> capturedStateWrapper.wrap(capturedState -> {
+            try {
+                return invocation.invoke(methodHandle, capturedState, args);
+            } catch (Throwable e) {
+                throw new MethodCaller.MethodCallerException(name, e);
+            }
+        });
     }
 }
