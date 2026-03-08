@@ -26,7 +26,7 @@ public interface MethodCallerFactory {
 
     /**
      * Create a non-capturing method caller. This uses {@link MethodHandle#invokeWithArguments(Object...)} which
-     * incurrs a performance overhead. Prefer {@link #createNonCapture(String, FunctionDescriptor, Invocation)}.
+     * incurs a performance overhead. Prefer {@link #createNonCapture(String, FunctionDescriptor, Invocation)}.
      * @param name the name of the method
      * @param descriptor the descriptor of the method
      * @return a new MethodCaller instance
