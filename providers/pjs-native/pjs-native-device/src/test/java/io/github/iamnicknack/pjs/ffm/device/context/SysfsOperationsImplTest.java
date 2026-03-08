@@ -22,6 +22,7 @@ class SysfsOperationsImplTest {
                 builder -> defaultFileOperations(SYSFS_TEST + "/test").apply(builder)
                         .addMethodCaller(
                                 "write",
+                                FileOperationsImpl.Descriptors.WRITE,
                                 writeMethodCaller(new byte[] { 1, 2, 3 })
                         ),
                 sysfsOperations -> {
@@ -36,6 +37,7 @@ class SysfsOperationsImplTest {
                 builder -> defaultFileOperations(SYSFS_TEST + "/test").apply(builder)
                         .addMethodCaller(
                                 "read",
+                                FileOperationsImpl.Descriptors.READ,
                                 readMethodCaller(new byte[] { 1, 2, 3 })
                         ),
                 sysfsOperations -> {
@@ -52,6 +54,7 @@ class SysfsOperationsImplTest {
                 builder -> defaultFileOperations(SYSFS_TEST + "/test").apply(builder)
                         .addMethodCaller(
                                 "write",
+                                FileOperationsImpl.Descriptors.WRITE,
                                 writeMethodCaller(value.getBytes())
                         ),
                 sysfsOperations -> {
@@ -69,6 +72,7 @@ class SysfsOperationsImplTest {
                 builder -> defaultFileOperations(SYSFS_TEST + "/test").apply(builder)
                         .addMethodCaller(
                                 "read",
+                                FileOperationsImpl.Descriptors.READ,
                                 readMethodCaller(value.getBytes())
                         ),
                 sysfsOperations -> {
@@ -88,8 +92,8 @@ class SysfsOperationsImplTest {
         var sysfsOperations = new SysfsOperationsImpl(Path.of(SYSFS_TEST), fileOperations);
         verifier.accept(sysfsOperations);
 
-        var methodCallerCustomizer = (FakeMethodCallerCustomizer)context.getMethodCallerCustomizer();
-        methodCallerCustomizer.assertInvoked();
+        var methodCallerFactory = (FakeMethodCallerFactory)context.getMethodCallerFactory();
+        methodCallerFactory.assertInvoked();
     }
 
     private MethodCaller readMethodCaller(byte[] data) {

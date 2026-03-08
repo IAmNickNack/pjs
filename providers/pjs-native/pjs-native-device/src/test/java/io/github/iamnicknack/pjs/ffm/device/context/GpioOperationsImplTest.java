@@ -25,7 +25,7 @@ class GpioOperationsImplTest {
     void canReadChipInfo() {
         performTest(
                 builder -> defaultFileOperations("canReadChipInfo").apply(builder)
-                        .addMethodCaller("ioctl", args -> {
+                        .addMethodCaller("ioctl", IoctlOperationsImpl.Descriptors.IOCTL_INT_BY_REFERENCE, args -> {
                             assertThat(args[0]).isEqualTo(1);
                             assertThat(args[1]).isEqualTo(GpioConstants.GPIO_GET_CHIPINFO_IOCTL);
                             var segment = (MemorySegment)args[2];
@@ -42,7 +42,7 @@ class GpioOperationsImplTest {
     void canReaLines() {
         performTest(
                 builder -> defaultFileOperations("/dev/chip name").apply(builder)
-                        .addMethodCaller("ioctl", args -> {
+                        .addMethodCaller("ioctl", IoctlOperationsImpl.Descriptors.IOCTL_INT_BY_REFERENCE, args -> {
                             assertThat(args[0]).isEqualTo(1);
                             assertThat(args[1]).isEqualTo(GpioConstants.GPIO_V2_GET_LINEINFO_IOCTL);
                             var segment = (MemorySegment)args[2];
@@ -64,7 +64,7 @@ class GpioOperationsImplTest {
     void canReadLine() {
         performTest(
                 builder -> defaultFileOperations("/dev/chip name").apply(builder)
-                        .addMethodCaller("ioctl", args -> {
+                        .addMethodCaller("ioctl", IoctlOperationsImpl.Descriptors.IOCTL_INT_BY_REFERENCE, args -> {
                             assertThat(args[0]).isEqualTo(1);
                             assertThat(args[1]).isEqualTo(GpioConstants.GPIO_V2_GET_LINEINFO_IOCTL);
                             var segment = (MemorySegment)args[2];
@@ -93,7 +93,7 @@ class GpioOperationsImplTest {
         var fileOperations = new GpioOperationsImpl(context);
         verifier.accept(fileOperations);
 
-        var methodCallerCustomizer = (FakeMethodCallerCustomizer)context.getMethodCallerCustomizer();
-        methodCallerCustomizer.assertInvoked();
+        var methodCallerFactory = (FakeMethodCallerFactory)context.getMethodCallerFactory();
+        methodCallerFactory.assertInvoked();
     }
 }

@@ -1,6 +1,6 @@
 package io.github.iamnicknack.pjs.ffm.context;
 
-import io.github.iamnicknack.pjs.ffm.context.method.MethodCallerCustomizer;
+import io.github.iamnicknack.pjs.ffm.context.method.MethodCallerFactory;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapper;
 
 import java.io.BufferedReader;
@@ -50,9 +50,7 @@ public interface NativeContext {
     MemorySegmentMapper getMemorySegmentMapper();
 
     /**
-     * Allow method callers to be instrumented by the framework.
+     * Common {@link MethodCallerFactory}
      */
-    default MethodCallerCustomizer getMethodCallerCustomizer() {
-        return MethodCallerCustomizer.NOOP;
-    }
+    MethodCallerFactory getMethodCallerFactory();
 }

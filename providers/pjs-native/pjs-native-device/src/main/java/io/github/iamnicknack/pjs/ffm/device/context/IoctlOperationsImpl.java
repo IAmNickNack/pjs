@@ -1,17 +1,13 @@
 package io.github.iamnicknack.pjs.ffm.device.context;
 
 import io.github.iamnicknack.pjs.ffm.context.NativeContext;
-import io.github.iamnicknack.pjs.ffm.context.method.CapturedStateWrapper;
 import io.github.iamnicknack.pjs.ffm.context.method.MethodCaller;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapper;
 
-import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
-import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SegmentAllocator;
 import java.lang.foreign.ValueLayout;
-import java.lang.invoke.MethodHandle;
 
 import static io.github.iamnicknack.pjs.ffm.device.context.IoctlOperationsImpl.Descriptors.IOCTL_INT_BY_REFERENCE;
 
@@ -34,10 +30,13 @@ public class IoctlOperationsImpl implements IoctlOperations {
     public IoctlOperationsImpl(NativeContext nativeContext) {
         this(
                 nativeContext.getSegmentAllocator(),
-                nativeContext.getMethodCallerCustomizer().customize(
-                        IntByReferenceMethodCaller.METHOD_NAME,
-                        new IntByReferenceMethodCaller(new CapturedStateWrapper(nativeContext.getSegmentAllocator()))
-                ),
+                nativeContext.getMethodCallerFactory()
+                        .createCapturedState(
+                                "ioctl",
+                                IOCTL_INT_BY_REFERENCE,
+                                (methodHandle, capturedState, args) ->
+                                        (int)methodHandle.invokeExact(capturedState, (int)args[0], (long)args[1], (MemorySegment)args[2])
+                        ),
                 nativeContext.getMemorySegmentMapper()
         );
     }
@@ -78,45 +77,4 @@ public class IoctlOperationsImpl implements IoctlOperations {
                 ValueLayout.ADDRESS     // void *argp
         );
     }
-
-    /**
-     * Method caller for ioctl(int fd, long command, void * pointer)
-     * <p>
-     * A specific implementation avoids use of {@link MethodHandle#invokeWithArguments(Object...)} in favor of
-     * {@link MethodHandle#invokeExact(Object...)}.
-     */
-    public static class IntByReferenceMethodCaller implements MethodCaller {
-
-        public static final String METHOD_NAME = "ioctl";
-
-        private final CapturedStateWrapper capturedStateWrapper;
-        private final MethodHandle methodHandle;
-
-        public IntByReferenceMethodCaller() {
-            this(new CapturedStateWrapper(Arena.ofAuto()));
-        }
-
-        public IntByReferenceMethodCaller(CapturedStateWrapper capturedStateWrapper) {
-            this.capturedStateWrapper = capturedStateWrapper;
-            this.methodHandle = Linker.nativeLinker()
-                    .downcallHandle(
-                            Linker.nativeLinker().defaultLookup().find(METHOD_NAME).orElseThrow(),
-                            IOCTL_INT_BY_REFERENCE,
-                            Linker.Option.captureCallState("errno")
-                    );
-        }
-
-        @Override
-        public Object call(Object... args) {
-            return capturedStateWrapper.wrap(capturedState ->
-                    (int)methodHandle.invokeExact(
-                            capturedState,
-                            (int)args[0],
-                            (long)args[1],
-                            (MemorySegment)args[2]
-                    )
-            );
-        }
-    }
-
 }

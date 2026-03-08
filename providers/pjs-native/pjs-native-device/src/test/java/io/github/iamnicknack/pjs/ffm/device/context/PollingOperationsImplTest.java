@@ -21,7 +21,7 @@ class PollingOperationsImplTest {
         var poll = new Poll(1, 2, 0);
         performTest(
                 builder -> builder
-                        .addMethodCaller("poll", args -> {
+                        .addMethodCaller("poll", PollingOperationsImpl.Descriptors.POLL, args -> {
                             var segmentPoll = mapper.value((MemorySegment) args[0], Poll.class);
                             assertThat(segmentPoll).isEqualTo(poll);
                             var pollResult = new Poll(segmentPoll.fd(), segmentPoll.events(), 3);
@@ -43,7 +43,7 @@ class PollingOperationsImplTest {
         var fileOperations = new PollingOperationsImpl(context);
         verifier.accept(fileOperations);
 
-        var methodCallerCustomizer = (FakeMethodCallerCustomizer)context.getMethodCallerCustomizer();
-        methodCallerCustomizer.assertInvoked();
+        var methodCallerFactory = (FakeMethodCallerFactory)context.getMethodCallerFactory();
+        methodCallerFactory.assertInvoked();
     }
 }

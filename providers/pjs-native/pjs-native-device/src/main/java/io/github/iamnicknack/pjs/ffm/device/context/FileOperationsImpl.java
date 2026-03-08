@@ -24,78 +24,49 @@ public class FileOperationsImpl implements FileOperations, SysfsOperationsFactor
     public FileOperationsImpl(NativeContext nativeContext) {
         this.segmentAllocator = nativeContext.getSegmentAllocator();
 
-        var methodCallerFactory = new MethodCallerFactoryImpl(nativeContext.getSegmentAllocator());
-
-        this.openCreate = nativeContext.getMethodCallerCustomizer()
-                .customize(
-                        "open",
-                        methodCallerFactory.createCapturedState(
-                                "open",
-                                Descriptors.OPEN_CREATE,
-                                (methodHandle, capturedState, args) ->
-                                        (int)methodHandle.invokeExact(capturedState, (MemorySegment)args[0], (int)args[1], (int)args[2])
-                        )
-                );
-        this.open = nativeContext.getMethodCallerCustomizer()
-                .customize(
-                        "open",
-                        methodCallerFactory.createCapturedState(
-                                "open",
-                                Descriptors.OPEN,
-                                (methodHandle, capturedState, args) ->
-                                        (int)methodHandle.invokeExact(capturedState, (MemorySegment)args[0], (int)args[1])
-                        )
-                );
-        this.close = nativeContext.getMethodCallerCustomizer()
-                .customize(
-                        "close",
-                        methodCallerFactory.createCapturedState(
-                                "close",
-                                Descriptors.CLOSE,
-                                (methodHandle, capturedState, args) ->
-                                        (int)methodHandle.invokeExact(capturedState, (int)args[0])
-                        )
-                );
-        this.read = nativeContext.getMethodCallerCustomizer()
-                .customize(
-                        "read",
-                        methodCallerFactory.createCapturedState(
-                                "read",
-                                Descriptors.READ,
-                                (methodHandle, capturedState, args) ->
-                                        (int)methodHandle.invokeExact(capturedState, (int)args[0], (MemorySegment)args[1], (int)args[2])
-                        )
-                );
-        this.write = nativeContext.getMethodCallerCustomizer()
-                .customize(
-                        "write",
-                        methodCallerFactory.createCapturedState(
-                                "write",
-                                Descriptors.WRITE,
-                                (methodHandle, capturedState, args) ->
-                                        (int)methodHandle.invokeExact(capturedState, (int)args[0], (MemorySegment)args[1], (int)args[2])
-                        )
-                );
-        this.access = nativeContext.getMethodCallerCustomizer()
-                .customize(
-                        "access",
-                        methodCallerFactory.createNonCapture(
-                                "access",
-                                Descriptors.ACCESS,
-                                (methodHandle, args) ->
-                                        (int)methodHandle.invokeExact((MemorySegment)args[0], (int)args[1])
-                        )
-                );
-        this.fcntl = nativeContext.getMethodCallerCustomizer()
-                .customize(
-                        "fcntl",
-                        methodCallerFactory.createNonCapture(
-                                "fcntl",
-                                Descriptors.FCNTL,
-                                (methodHandle, args) ->
-                                        (int)methodHandle.invokeExact((int)args[0], (int)args[1])
-                        )
-                );
+        var methodCallerFactory = nativeContext.getMethodCallerFactory();
+        this.openCreate = nativeContext.getMethodCallerFactory().createCapturedState(
+                "open",
+                Descriptors.OPEN_CREATE,
+                (methodHandle, capturedState, args) ->
+                        (int)methodHandle.invokeExact(capturedState, (MemorySegment)args[0], (int)args[1], (int)args[2])
+        );
+        this.open = methodCallerFactory.createCapturedState(
+                "open",
+                Descriptors.OPEN,
+                (methodHandle, capturedState, args) ->
+                        (int)methodHandle.invokeExact(capturedState, (MemorySegment)args[0], (int)args[1])
+        );
+        this.close = methodCallerFactory.createCapturedState(
+                "close",
+                Descriptors.CLOSE,
+                (methodHandle, capturedState, args) ->
+                        (int)methodHandle.invokeExact(capturedState, (int)args[0])
+        );
+        this.read = methodCallerFactory.createCapturedState(
+                "read",
+                Descriptors.READ,
+                (methodHandle, capturedState, args) ->
+                        (int)methodHandle.invokeExact(capturedState, (int)args[0], (MemorySegment)args[1], (int)args[2])
+        );
+        this.write = methodCallerFactory.createCapturedState(
+                "write",
+                Descriptors.WRITE,
+                (methodHandle, capturedState, args) ->
+                        (int)methodHandle.invokeExact(capturedState, (int)args[0], (MemorySegment)args[1], (int)args[2])
+        );
+        this.access = methodCallerFactory.createNonCapture(
+                "access",
+                Descriptors.ACCESS,
+                (methodHandle, args) ->
+                        (int)methodHandle.invokeExact((MemorySegment)args[0], (int)args[1])
+        );
+        this.fcntl = methodCallerFactory.createNonCapture(
+                "fcntl",
+                Descriptors.FCNTL,
+                (methodHandle, args) ->
+                        (int)methodHandle.invokeExact((int)args[0], (int)args[1])
+        );
     }
 
     @Override

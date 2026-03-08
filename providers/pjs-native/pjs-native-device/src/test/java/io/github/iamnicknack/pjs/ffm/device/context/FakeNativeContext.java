@@ -2,25 +2,23 @@ package io.github.iamnicknack.pjs.ffm.device.context;
 
 import io.github.iamnicknack.pjs.ffm.context.NativeContext;
 import io.github.iamnicknack.pjs.ffm.context.method.MethodCaller;
-import io.github.iamnicknack.pjs.ffm.context.method.MethodCallerCustomizer;
+import io.github.iamnicknack.pjs.ffm.context.method.MethodCallerFactory;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapper;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapperImpl;
 import org.jspecify.annotations.NonNull;
 
 import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.SegmentAllocator;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 public class FakeNativeContext implements NativeContext {
 
     private final SegmentAllocator segmentAllocator = Arena.ofAuto();
     private final MemorySegmentMapper memorySegmentMapper = new MemorySegmentMapperImpl(segmentAllocator);
-    private final FakeMethodCallerCustomizer fakeMethodCallerCustomizer;
+    private final MethodCallerFactory methodCallerFactory;
 
-    FakeNativeContext(Map<String, MethodCaller> methodCallerLookup) {
-        this.fakeMethodCallerCustomizer = new FakeMethodCallerCustomizer(methodCallerLookup);
+    FakeNativeContext(MethodCallerFactory methodCallerFactory) {
+        this.methodCallerFactory = methodCallerFactory;
     }
 
     @Override
@@ -37,8 +35,8 @@ public class FakeNativeContext implements NativeContext {
 
     @Override
     @NonNull
-    public MethodCallerCustomizer getMethodCallerCustomizer() {
-        return fakeMethodCallerCustomizer;
+    public MethodCallerFactory getMethodCallerFactory() {
+        return methodCallerFactory;
     }
 
     public static Builder builder() {
@@ -46,15 +44,15 @@ public class FakeNativeContext implements NativeContext {
     }
 
     public static class Builder {
-        private final Map<String, MethodCaller> methodCallerLookup = new HashMap<>();
+        private final FakeMethodCallerFactory.Builder methodCallerFactoryBuilder = FakeMethodCallerFactory.builder();
 
-        public Builder addMethodCaller(String name, MethodCaller caller) {
-            methodCallerLookup.put(name, caller);
+        public Builder addMethodCaller(String name, FunctionDescriptor descriptor, MethodCaller caller) {
+            methodCallerFactoryBuilder.add(name, descriptor, caller);
             return this;
         }
 
         public FakeNativeContext build() {
-            return new FakeNativeContext(Collections.unmodifiableMap(methodCallerLookup));
+            return new FakeNativeContext(methodCallerFactoryBuilder.build());
         }
     }
 }
