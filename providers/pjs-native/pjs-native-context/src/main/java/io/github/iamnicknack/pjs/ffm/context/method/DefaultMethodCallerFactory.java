@@ -23,7 +23,7 @@ public class DefaultMethodCallerFactory implements MethodCallerFactory {
     }
 
     /**
-     * Constructor using provided segment allocator, default linker lookup and default call state.
+     * Constructor using the provided segment allocator, default linker-lookup and default call state.
      * @param segmentAllocator the segment allocator to use
      */
     public DefaultMethodCallerFactory(SegmentAllocator segmentAllocator) {
@@ -31,7 +31,7 @@ public class DefaultMethodCallerFactory implements MethodCallerFactory {
     }
 
     /**
-     * Constructor using provided segment allocator, linker lookup and call state option.
+     * Constructor using the provided segment allocator, linker-lookup and call state option.
      * @param segmentAllocator the segment allocator to use
      * @param symbolLookup the linker lookup to use
      * @param capturedStateOption the call state option to use
@@ -60,7 +60,7 @@ public class DefaultMethodCallerFactory implements MethodCallerFactory {
             try {
                 return invocation.invoke(methodHandle, args);
             } catch (Throwable e) {
-                throw new RuntimeException(e);
+                throw new MethodCaller.MethodCallerException(name, e);
             }
         };
     }
@@ -80,7 +80,7 @@ public class DefaultMethodCallerFactory implements MethodCallerFactory {
             try {
                 return invocation.invoke(methodHandle, capturedState, args);
             } catch (Throwable e) {
-                throw new RuntimeException(e);
+                throw new MethodCaller.MethodCallerException(name, e);
             }
         });
     }
