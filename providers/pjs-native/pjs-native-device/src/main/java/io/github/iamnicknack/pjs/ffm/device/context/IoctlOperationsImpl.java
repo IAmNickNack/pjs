@@ -2,6 +2,7 @@ package io.github.iamnicknack.pjs.ffm.device.context;
 
 import io.github.iamnicknack.pjs.ffm.context.NativeContext;
 import io.github.iamnicknack.pjs.ffm.context.method.MethodCaller;
+import io.github.iamnicknack.pjs.ffm.context.method.MethodCallerFactory;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapper;
 
 import java.lang.foreign.FunctionDescriptor;
@@ -28,17 +29,12 @@ public class IoctlOperationsImpl implements IoctlOperations {
     }
 
     public IoctlOperationsImpl(NativeContext nativeContext) {
-        this(
-                nativeContext.getSegmentAllocator(),
-                nativeContext.getMethodCallerFactory()
-                        .createCapturedState(
-                                "ioctl",
-                                IOCTL_INT_BY_REFERENCE,
-                                (methodHandle, capturedState, args) ->
-                                        (int)methodHandle.invokeExact(capturedState, (int)args[0], (long)args[1], (MemorySegment)args[2])
-                        ),
-                nativeContext.getMemorySegmentMapper()
-        );
+        MethodCallerFactory.InvocationWithCapturedState invocation = (methodHandle, capturedState, args) ->
+                (int)methodHandle.invokeExact(capturedState, (int)args[0], (long)args[1], (MemorySegment)args[2]);
+        MethodCaller methodCaller = nativeContext.getMethodCallerFactory()
+                .createCapturedState("ioctl", IOCTL_INT_BY_REFERENCE, invocation);
+
+        this(nativeContext.getSegmentAllocator(), methodCaller, nativeContext.getMemorySegmentMapper());
     }
 
     @Override
