@@ -46,7 +46,8 @@ public class NativeDeviceRegistryLoader implements DeviceRegistryLoader {
         var eventPollerFactory = new EventPollerFactoryImpl(
                 Duration.ofMillis(100),
                 pollingOperations,
-                fileOperations
+                fileOperations,
+                4
         );
 
         var i2cProvider = new NativeI2CProvider(fileOperations, ioctlOperations);

@@ -87,6 +87,7 @@ public class Main {
                             .addOption(new Option(null, "mcp", false, "Run the MCP23017 example"))
                             .addOption(new Option(null, "oled", false, "Run the OLED example"))
                             .addOption(new Option(null, "debounce", false, "Run the debounce example"))
+                            .addOption(new Option(null, "rotary", false, "Run the rotary encoder example"))
             )
             .addOption("h", "help", false, "Display help information");
 
@@ -168,6 +169,8 @@ public class Main {
                 example = new OledExample(registryDelegate);
             } else if (commandLineArgs.hasOption("debounce")) {
                 example = new DebounceTester(registryDelegate);
+            } else if (commandLineArgs.hasOption("rotary")) {
+                example = new RotaryEncoderExample(registryDelegate);
             } else {
                 example = () -> logger.info("No example selected");
             }
