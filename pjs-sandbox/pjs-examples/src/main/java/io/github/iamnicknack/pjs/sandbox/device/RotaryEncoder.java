@@ -4,12 +4,24 @@ import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.model.ReadOperation;
 import io.github.iamnicknack.pjs.model.event.GpioChangeEvent;
 import io.github.iamnicknack.pjs.model.event.GpioChangeEventType;
-import io.github.iamnicknack.pjs.model.event.GpioEventEmitter;
 import io.github.iamnicknack.pjs.model.event.GpioEventEmitterDelegate;
-import io.github.iamnicknack.pjs.model.event.GpioEventListener;
 
-public class RotaryEncoder implements GpioEventEmitter<RotaryEncoder>, ReadOperation<Integer> {
-    private final GpioEventEmitterDelegate<RotaryEncoder> delegate = new GpioEventEmitterDelegate<>();
+/**
+ * Basic implementation of a rotary encoder.
+ * <p>
+ * Utilises a {@link io.github.iamnicknack.pjs.model.port.Port} of two pins representing channels A on pin 0 and B
+ * on pin 1.
+ * A single interrupt is configured to fire each time this port value changes. There are no separate interrupts
+ * for A and B.
+ * <p>
+ * If A falls before B, the input is binary 2 (0b10). If B falls before A, the input is binary 1 (0b01).
+ * A value of 1 indicates a clockwise rotation, while a value of 2 indicates an anti-clockwise rotation.
+ * <p>
+ * A clockwise change event increments the current value and is indicated with an event type of
+ * {@link GpioChangeEventType#RISING}. An anti-clockwise change event decrements the current value and is
+ * indicated with an event type of {@link GpioChangeEventType#FALLING}.
+ */
+public class RotaryEncoder extends GpioEventEmitterDelegate<RotaryEncoder> implements ReadOperation<Integer> {
     private volatile int value = 0;   // written on callback thread, read elsewhere
     private long lastEventTime = 0L;  // callback-thread only
 
@@ -27,6 +39,7 @@ public class RotaryEncoder implements GpioEventEmitter<RotaryEncoder>, ReadOpera
         var diff = now - lastEventTime;
         lastEventTime = now;
 
+        // larger delta value depending on how fast the encoder is spinning
         var delta = (diff < 30) ? 3 : 1;
 
         var portValue = event.port().read();
@@ -34,22 +47,12 @@ public class RotaryEncoder implements GpioEventEmitter<RotaryEncoder>, ReadOpera
             // clockwise
             var v = value;
             value = (Math.floorDiv(v, delta) * delta) + delta;
-            delegate.onEvent(new GpioChangeEvent<>(this, GpioChangeEventType.RISING));
+            onEvent(new GpioChangeEvent<>(this, GpioChangeEventType.RISING));
         } else if (portValue == 2) {
             // anti-clockwise
             var v = value;
             value = (Math.floorDiv(v, delta) * delta) - delta;
-            delegate.onEvent(new GpioChangeEvent<>(this, GpioChangeEventType.FALLING));
+            onEvent(new GpioChangeEvent<>(this, GpioChangeEventType.FALLING));
         }
-    }
-
-    @Override
-    public void addListener(GpioEventListener<RotaryEncoder> listener) {
-        delegate.addListener(listener);
-    }
-
-    @Override
-    public void removeListener(GpioEventListener<RotaryEncoder> listener) {
-        delegate.removeListener(listener);
     }
 }

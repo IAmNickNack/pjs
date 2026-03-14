@@ -87,7 +87,7 @@ public class Main {
                             .addOption(new Option(null, "mcp", false, "Run the MCP23017 example"))
                             .addOption(new Option(null, "oled", false, "Run the OLED example"))
                             .addOption(new Option(null, "debounce", false, "Run the debounce example"))
-                            .addOption(new Option(null, "rotary", false, "Run the rotary encoder example"))
+                            .addOption(new Option(null, "rotary", false, "Run the rotary encoder example. Doesn't currently work well with grpc"))
             )
             .addOption("h", "help", false, "Display help information");
 
