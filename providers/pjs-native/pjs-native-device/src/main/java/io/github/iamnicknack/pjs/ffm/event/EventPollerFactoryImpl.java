@@ -13,6 +13,7 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 /**
@@ -29,15 +30,16 @@ public class EventPollerFactoryImpl implements EventPoller.Factory {
     private final PollingOperations pollingOperations;
     private final FileOperations fileOperations;
 
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor(r -> {
-        Objects.requireNonNull(r);
-        var thread = new Thread(r, "gpio-event-poller");
-        thread.setDaemon(true);
-        thread.setUncaughtExceptionHandler((t, e) ->
-                logger.error("Error on thread: {}", t.getName(), e)
-        );
-        return thread;
-    });
+    private final AtomicInteger threadCounter = new AtomicInteger(0);
+    private final ExecutorService executorService;
+
+    public EventPollerFactoryImpl(
+            Duration timeout,
+            PollingOperations pollingOperations,
+            FileOperations fileOperations
+    ) {
+        this(timeout, pollingOperations, fileOperations, 4);
+    }
 
     /**
      * Constructor.
@@ -48,11 +50,21 @@ public class EventPollerFactoryImpl implements EventPoller.Factory {
     public EventPollerFactoryImpl(
             Duration timeout,
             PollingOperations pollingOperations,
-            FileOperations fileOperations
+            FileOperations fileOperations,
+            int threadPoolSize
     ) {
         this.timeout = timeout;
         this.pollingOperations = pollingOperations;
         this.fileOperations = fileOperations;
+        this.executorService = Executors.newFixedThreadPool(threadPoolSize, r -> {
+            Objects.requireNonNull(r);
+            var thread = new Thread(r, "gpio-event-poller[" + threadCounter.getAndIncrement() + "]");
+            thread.setDaemon(true);
+            thread.setUncaughtExceptionHandler((t, e) ->
+                    logger.error("Error on thread: {}", t.getName(), e)
+            );
+            return thread;
+        });
     }
 
     /**

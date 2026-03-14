@@ -114,6 +114,14 @@ public class PwmExample implements Runnable {
      */
     private static class EasedRange implements Iterable<Integer> {
 
+        public static EasedRange cosine(int start, int end, int steps) {
+            return new EasedRange(start, end, steps, t -> 0.5 * (1 - Math.cos(Math.PI * t)));
+        }
+
+        public static EasedRange linear(int start, int end, int steps) {
+            return new EasedRange(start, end, steps, t -> t);
+        }
+
         private final int start;
         private final int end;
         private final int steps;
@@ -125,14 +133,6 @@ public class PwmExample implements Runnable {
             this.end = end;
             this.steps = steps;
             this.easing = easing;
-        }
-
-        public static EasedRange cosine(int start, int end, int steps) {
-            return new EasedRange(start, end, steps, t -> 0.5 * (1 - Math.cos(Math.PI * t)));
-        }
-
-        public static EasedRange linear(int start, int end, int steps) {
-            return new EasedRange(start, end, steps, t -> t);
         }
 
         @Override
