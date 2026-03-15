@@ -12,27 +12,15 @@ dependencyResolutionManagement {
     }
 }
 
-val pjsVersion: String = settings.providers.gradleProperty("version").get()
-
 includeBuild("..") {
     dependencySubstitution {
-        substitute(module("io.github.iamnicknack.pjs:pjs-core:$pjsVersion"))
-            .using(project(":pjs-core"))
-        substitute(module("io.github.iamnicknack.pjs:pjs-utils:$pjsVersion"))
-            .using(project(":pjs-utils"))
-        substitute(module("io.github.iamnicknack.pjs:pjs-mock-device:$pjsVersion"))
-            .using(project(":pjs-mock-device"))
-
-        substitute(module("io.github.iamnicknack.pjs:pjs-grpc-device:$pjsVersion"))
-            .using(project(":pjs-grpc-device"))
-        substitute(module("io.github.iamnicknack.pjs:pjs-http-device:$pjsVersion"))
-            .using(project(":pjs-http-device"))
-        substitute(module("io.github.iamnicknack.pjs:pjs-pi4j-device:$pjsVersion"))
-            .using(project(":pjs-pi4j-device"))
-        substitute(module("io.github.iamnicknack.pjs:pjs-native-device:$pjsVersion"))
-            .using(project(":pjs-native-device"))
-        substitute(module("io.github.iamnicknack.pjs:pjs-mock-device:$pjsVersion"))
-            .using(project(":pjs-mock-device"))
+        alias(":pjs-core")
+        alias(":pjs-utils")
+        alias(":pjs-mock-device")
+        alias(":pjs-native-device")
+        alias(":pjs-grpc-device")
+        alias(":pjs-http-device")
+        alias(":pjs-pi4j-device")
     }
 }
 
@@ -43,3 +31,6 @@ include(
     "pjs-examples"
 )
 
+fun DependencySubstitutions.alias(moduleName: String) =
+    substitute(module("io.github.iamnicknack${moduleName}:0.0.0"))
+        .using(project(moduleName))
