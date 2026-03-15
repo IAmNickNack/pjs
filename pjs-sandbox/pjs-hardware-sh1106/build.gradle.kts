@@ -6,5 +6,5 @@ plugins {
 }
 
 dependencies {
-    api("io.github.iamnicknack:pjs-core:0.0.0")
+    api("io.github.iamnicknack:pjs-core:")
 }

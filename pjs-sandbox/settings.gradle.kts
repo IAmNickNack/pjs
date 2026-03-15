@@ -32,5 +32,5 @@ include(
 )
 
 fun DependencySubstitutions.alias(moduleName: String) =
-    substitute(module("io.github.iamnicknack${moduleName}:0.0.0"))
+    substitute(module("io.github.iamnicknack${moduleName}:"))
         .using(project(moduleName))
