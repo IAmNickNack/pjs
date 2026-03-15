@@ -12,6 +12,8 @@ import io.github.iamnicknack.pjs.mock.MockDeviceRegistry;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
 import io.github.iamnicknack.pjs.pi4j.Pi4jDeviceRegistryLoader;
 import io.github.iamnicknack.pjs.sandbox.example.*;
+import io.github.iamnicknack.pjs.util.LoggingUtils;
+import io.github.iamnicknack.pjs.util.StartupUtils;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import org.apache.commons.cli.CommandLine;
@@ -106,6 +108,9 @@ public class Main {
     }
 
     static void main(String[] args) throws ParseException, IOException {
+        StartupUtils.loadApplicationProperties();
+        LoggingUtils.setLogbackLevelsFromProperties(System.getProperties());
+
         var commandLineArgs = new DefaultParser()
                 .parse(options, args);
 
