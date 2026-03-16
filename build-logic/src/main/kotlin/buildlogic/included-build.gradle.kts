@@ -4,23 +4,25 @@ plugins {
     base
 }
 
+delegateNamed("assemble")
 delegateNamed("build")
 delegateNamed("clean")
 
-delegateRegister("publish")
-delegateRegister("publishToMavenLocal")
+delegateRegister("publishToMavenCentral", "publishing")
+delegateRegister("publishToMavenLocal", "publishing")
 
-fun delegateNamed(name: String) =
+fun delegateNamed(name: String) {
     tasks.named(name) {
         dependsOn(subprojects.map { it.tasks.named(name) })
     }
+}
 
-fun delegateRegister(name: String) =
+fun delegateRegister(name: String, groupName: String = "other") {
     tasks.register(name) {
+        group = groupName
         dependsOn(
             subprojects
-                .filter { it.tasks.findByName(name) != null }
-                .map { it.tasks.named(name) }
+                .mapNotNull { it.tasks.findByName(name) }
         )
     }
-
+}

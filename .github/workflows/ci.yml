@@ -35,7 +35,7 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          ./gradlew build 
+          ./gradlew build :providers:build :sandbox:build
 
       - name: Do Release
         if: github.ref == 'refs/heads/main' || github.event.inputs.manual_release == 'true'
