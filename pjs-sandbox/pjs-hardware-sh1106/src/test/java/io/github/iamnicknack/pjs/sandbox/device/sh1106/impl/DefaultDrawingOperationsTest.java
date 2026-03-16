@@ -35,7 +35,7 @@ class DefaultDrawingOperationsTest {
                 switch (page) {
                     case 0 -> assertEquals(0b1100_0000, data[0] & 0xff);
                     case 1 -> assertEquals(0b1111_1111, data[0] & 0xff);
-                    case 2 -> assertEquals(0b0000_0011, data[0] & 0xff);
+                    case 2 -> assertEquals(0b0000_0111, data[0] & 0xff);
                     default -> throw new IllegalStateException();
                 }
             }

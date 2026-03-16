@@ -61,7 +61,7 @@ public class DefaultDrawingOperations implements DrawingOperations {
     public void drawVerticalLine(int x, int y1, int y2) {
         long mask = 0xffffffffffffffffL;
         long low = mask << y1;
-        long high = mask >>> (64 - y2);
+        long high = mask >>> (64 - (y2 + 1));
         long value = low & high;
 
         for (int i = 0; i < 8 && value != 0; i++) {
