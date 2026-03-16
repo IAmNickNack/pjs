@@ -16,6 +16,11 @@ includeBuild("..") {
     dependencySubstitution {
         alias(":pjs-core")
         alias(":pjs-utils")
+    }
+}
+
+includeBuild("../providers") {
+    dependencySubstitution {
         alias(":pjs-mock-device")
         alias(":pjs-native-device")
         alias(":pjs-grpc-device")

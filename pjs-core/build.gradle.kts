@@ -8,6 +8,6 @@ plugins {
 }
 
 dependencies {
-    api(project(":pjs-utils"))
-    testImplementation(project(":pjs-mock-device"))
+    api("io.github.iamnicknack:pjs-utils:")
+    testImplementation("io.github.iamnicknack:pjs-mock-device:")
 }
