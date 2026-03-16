@@ -8,7 +8,7 @@ class DirtyTrackingDisplayBufferTest {
     void dirtyBitsAreStoredByReference() {
         var buffer = new DirtyTrackingDisplayBuffer();
 
-        buffer.setData(0, 0, new byte[1], 0, 1);
+        buffer.setData(0, 0, new byte[] { 1 }, 0, 1);
 
         for (int i = 0; i < 16; i++) {
             assert buffer.isDirty(0, i);
