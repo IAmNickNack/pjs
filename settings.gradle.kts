@@ -1,7 +1,7 @@
 rootProject.name = "pjs"
 
 includeBuild("build-logic")
-includeBuild("pjs-sandbox")
+includeBuild("sandbox")
 includeBuild("providers") {
     dependencySubstitution {
         substitute(module("io.github.iamnicknack:pjs-mock-device:"))

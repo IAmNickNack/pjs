@@ -1,7 +1,7 @@
 rootProject.name = "pjs-providers"
 
 pluginManagement {
-    includeBuild("../build-logic") // if you have convention plugins
+    includeBuild("../build-logic")
 }
 
 dependencyResolutionManagement {
