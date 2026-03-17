@@ -11,8 +11,8 @@ plugins {
 dependencies {
     implementation(libs.logback.classic)
     implementation(project(":pjs-http-common"))
-    implementation(project(":pjs-core"))
-    implementation(project(":pjs-utils"))
+    implementation("io.github.iamnicknack:pjs-core:")
+    implementation("io.github.iamnicknack:pjs-utils:")
 
     testImplementation(project(":pjs-mock-device"))
     testImplementation(project(":pjs-http-server"))

@@ -160,15 +160,15 @@ DEBUG [device.MockSpi::SPI-0.0             ] Received: 3 bytes: [00 00 20]
 Specific device implementations are boyond the scope of the core APIs. However, the core APIs aim to provide
 the functionality required to implement these devices as required.
 
-For example, in addition to the [MCP23S08](../pjs-sandbox/src/main/kotlin/io/github/iamnicknack/pjs/sandbox/device/mcp/Mcp23x08.kt)-type
-device described above, [Microchip25LcEeprom](../pjs-sandbox/src/main/kotlin/io/github/iamnicknack/pjs/sandbox/device/eeprom/Microchip25LcEeprom.kt)
+For example, in addition to the [MCP23S08](../sandbox/pjs-hardware-mcp23x/src/main/java/io/github/iamnicknack/pjs/sandbox/device/mcp/Mcp23x08.java)-type
+device described above, [Microchip25LcEeprom](../sandbox/pjs-hardware-25lc/src/main/java/io/github/iamnicknack/pjs/sandbox/device/eeprom/Microchip25LcEeprom.java)
 provides an example a slightly more complex SPI device implementation, again built on top of the core SPI APIs.
 
 What can become clear when implementing more complex devices is that the generic nature of underlying SPI and
 i2c protocols makes generic mock implementations of the hardware layer difficult to implement. The alternative
 is to provide a mock implementation which specifically emulates the transport for the device under test.
 
-[MockLc25SpiTransfer](../pjs-sandbox/src/main/kotlin/io/github/iamnicknack/pjs/sandbox/device/eeprom/MockLc25SpiTransfer.kt)
+[MockLc25SpiTransfer](../sandbox/pjs-hardware-25lc/src/main/java/io/github/iamnicknack/pjs/sandbox/device/eeprom/MockLc25SpiTransfer.java)
 is an example of a device-specific mock.
 
 ```kotlin
@@ -249,7 +249,7 @@ INFO  [notebook                            ] Read bytes: [0, 1, 2]
 
 It's probably not desirable to work with the bus device directly. Instead, a higher-level abstraction can be used to simplify I2C communication.
 
-[I2CSerialPort](../pjs-core/src/main/kotlin/io/github/iamnicknack/pjs/device/i2c/impl/I2CSerialPort.kt) provides a basic `SerialPort`
+[I2CSerialPort](../pjs-core/src/main/java/io/github/iamnicknack/pjs/device/i2c/impl/I2CSerialPort.java) provides a basic `SerialPort`
 implementation that allows writing and reading bytes to and from an addressed device the bus.
 
 ```kotlin
@@ -278,7 +278,7 @@ I2C devices often expose individual registers which it would be cumbersome to wo
 either via the bus device or the `I2CSerialPort` abstraction.
 It would be much more convenient to be able to write and read values from a register directly.
 
-The [I2CRegister](../pjs-core/src/main/kotlin/io/github/iamnicknack/pjs/device/i2c/impl/I2CRegister.kt) provides a
+The [I2CRegister](../pjs-core/src/main/java/io/github/iamnicknack/pjs/device/i2c/impl/I2CRegister.java) provides a
 higher-level abstraction for working with individual registers on an I2C bus.
 
 Given a device and register address, the register can be written to and read from as a `SerialPort`:
@@ -327,7 +327,7 @@ The SH1106 OLED display is an example of a device which can make use of the `I2C
 register-like inputs don't behave the same as the registers in, for example, the MCP23008. Rather, the 'register'
 is provided as the first byte in a continuous sequence of either command or data bytes.
 
-The sandbox [OLED device](../pjs-sandbox/pjs-device-sh1106) takes advantage ot the `SerialPort`'s ability to
+The sandbox [OLED device](../sandbox/pjs-hardware-sh1106) takes advantage ot the `SerialPort`'s ability to
 provide a Java `BufferedOutputStream`. First the prefix byte is written, followed by the 'payload' bytes. The
 `BufferedOutputStream` is left to write the complete stream of bytes to the `SerialPort`'s `OutputStream`.
 
@@ -345,7 +345,7 @@ val loggingOperations = Sh1106Operations(Sh1106Driver(LoggingI2C(i2c, 128), 0x3c
 
 oledOperations.init()
 oledOperations.clear()
-oledOperations.displayOn();
+oledOperations.displayOn()
 loggingOperations.drawText("Hello World!")
 ```
 ```shell

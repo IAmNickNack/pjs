@@ -17,7 +17,7 @@ dependencies {
     implementation(project(":pjs-grpc-device"))
     implementation(project(":pjs-pi4j-device"))
     implementation(project(":pjs-mock-device"))
-    implementation(project(":pjs-utils"))
+    implementation("io.github.iamnicknack:pjs-utils:")
     implementation(libs.apache.cli)
 
     runtimeOnly(libs.bundles.pi4j.plugins)

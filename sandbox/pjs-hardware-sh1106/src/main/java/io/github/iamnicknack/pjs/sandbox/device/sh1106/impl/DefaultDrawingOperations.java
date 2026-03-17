@@ -61,8 +61,14 @@ public class DefaultDrawingOperations implements DrawingOperations {
     public void drawVerticalLine(int x, int y1, int y2) {
         long mask = 0xffffffffffffffffL;
         long low = mask << y1;
-        long high = mask >>> (64 - (y2 + 1));
+        long high = mask ^ (mask << (y2 + 1));
         long value = low & high;
+
+        System.out.printf("%s, %s, %s%n",
+                Long.toBinaryString(low),
+                Long.toBinaryString(high),
+                Long.toBinaryString(value)
+        );
 
         for (int i = 0; i < 8 && value != 0; i++) {
             var pageValue = value & 0xff;

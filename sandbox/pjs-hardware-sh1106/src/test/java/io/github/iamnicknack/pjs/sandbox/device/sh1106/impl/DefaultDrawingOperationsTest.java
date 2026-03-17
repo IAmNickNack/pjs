@@ -11,21 +11,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class DefaultDrawingOperationsTest {
 
     @TestFactory
-    Stream<DynamicTest> canDrawLine() {
+    Stream<DynamicTest> canDrawVerticalLines() {
+        record Expectation(int start, int end, int expected) {}
         return Stream.of(
-                new DefaultDisplayBuffer(),
-                new StackedDisplayBuffer()
-        ).map(buffer -> DynamicTest.dynamicTest(buffer.getClass().getSimpleName(), () -> {
+                new Expectation(0, 7, 255),
+                new Expectation(0, 1, 3),
+                new Expectation(0, 4, 31),
+                new Expectation(1, 7, 254),
+                new Expectation(1, 2, 6),
+                new Expectation(1, 5, 62),
+                new Expectation(1, 4, 30)
+        ).map(expectation -> DynamicTest.dynamicTest(expectation.toString(), () -> {
+            var buffer = new DefaultDisplayBuffer();
             var drawingOperations = new DefaultDrawingOperations(buffer);
 
-            drawingOperations.drawLine(0, 0, 0, 8);
-            assertEquals(255, buffer.getPointValue(0, 0));
-
-            drawingOperations.drawLine(1, 1, 1, 2);
-            assertEquals(6, buffer.getPointValue(0, 1));
+            drawingOperations.drawLine(0, expectation.start, 0, expectation.end);
+            assertEquals(expectation.expected, buffer.getPointValue(0, 0));
         }));
     }
-
 
     @Test
     void canDrawVerticalLine() {
