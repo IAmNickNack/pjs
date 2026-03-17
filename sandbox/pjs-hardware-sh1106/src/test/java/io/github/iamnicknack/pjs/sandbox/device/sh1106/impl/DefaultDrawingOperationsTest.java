@@ -1,13 +1,9 @@
 package io.github.iamnicknack.pjs.sandbox.device.sh1106.impl;
 
-import io.github.iamnicknack.pjs.sandbox.device.sh1106.DisplayOperations;
-import io.github.iamnicknack.pjs.sandbox.device.sh1106.buffer.BufferedDisplayOperations;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
-import java.nio.Buffer;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
