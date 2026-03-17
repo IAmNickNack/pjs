@@ -12,10 +12,11 @@ repositories {
 
 dependencies {
     api(files(libs.javaClass.protectionDomain.codeSource.location.toURI().toPath()))
-    implementation(libs.protobuf.plugin)
-    implementation(libs.gradle.test.retry)
-    implementation(libs.publish.vanniktech)
     implementation(libs.dokka)
+    implementation(libs.gradle.test.retry)
+    implementation(libs.gradle.versions)
+    implementation(libs.protobuf.plugin)
+    implementation(libs.publish.vanniktech)
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin")
     implementation("org.jetbrains.kotlin:kotlin-stdlib") {
         version {

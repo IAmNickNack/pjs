@@ -1,5 +1,6 @@
 plugins {
     base
+    id("buildlogic.gradle-versions")
 }
 
 subprojects {

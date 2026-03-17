@@ -1,5 +1,8 @@
 package buildlogic
 
+/**
+ * Applied to an `includedBuild` to expose build and publish tasks to the root project.
+ */
 plugins {
     base
 }
