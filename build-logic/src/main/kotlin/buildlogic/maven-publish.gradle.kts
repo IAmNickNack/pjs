@@ -6,7 +6,7 @@ plugins {
 }
 
 withVersionCatalog {
-    version = providers.gradleProperty("VERSION")
+    version = providers.gradleProperty("version")
         .getOrElse(libs.versions.pjs.get())
 }
 
