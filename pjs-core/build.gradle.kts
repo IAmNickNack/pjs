@@ -1,3 +1,6 @@
+import buildlogic.withVersionCatalog
+import org.gradle.api.internal.artifacts.dependencies.DefaultMutableVersionConstraint.withVersion
+
 plugins {
     id("buildlogic.repositories")
     id("buildlogic.java-core")
@@ -8,6 +11,6 @@ plugins {
 }
 
 dependencies {
-    api("io.github.iamnicknack:pjs-utils:")
-    testImplementation("io.github.iamnicknack:pjs-mock-device:")
+    api("io.github.iamnicknack:pjs-utils:${project.version}")
+    testImplementation("io.github.iamnicknack:pjs-mock-device:${project.version}")
 }

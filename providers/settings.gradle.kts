@@ -42,5 +42,5 @@ project(":pjs-http-device").projectDir = file("network/pjs-http/pjs-http-device"
 project(":pjs-network-common").projectDir = file("network/pjs-network-common")
 
 fun DependencySubstitutions.alias(moduleName: String) =
-    substitute(module("io.github.iamnicknack${moduleName}:"))
+    substitute(module("io.github.iamnicknack${moduleName}:${providers.gradleProperty("version")}"))
         .using(project(moduleName))

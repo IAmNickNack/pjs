@@ -7,7 +7,7 @@ plugins {
 }
 
 dependencies {
-    api("io.github.iamnicknack:pjs-core:")
+    api("io.github.iamnicknack:pjs-core:${project.version}")
     api(project(":pjs-native-context"))
     api(libs.slf4j.api)
     testRuntimeOnly(libs.logback.classic)

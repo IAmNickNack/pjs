@@ -12,7 +12,7 @@ plugins {
 javaModuleSystem.moduleName = "pjs.grpc"
 
 dependencies {
-    api("io.github.iamnicknack:pjs-core:")
+    api("io.github.iamnicknack:pjs-core:${project.version}")
     api(project(":pjs-grpc-proto"))
 
     testImplementation(project(":pjs-mock-device"))

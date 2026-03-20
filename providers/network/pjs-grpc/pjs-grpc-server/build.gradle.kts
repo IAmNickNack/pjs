@@ -12,7 +12,7 @@ dependencies {
     implementation(project(":pjs-grpc-device"))
     implementation(project(":pjs-pi4j-device"))
     implementation(project(":pjs-mock-device"))
-    implementation("io.github.iamnicknack:pjs-utils:")
+    implementation("io.github.iamnicknack:pjs-utils:${project.version}")
     implementation(libs.apache.cli)
     implementation(libs.bundles.logging)
     implementation(libs.grpc.inprocess)

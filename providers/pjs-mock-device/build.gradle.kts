@@ -8,6 +8,6 @@ plugins {
 }
 
 dependencies {
-    api("io.github.iamnicknack:pjs-core:")
+    api("io.github.iamnicknack:pjs-core:${project.version}")
     api(libs.slf4j.api)
 }
