@@ -14,18 +14,18 @@ dependencyResolutionManagement {
 
 includeBuild("..") {
     dependencySubstitution {
-        alias(":pjs-core")
-        alias(":pjs-utils")
+        alias("pjs-core")
+        alias("pjs-utils")
     }
 }
 
 includeBuild("../providers") {
     dependencySubstitution {
-        alias(":pjs-mock-device")
-        alias(":pjs-native-device")
-        alias(":pjs-grpc-device")
-        alias(":pjs-http-device")
-        alias(":pjs-pi4j-device")
+        alias("pjs-mock-device")
+        alias("pjs-native-device")
+        alias("pjs-grpc-device")
+        alias("pjs-http-device")
+        alias("pjs-pi4j-device")
     }
 }
 
@@ -37,5 +37,5 @@ include(
 )
 
 fun DependencySubstitutions.alias(moduleName: String) =
-    substitute(module("io.github.iamnicknack${moduleName}:${providers.gradleProperty("version")}"))
-        .using(project(moduleName))
+    substitute(module("io.github.iamnicknack:${moduleName}:${providers.gradleProperty("version").get()}"))
+        .using(project(":$moduleName"))
