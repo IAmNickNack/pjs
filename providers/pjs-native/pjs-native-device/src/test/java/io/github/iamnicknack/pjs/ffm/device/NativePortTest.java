@@ -2,12 +2,16 @@ package io.github.iamnicknack.pjs.ffm.device;
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
+import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
 import io.github.iamnicknack.pjs.ffm.device.context.AbstractFileOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.AbstractIoctlOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.FileDescriptor;
 import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.GpioConstants;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineConfig;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineConfigAttribute;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineValues;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.PinFlag;
 import io.github.iamnicknack.pjs.ffm.event.DebounceStrategy;
 import io.github.iamnicknack.pjs.ffm.event.EventPoller;
 import io.github.iamnicknack.pjs.ffm.event.PollEvent;
@@ -153,6 +157,34 @@ class NativePortTest {
         assertThat(isClosed.get()).isTrue();
     }
 
+    @Test
+    void setsDirectionWhenNecessary() {
+        var config = GpioPortConfig.builder()
+                .portMode(GpioPortMode.INPUT)
+                .pin(1)
+                .build();
+
+        var invocationCount = new AtomicInteger(0);
+        var ioctlOperations = AbstractIoctlOperations.builder()
+                .addHandler(GpioConstants.GPIO_V2_LINE_SET_CONFIG_IOCTL, (_, _, _) -> {
+                    invocationCount.incrementAndGet();
+                    return null;
+                })
+                .build();
+        var port = createPort(config, fileDescriptor, ioctlOperations, EventPoller.NOOP_FACTORY);
+
+        port.setDirection(GpioPortMode.INPUT);
+        assertThat(invocationCount.get()).isEqualTo(0);
+        port.setDirection(GpioPortMode.OUTPUT);
+        assertThat(invocationCount.get()).isEqualTo(1);
+        port.setDirection(GpioPortMode.OUTPUT);
+        assertThat(invocationCount.get()).isEqualTo(1);
+        port.setDirection(GpioPortMode.INPUT);
+        assertThat(invocationCount.get()).isEqualTo(2);
+        port.setDirection(GpioPortMode.INPUT);
+        assertThat(invocationCount.get()).isEqualTo(2);
+    }
+
     static class FakeEventPoller implements EventPoller {
         private boolean running = false;
         private final PollEventsCallback pollEventsCallback;
@@ -206,7 +238,10 @@ class NativePortTest {
     ) {
         return new NativePort(
                 config,
-                new NativePortProvider.LineConfigPair(null, null),
+                new NativePortProvider.LineConfigPair(
+                        new LineConfig(PinFlag.INPUT.value, new LineConfigAttribute[0]),
+                        new LineConfig(PinFlag.OUTPUT.value, new LineConfigAttribute[0])
+                ),
                 fileDescriptor,
                 ioctlOperations,
                 eventPollerFactory
