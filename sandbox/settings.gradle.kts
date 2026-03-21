@@ -37,5 +37,5 @@ include(
 )
 
 fun DependencySubstitutions.alias(moduleName: String) =
-    substitute(module("io.github.iamnicknack:${moduleName}:${providers.gradleProperty("version").get()}"))
+    substitute(module("io.github.iamnicknack:$moduleName"))
         .using(project(":$moduleName"))

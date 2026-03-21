@@ -11,6 +11,6 @@ plugins {
 }
 
 dependencies {
-    api("io.github.iamnicknack:pjs-utils:${project.version}")
-    testImplementation("io.github.iamnicknack:pjs-mock-device:${project.version}")
+    api("io.github.iamnicknack:pjs-utils")
+    testImplementation("io.github.iamnicknack:pjs-mock-device")
 }

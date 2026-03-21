@@ -6,5 +6,5 @@ plugins {
 }
 
 dependencies {
-    api("io.github.iamnicknack:pjs-core:${project.version}")
+    api("io.github.iamnicknack:pjs-core")
 }
