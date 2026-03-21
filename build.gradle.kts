@@ -1,5 +1,3 @@
-import buildlogic.withVersionCatalog
-
 plugins {
     base
     id("buildlogic.gradle-versions")
