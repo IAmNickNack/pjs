@@ -2,9 +2,11 @@ package io.github.iamnicknack.pjs.ffm.device;
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
+import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
 import io.github.iamnicknack.pjs.ffm.device.context.FileDescriptor;
 import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.GpioConstants;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineConfig;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineValues;
 import io.github.iamnicknack.pjs.ffm.event.DebounceStrategy;
 import io.github.iamnicknack.pjs.ffm.event.EventPoller;
@@ -31,6 +33,7 @@ class NativePort implements GpioPort, AutoCloseable {
     private final Logger logger = LoggerFactory.getLogger(NativePort.class);
 
     private final GpioPortConfig config;
+    private final NativePortProvider.LineConfigPair lineConfigs;
     private final IoctlOperations ioctlOperations;
     private final FileDescriptor fileDescriptor;
     private final Set<GpioEventListener<GpioPort>> listeners = new CopyOnWriteArraySet<>();
@@ -47,12 +50,13 @@ class NativePort implements GpioPort, AutoCloseable {
      */
     public NativePort(
             GpioPortConfig config,
+            NativePortProvider.LineConfigPair lineConfigs,
             FileDescriptor fileDescriptor,
             IoctlOperations ioctlOperations,
             EventPoller.Factory eventPollerFactory
-
     ) {
         this.config = config;
+        this.lineConfigs = lineConfigs;
         this.fileDescriptor = fileDescriptor;
         this.ioctlOperations = ioctlOperations;
         PollEventsCallback pollEventsCallback = switch (DebounceStrategy.fromProperty()) {
@@ -76,10 +80,11 @@ class NativePort implements GpioPort, AutoCloseable {
      */
     public NativePort(
             GpioPortConfig config,
+            NativePortProvider.LineConfigPair lineConfigs,
             FileDescriptor fileDescriptor,
             IoctlOperations ioctlOperations
     ) {
-        this(config, fileDescriptor, ioctlOperations, EventPoller.NOOP_FACTORY);
+        this(config, lineConfigs, fileDescriptor, ioctlOperations, EventPoller.NOOP_FACTORY);
     }
 
     @Override
@@ -97,6 +102,14 @@ class NativePort implements GpioPort, AutoCloseable {
     public void write(Integer value) {
         var lineValues = new LineValues(value, Long.MAX_VALUE);
         ioctlOperations.ioctl(fileDescriptor, GpioConstants.GPIO_V2_LINE_SET_VALUES_IOCTL, lineValues);
+    }
+
+    public void setDirection(GpioPortMode mode) {
+        if (mode.isSet(GpioPortMode.OUTPUT)) {
+            ioctlOperations.ioctl(fileDescriptor, GpioConstants.GPIO_V2_LINE_SET_CONFIG_IOCTL, lineConfigs.outputConfig());
+        } else {
+            ioctlOperations.ioctl(fileDescriptor, GpioConstants.GPIO_V2_LINE_SET_CONFIG_IOCTL, lineConfigs.inputConfig());
+        }
     }
 
     @Override

@@ -46,7 +46,7 @@ class NativePortTest {
 
         var eventCount = new AtomicInteger(0);
 
-        var port = new NativePort(config, fileDescriptor, ioctlOperations, pollerFactory);
+        var port = createPort(config, fileDescriptor, ioctlOperations, pollerFactory);
         port.addListener(_ -> eventCount.incrementAndGet());
 
         pollerFactory.poke(new PollEvent(PollEventType.RISING, 1_000));
@@ -73,7 +73,7 @@ class NativePortTest {
 
         var eventCount = new AtomicInteger(0);
 
-        var port = new NativePort(config, fileDescriptor, ioctlOperations, pollerFactory);
+        var port = createPort(config, fileDescriptor, ioctlOperations, pollerFactory);
         port.addListener(_ -> eventCount.incrementAndGet());
 
         pollerFactory.poke(new PollEvent(PollEventType.RISING, 1_000));
@@ -93,7 +93,7 @@ class NativePortTest {
 
         var eventCount = new AtomicInteger(0);
 
-        var port = new NativePort(config, fileDescriptor, ioctlOperations, pollerFactory);
+        var port = createPort(config, fileDescriptor, ioctlOperations, pollerFactory);
 
         GpioEventListener<GpioPort> listener1 = _ -> eventCount.incrementAndGet();
         GpioEventListener<GpioPort> listener2 = _ -> eventCount.incrementAndGet();
@@ -127,7 +127,7 @@ class NativePortTest {
                 .pin(1)
                 .build();
 
-        var port = new NativePort(config, fileDescriptor, ioctlOperations);
+        var port = createPort(config, fileDescriptor, ioctlOperations, EventPoller.NOOP_FACTORY);
         port.write(0x55);
         assertThat(port.read()).isEqualTo(0x55);
     }
@@ -147,7 +147,7 @@ class NativePortTest {
                 .pin(1)
                 .build();
 
-        try (var _ = new NativePort(config, fileDescriptor, ioctlOperations)) {
+        try (var _ = createPort(config, fileDescriptor, ioctlOperations, EventPoller.NOOP_FACTORY)) {
             assertThat(isClosed.get()).isFalse();
         }
         assertThat(isClosed.get()).isTrue();
@@ -196,5 +196,20 @@ class NativePortTest {
                 poller.pollEventsCallback.callback(poller, Arrays.stream(events).toList());
             }
         }
+    }
+
+    static NativePort createPort(
+            GpioPortConfig config,
+            FileDescriptor fileDescriptor,
+            IoctlOperations ioctlOperations,
+            EventPoller.Factory eventPollerFactory
+    ) {
+        return new NativePort(
+                config,
+                new NativePortProvider.LineConfigPair(null, null),
+                fileDescriptor,
+                ioctlOperations,
+                eventPollerFactory
+        );
     }
 }
