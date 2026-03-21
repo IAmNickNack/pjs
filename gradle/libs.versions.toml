@@ -1,7 +1,7 @@
 [versions]
 
 # The PJs version to be built
-pjs = "0.1.1-SNAPSHOT"
+pjs = "0.1.2-SNAPSHOT"
 
 apache-cli = "1.11.0"
 assertj = "3.27.7"
