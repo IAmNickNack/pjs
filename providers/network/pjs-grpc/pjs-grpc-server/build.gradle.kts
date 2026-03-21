@@ -6,13 +6,15 @@ plugins {
     application
 }
 
+version = libs.versions.pjs.get()
+
 dependencies {
     implementation(project(":pjs-network-common"))
     implementation(project(":pjs-native-device"))
     implementation(project(":pjs-grpc-device"))
     implementation(project(":pjs-pi4j-device"))
     implementation(project(":pjs-mock-device"))
-    implementation("io.github.iamnicknack:pjs-utils:")
+    implementation("io.github.iamnicknack:pjs-utils")
     implementation(libs.apache.cli)
     implementation(libs.bundles.logging)
     implementation(libs.grpc.inprocess)

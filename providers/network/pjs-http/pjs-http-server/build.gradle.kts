@@ -7,6 +7,8 @@ plugins {
     application
 }
 
+version = libs.versions.pjs.get()
+
 dependencies {
     implementation(libs.logback.classic)
     implementation(libs.koin.ktor)
@@ -17,7 +19,7 @@ dependencies {
     implementation(project(":pjs-grpc-device"))
     implementation(project(":pjs-pi4j-device"))
     implementation(project(":pjs-mock-device"))
-    implementation("io.github.iamnicknack:pjs-utils:")
+    implementation("io.github.iamnicknack:pjs-utils")
     implementation(libs.apache.cli)
 
     runtimeOnly(libs.bundles.pi4j.plugins)

@@ -1,12 +1,15 @@
 package buildlogic
 
+import groovy.namespace.QName
+import groovy.util.Node
+
 plugins {
     id("org.jetbrains.dokka-javadoc")
     id("com.vanniktech.maven.publish")
 }
 
 withVersionCatalog {
-    version = providers.gradleProperty("VERSION")
+    version = providers.gradleProperty("version")
         .getOrElse(libs.versions.pjs.get())
 }
 
@@ -39,8 +42,25 @@ mavenPublishing {
             developerConnection = "scm:git:git@github.com:IAmNickNack/pjs.git"
             url = "https://github.com/IAmNickNack/pjs"
         }
+
+        withXml {
+            asNode().apply {
+                val dependenciesNode = getAt(pomName("dependencies"))
+                    .getAt(pomName("dependency"))
+                    .filter { (it as Node).getAt(pomName("groupId")).text() == project.group.toString() }
+
+                dependenciesNode.forEach {
+                    val dependencyNode = it as Node
+                    if (dependencyNode.getAt(pomName("version")).isEmpty()) {
+                        dependencyNode.appendNode(pomName("version"), project.version)
+                    }
+                }
+            }
+        }
     }
 
     signAllPublications()
     publishToMavenCentral()
 }
+
+fun pomName(name: String) = QName("http://maven.apache.org/POM/4.0.0", name, "")

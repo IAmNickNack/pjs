@@ -7,7 +7,7 @@ plugins {
 }
 
 dependencies {
-    api("io.github.iamnicknack:pjs-core:")
+    api("io.github.iamnicknack:pjs-core")
     compileOnly(libs.pi4j.core) // allow the pi4j version to be specified by the user
     testImplementation(libs.pi4j.plugin.mock)
 }

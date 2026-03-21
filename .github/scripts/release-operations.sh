@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export BUILD_VERSION=$(./gradlew properties -q | grep '^version:' | awk '{print $2}')
+export BUILD_VERSION=$(./gradlew printVersion -q | grep '^version:' | awk '{print $2}')
 export GRPC_DIST_ZIP=$(find . -name "pjs-grpc-server-${BUILD_VERSION}.zip")
 export HTTP_DIST_ZIP=$(find . -name "pjs-http-server-${BUILD_VERSION}.zip")
 
@@ -72,7 +72,7 @@ upload_github_packages() {
 do_release() {
   if can_release; then
     create_github_release && \
-      ./gradlew publishToMavenCentral :providers:publishToMavenCentral && \
+      ./gradlew publishToMavenCentral :providers:publishToMavenCentral --console plain && \
       upload_github_packages
   fi
 }

@@ -4,7 +4,7 @@ includeBuild("build-logic")
 includeBuild("sandbox")
 includeBuild("providers") {
     dependencySubstitution {
-        substitute(module("io.github.iamnicknack:pjs-mock-device:"))
+        substitute(module("io.github.iamnicknack:pjs-mock-device"))
             .using(project(":pjs-mock-device"))
     }
 }

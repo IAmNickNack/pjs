@@ -8,12 +8,12 @@ plugins {
 }
 
 dependencies {
-    api("io.github.iamnicknack:pjs-core:")
-    implementation("io.github.iamnicknack:pjs-mock-device:")
-    implementation("io.github.iamnicknack:pjs-native-device:")
-    implementation("io.github.iamnicknack:pjs-grpc-device:")
-    implementation("io.github.iamnicknack:pjs-http-device:")
-    api("io.github.iamnicknack:pjs-pi4j-device:")
+    api("io.github.iamnicknack:pjs-core")
+    implementation("io.github.iamnicknack:pjs-mock-device")
+    implementation("io.github.iamnicknack:pjs-native-device")
+    implementation("io.github.iamnicknack:pjs-grpc-device")
+    implementation("io.github.iamnicknack:pjs-http-device")
+    api("io.github.iamnicknack:pjs-pi4j-device")
 
     implementation(project(":pjs-hardware-25lc"))
     implementation(project(":pjs-hardware-mcp23x"))
