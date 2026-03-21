@@ -12,6 +12,7 @@ service PortService {
   rpc write(types.IntegerRequest) returns (Empty);
   rpc addListener(types.DeviceRequest) returns (stream StateChangeEvent);
   rpc removeListener(RemoveListenerRequest) returns (Empty);
+  rpc setPortMode(PortModePayload) returns (Empty);
 }
 
 service PortConfigService {
@@ -43,6 +44,11 @@ message StateChangeEvent {
 
 message RemoveListenerRequest {
   string listenerId = 1;
+}
+
+message PortModePayload {
+  string deviceId = 1;
+  PortMode portMode = 2;
 }
 
 enum PortMode {

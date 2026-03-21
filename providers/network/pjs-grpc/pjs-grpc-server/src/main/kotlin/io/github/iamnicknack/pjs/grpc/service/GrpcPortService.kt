@@ -3,9 +3,11 @@ package io.github.iamnicknack.pjs.grpc.service
 import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
+import io.github.iamnicknack.pjs.grpc.asGpioPortMode
 import io.github.iamnicknack.pjs.grpc.deviceOrThrow
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.Empty
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.EventMode
+import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortModePayload
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortServiceGrpcKt
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.RemoveListenerRequest
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.StateChangeEvent
@@ -45,6 +47,13 @@ class GrpcPortService(
     override suspend fun write(request: IntegerRequest): Empty {
         deviceRegistry.deviceOrThrow<GpioPort>(request.deviceId)
             .write(request.value)
+
+        return Empty.getDefaultInstance()
+    }
+
+    override suspend fun setPortMode(request: PortModePayload): Empty {
+        deviceRegistry.deviceOrThrow<GpioPort>(request.deviceId)
+            .setDirection(request.portMode.asGpioPortMode())
 
         return Empty.getDefaultInstance()
     }

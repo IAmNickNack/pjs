@@ -1,6 +1,7 @@
 package io.github.iamnicknack.pjs.http.client.gpio
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort
+import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.http.client.config.HttpConfigHandler
 import io.github.iamnicknack.pjs.http.config.ConfigHandler
 import io.github.iamnicknack.pjs.http.gpio.GpioPortHandler
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import kotlin.time.Duration.Companion.milliseconds
 
 class HttpGpioPortHandler(
     private val httpClient: HttpClient,
@@ -44,6 +46,10 @@ class HttpGpioPortHandler(
 
     override suspend fun writeDevice(deviceId: String, value: Int) {
         httpClient.put("/api/v1/gpio/$deviceId/value/$value")
+    }
+
+    override suspend fun setDeviceDirection(deviceId: String, direction: GpioPortMode) {
+        httpClient.put("/api/v1/gpio/$deviceId/direction/${direction.name}")
     }
 
     override suspend fun listen(deviceId: String, listener: GpioEventListener<GpioPort>) {
@@ -77,7 +83,7 @@ class HttpGpioPortHandler(
                     }
             }
 
-        withTimeoutOrNull(1000) { completer.await() }
+        withTimeoutOrNull(1000.milliseconds) { completer.await() }
     }
 
     override suspend fun unlisten(deviceId: String) {

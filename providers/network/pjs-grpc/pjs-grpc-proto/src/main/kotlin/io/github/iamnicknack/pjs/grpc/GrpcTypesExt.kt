@@ -1,7 +1,9 @@
 package io.github.iamnicknack.pjs.grpc
 
 import com.google.protobuf.ByteString
+import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.device.pwm.Pwm
+import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortModePayload
 import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PolarityRequest
 import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PolarityResponse
 import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PwmPolarity
@@ -81,3 +83,9 @@ fun DeviceConfig<*>.asDataRequest(bytes: ByteArray, offset: Int, length: Int): D
 fun ByteArray.asDataResponse(): DataResponse = DataResponse.newBuilder()
     .setPayload(ByteString.copyFrom(this))
     .build()
+
+fun GpioPortMode.asPortModePayload(): PortModePayload {
+    return PortModePayload.newBuilder()
+        .setPortMode(this.asPortMode())
+        .build()
+}

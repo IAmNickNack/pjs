@@ -2,6 +2,7 @@ package io.github.iamnicknack.pjs.logging;
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
+import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
 import io.github.iamnicknack.pjs.model.device.DeviceConfig;
 import io.github.iamnicknack.pjs.model.device.WithDelegateDevice;
 import io.github.iamnicknack.pjs.model.event.GpioEventListener;
@@ -50,8 +51,14 @@ public class LoggingGpioPort implements GpioPort, WithDelegateDevice<GpioPort> {
 
     @Override
     public void write(Integer value) {
-        delegate.write(value);
         logger.debug("Writing port value: {}, {}", pinsMask.getMaskString(value), value);
+        delegate.write(value);
+    }
+
+    @Override
+    public void setDirection(GpioPortMode direction) {
+        logger.debug("Asserting port direction: {}", direction);
+        delegate.setDirection(direction);
     }
 
     @Override

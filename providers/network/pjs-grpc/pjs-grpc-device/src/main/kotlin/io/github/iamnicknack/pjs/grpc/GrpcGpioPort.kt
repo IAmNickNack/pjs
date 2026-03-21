@@ -2,6 +2,7 @@ package io.github.iamnicknack.pjs.grpc
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
+import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.EventMode
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortConfigServiceGrpc
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortServiceGrpc
@@ -20,6 +21,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import kotlin.time.Duration.Companion.milliseconds
 
 class GrpcGpioPort(
     private val config: GpioPortConfig,
@@ -44,6 +46,10 @@ class GrpcGpioPort(
 
     override fun write(value: Int) {
         stub.write(this.config.asIntegerRequest(value))
+    }
+
+    override fun setDirection(direction: GpioPortMode) {
+        stub.setPortMode(direction.asPortModePayload())
     }
 
     override fun getConfig(): DeviceConfig<GpioPort> {
@@ -118,7 +124,7 @@ class GrpcGpioPort(
                 config.asDeviceRequest(),
                 this
             )
-            withTimeoutOrNull(500) { connectionRendezvous.receive()}
+            withTimeoutOrNull(500.milliseconds) { connectionRendezvous.receive()}
                 ?: logger.warn("Timeout waiting for connection event on device: {}", device.config.id)
         }
 

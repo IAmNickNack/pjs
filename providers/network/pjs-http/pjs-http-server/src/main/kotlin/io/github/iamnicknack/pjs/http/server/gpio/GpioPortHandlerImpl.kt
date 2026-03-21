@@ -1,6 +1,7 @@
 package io.github.iamnicknack.pjs.http.server.gpio
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort
+import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.http.config.ConfigHandler
 import io.github.iamnicknack.pjs.http.event.EventBroadcaster
 import io.github.iamnicknack.pjs.http.server.deviceOrThrow
@@ -23,6 +24,10 @@ class GpioPortHandlerImpl(
     override suspend fun writeDevice(deviceId: String, value: Int) =
         deviceRegistry.deviceOrThrow<GpioPort>(deviceId)
             .write(value)
+
+    override suspend fun setDeviceDirection(deviceId: String, direction: GpioPortMode) =
+        deviceRegistry.deviceOrThrow<GpioPort>(deviceId)
+            .setDirection(direction)
 
     override suspend fun listen(deviceId: String) {
         deviceRegistry.deviceOrThrow<GpioPort>(deviceId)
