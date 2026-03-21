@@ -12,6 +12,6 @@ subprojects {
 
 tasks.register("printVersion") {
     doLast {
-        withVersionCatalog { println("version: ${libs.versions.pjs.get()}") }
+        println("version: ${libs.versions.pjs.get()}")
     }
 }
