@@ -1,5 +1,6 @@
 package io.github.iamnicknack.pjs.model.port;
 
+import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
 import io.github.iamnicknack.pjs.model.ReadOperation;
 import io.github.iamnicknack.pjs.model.WriteOperation;
 import io.github.iamnicknack.pjs.model.pin.Pin;

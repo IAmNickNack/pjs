@@ -16,6 +16,7 @@ import io.github.iamnicknack.pjs.ffm.event.debounce.TrailingEdgeDebounceCallback
 import io.github.iamnicknack.pjs.ffm.event.debounce.LeadingEdgeDebounceCallback;
 import io.github.iamnicknack.pjs.model.event.GpioChangeEvent;
 import io.github.iamnicknack.pjs.model.event.GpioEventListener;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,8 @@ class NativePort implements GpioPort, AutoCloseable {
     private final EventPoller eventPoller;
     private final AutoCloseable closeableCallback;
 
+
+    private @NonNull LineConfig currentLineConfig;
 
     /**
      * Create a new instance with event polling support
@@ -70,6 +73,7 @@ class NativePort implements GpioPort, AutoCloseable {
             this.closeableCallback = null;
         }
         this.eventPoller = eventPollerFactory.create(fileDescriptor, pollEventsCallback);
+        this.currentLineConfig = (config.portMode().isSet(GpioPortMode.INPUT) ? lineConfigs.inputConfig() : lineConfigs.outputConfig());
     }
 
     /**
@@ -104,10 +108,11 @@ class NativePort implements GpioPort, AutoCloseable {
         ioctlOperations.ioctl(fileDescriptor, GpioConstants.GPIO_V2_LINE_SET_VALUES_IOCTL, lineValues);
     }
 
+    @Override
     public void setDirection(GpioPortMode mode) {
-        if (mode.isSet(GpioPortMode.OUTPUT)) {
+        if (mode.isSet(GpioPortMode.OUTPUT) && currentLineConfig != lineConfigs.outputConfig()) {
             ioctlOperations.ioctl(fileDescriptor, GpioConstants.GPIO_V2_LINE_SET_CONFIG_IOCTL, lineConfigs.outputConfig());
-        } else {
+        } else if (mode.isSet(GpioPortMode.INPUT) && currentLineConfig != lineConfigs.inputConfig()) {
             ioctlOperations.ioctl(fileDescriptor, GpioConstants.GPIO_V2_LINE_SET_CONFIG_IOCTL, lineConfigs.inputConfig());
         }
     }
