@@ -49,7 +49,7 @@ class GrpcGpioPort(
     }
 
     override fun setDirection(direction: GpioPortMode) {
-        stub.setPortMode(direction.asPortModePayload())
+        stub.setPortMode(this.config.asPortModePayload(direction))
     }
 
     override fun getConfig(): DeviceConfig<GpioPort> {

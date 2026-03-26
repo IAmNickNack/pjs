@@ -84,8 +84,9 @@ fun ByteArray.asDataResponse(): DataResponse = DataResponse.newBuilder()
     .setPayload(ByteString.copyFrom(this))
     .build()
 
-fun GpioPortMode.asPortModePayload(): PortModePayload {
+fun DeviceConfig<*>.asPortModePayload(portMode: GpioPortMode): PortModePayload {
     return PortModePayload.newBuilder()
-        .setPortMode(this.asPortMode())
+        .setDeviceId(this.id)
+        .setPortMode(portMode.asPortMode())
         .build()
 }
