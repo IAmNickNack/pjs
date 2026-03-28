@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * Configuration for a GPIO port which can be used by a {@link GpioPortProvider} to construct a {@link GpioPort} instance.
  * @param pinNumber array of pin numbers
- * @param portMode portMode of the port
+ * @param portMode initial portMode of the port
  * @param debounceDelay debounce delay in microseconds
  * @param id unique identifier for the port
  */

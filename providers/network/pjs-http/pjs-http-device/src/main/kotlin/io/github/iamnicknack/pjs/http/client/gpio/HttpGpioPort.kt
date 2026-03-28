@@ -2,6 +2,7 @@ package io.github.iamnicknack.pjs.http.client.gpio
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
+import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.model.device.DeviceConfig
 import io.github.iamnicknack.pjs.model.event.GpioEventListener
 import kotlinx.coroutines.runBlocking
@@ -25,6 +26,10 @@ class HttpGpioPort(
 
     override fun removeListener(listener: GpioEventListener<GpioPort>) = runBlocking {
         handler.unlisten(config.id)
+    }
+
+    override fun setDirection(direction: GpioPortMode) = runBlocking {
+        handler.setDeviceDirection(config.id, direction)
     }
 
     override fun getConfig(): DeviceConfig<GpioPort> = this.config

@@ -27,6 +27,13 @@ interface GpioPortHandler : ConfigHandler<GpioPort> {
     suspend fun writeDevice(deviceId: String, value: Int)
 
     /**
+     * Assert the direction of the device
+     * @param deviceId the device id
+     * @param direction the direction to assert
+     */
+    suspend fun setDeviceDirection(deviceId: String, direction: GpioPortMode)
+
+    /**
      * Configuration payload for a GPIO port
      */
     @JsonIgnoreProperties(ignoreUnknown = true)

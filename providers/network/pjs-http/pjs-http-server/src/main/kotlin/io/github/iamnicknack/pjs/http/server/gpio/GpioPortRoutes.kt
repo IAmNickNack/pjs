@@ -1,5 +1,6 @@
 package io.github.iamnicknack.pjs.http.server.gpio
 
+import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.http.gpio.GpioPortHandler
 import io.github.iamnicknack.pjs.http.server.config.configRoutes
 import io.github.iamnicknack.pjs.http.server.deviceId
@@ -29,6 +30,13 @@ fun Route.gpioPortRoutes(
             val value = call.parameters["value"]?.toInt() ?: throw IllegalArgumentException("Invalid value")
             handler.writeDevice(call.deviceId, value)
             call.respond(HttpStatusCode.OK)
+        }
+
+        put("/direction/{direction}") {
+            val direction = call.parameters["direction"]
+                ?.let { GpioPortMode.valueOf(it) }
+                ?: throw IllegalArgumentException("Invalid direction")
+            handler.setDeviceDirection(call.deviceId, direction)
         }
 
         configRoutes(

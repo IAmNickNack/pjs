@@ -14,6 +14,12 @@ import io.github.iamnicknack.pjs.util.GpioPinMask;
 public interface GpioPort extends Port<Integer>, GpioEventEmitter<GpioPort>, Device<GpioPort> {
 
     /**
+     * Change the direction of the port at runtime
+     * @param direction the new direction.
+     */
+    default void setDirection(GpioPortMode direction) {}
+
+    /**
      * Returns a pin which when high sets all pins in the port to high.
      * @return the pin.
      */

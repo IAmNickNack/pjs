@@ -64,7 +64,15 @@ public class NativePortProvider implements GpioPortProvider {
         ) {
             checkLines(config, fileDescriptor);
 
-            var lineRequest = createLineRequest(config);
+            var lineConfigs = createLineConfigPair(config);
+            var lineRequest = new LineRequest(
+                    config.pinNumber(),
+                    config.id(),
+                    (config.portMode().isSet(GpioPortMode.INPUT) ? lineConfigs.inputConfig() : lineConfigs.outputConfig()),
+                    0,
+                    0
+            );
+
             var lineRequestResult = ioctlOperations.ioctl(
                     fileDescriptor,
                     GpioConstants.GPIO_V2_GET_LINE_IOCTL,
@@ -76,12 +84,14 @@ public class NativePortProvider implements GpioPortProvider {
             var port = ((config.eventMode() != GpioEventMode.NONE) && (config.portMode().isSet(GpioPortMode.INPUT))
                     ? new NativePort(
                             config,
+                            lineConfigs,
                             fileOperations.createFileDescriptor(lineRequestResult.fd()),
                             ioctlOperations,
                             eventPollerFactory
                     )
                     : new NativePort(
                             config,
+                            lineConfigs,
                             fileOperations.createFileDescriptor(lineRequestResult.fd()),
                             ioctlOperations
                     )
@@ -115,11 +125,12 @@ public class NativePortProvider implements GpioPortProvider {
     }
 
     /**
-     * Construct a {@link LineRequest} from the given {@link GpioPortConfig}.
+     * Create a {@link LineConfigPair} from the given {@link GpioPortConfig}. For the opposite port direction
+     * a basic {@link LineConfig} is returned.
      * @param config the requested config
-     * @return the constructed {@link LineRequest}
+     * @return the constructed {@link LineConfigPair}
      */
-    private @NonNull LineRequest createLineRequest(GpioPortConfig config) {
+    private @NonNull LineConfigPair createLineConfigPair(GpioPortConfig config) {
         var eventFlags = switch (config.eventMode()) {
             case NONE -> 0;
             case RISING -> PinFlag.EDGE_RISING.value;
@@ -158,6 +169,20 @@ public class NativePortProvider implements GpioPortProvider {
         }
 
         var lineConfig = new LineConfig(modeFlags | eventFlags, attributes);
-        return new LineRequest(config.pinNumber(), config.id(), lineConfig, 0, 0);
+
+        var inputConfig = (config.portMode().isSet(GpioPortMode.INPUT))
+                ? lineConfig
+                : new LineConfig(PinFlag.INPUT.value, new LineConfigAttribute[0]);
+
+        var outputConfig = (config.portMode().isSet(GpioPortMode.OUTPUT))
+                ? lineConfig
+                : new LineConfig(PinFlag.OUTPUT.value, new LineConfigAttribute[0]);
+
+        return new LineConfigPair(inputConfig, outputConfig);
     }
+
+    record LineConfigPair(
+            LineConfig inputConfig,
+            LineConfig outputConfig
+    ) {}
 }

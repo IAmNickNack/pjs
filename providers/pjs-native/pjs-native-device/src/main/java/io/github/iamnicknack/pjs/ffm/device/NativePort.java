@@ -2,9 +2,11 @@ package io.github.iamnicknack.pjs.ffm.device;
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
+import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
 import io.github.iamnicknack.pjs.ffm.device.context.FileDescriptor;
 import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.GpioConstants;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineConfig;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineValues;
 import io.github.iamnicknack.pjs.ffm.event.DebounceStrategy;
 import io.github.iamnicknack.pjs.ffm.event.EventPoller;
@@ -14,6 +16,7 @@ import io.github.iamnicknack.pjs.ffm.event.debounce.TrailingEdgeDebounceCallback
 import io.github.iamnicknack.pjs.ffm.event.debounce.LeadingEdgeDebounceCallback;
 import io.github.iamnicknack.pjs.model.event.GpioChangeEvent;
 import io.github.iamnicknack.pjs.model.event.GpioEventListener;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,12 +34,15 @@ class NativePort implements GpioPort, AutoCloseable {
     private final Logger logger = LoggerFactory.getLogger(NativePort.class);
 
     private final GpioPortConfig config;
+    private final NativePortProvider.LineConfigPair lineConfigs;
     private final IoctlOperations ioctlOperations;
     private final FileDescriptor fileDescriptor;
     private final Set<GpioEventListener<GpioPort>> listeners = new CopyOnWriteArraySet<>();
     private final EventPoller eventPoller;
     private final AutoCloseable closeableCallback;
 
+
+    private @NonNull LineConfig currentLineConfig;
 
     /**
      * Create a new instance with event polling support
@@ -47,12 +53,13 @@ class NativePort implements GpioPort, AutoCloseable {
      */
     public NativePort(
             GpioPortConfig config,
+            NativePortProvider.LineConfigPair lineConfigs,
             FileDescriptor fileDescriptor,
             IoctlOperations ioctlOperations,
             EventPoller.Factory eventPollerFactory
-
     ) {
         this.config = config;
+        this.lineConfigs = lineConfigs;
         this.fileDescriptor = fileDescriptor;
         this.ioctlOperations = ioctlOperations;
         PollEventsCallback pollEventsCallback = switch (DebounceStrategy.fromProperty()) {
@@ -66,6 +73,7 @@ class NativePort implements GpioPort, AutoCloseable {
             this.closeableCallback = null;
         }
         this.eventPoller = eventPollerFactory.create(fileDescriptor, pollEventsCallback);
+        this.currentLineConfig = (config.portMode().isSet(GpioPortMode.INPUT) ? lineConfigs.inputConfig() : lineConfigs.outputConfig());
     }
 
     /**
@@ -76,10 +84,11 @@ class NativePort implements GpioPort, AutoCloseable {
      */
     public NativePort(
             GpioPortConfig config,
+            NativePortProvider.LineConfigPair lineConfigs,
             FileDescriptor fileDescriptor,
             IoctlOperations ioctlOperations
     ) {
-        this(config, fileDescriptor, ioctlOperations, EventPoller.NOOP_FACTORY);
+        this(config, lineConfigs, fileDescriptor, ioctlOperations, EventPoller.NOOP_FACTORY);
     }
 
     @Override
@@ -97,6 +106,17 @@ class NativePort implements GpioPort, AutoCloseable {
     public void write(Integer value) {
         var lineValues = new LineValues(value, Long.MAX_VALUE);
         ioctlOperations.ioctl(fileDescriptor, GpioConstants.GPIO_V2_LINE_SET_VALUES_IOCTL, lineValues);
+    }
+
+    @Override
+    public void setDirection(GpioPortMode mode) {
+        if (mode.isSet(GpioPortMode.OUTPUT) && currentLineConfig != lineConfigs.outputConfig()) {
+            ioctlOperations.ioctl(fileDescriptor, GpioConstants.GPIO_V2_LINE_SET_CONFIG_IOCTL, lineConfigs.outputConfig());
+            currentLineConfig = lineConfigs.outputConfig();
+        } else if (mode.isSet(GpioPortMode.INPUT) && currentLineConfig != lineConfigs.inputConfig()) {
+            ioctlOperations.ioctl(fileDescriptor, GpioConstants.GPIO_V2_LINE_SET_CONFIG_IOCTL, lineConfigs.inputConfig());
+            currentLineConfig = lineConfigs.inputConfig();
+        }
     }
 
     @Override

@@ -144,6 +144,32 @@ paths:
         "200":
           description: "OK"
 
+  /api/v1/gpio/{deviceId}/direction/{direction}:
+    put:
+      tags:
+        - GPIO
+      description: "Set the direction of the port"
+      parameters:
+        - name: "direction"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "deviceId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+
   #############################################################################
   # I2C
   /api/v1/i2c/{deviceId}:
