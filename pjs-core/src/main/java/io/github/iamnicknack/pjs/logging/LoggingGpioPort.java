@@ -22,7 +22,7 @@ public class LoggingGpioPort implements GpioPort, WithDelegateDevice<GpioPort> {
     public LoggingGpioPort(GpioPort delegate) {
         this.delegate = delegate;
         this.pinsMask = new GpioPinMask(((GpioPortConfig)delegate.getConfig()).pinNumber());
-        this.logger = LoggerFactory.getLogger("device." + delegate.getClass().getSimpleName() + "::" + delegate.getConfig().getId());
+        this.logger = LoggerFactory.getLogger("device." + delegate.getClass().getSimpleName() + "." + delegate.getConfig().getId());
     }
 
     @Override

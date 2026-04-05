@@ -22,7 +22,7 @@ public class LoggingI2C implements I2C, WithDelegateDevice<I2C> {
 
     public LoggingI2C(I2C delegate, int maxLogLength) {
         this.delegate = delegate;
-        this.logger = LoggerFactory.getLogger("device." + delegate.getClass().getSimpleName() + "::" + delegate.getConfig().getId());
+        this.logger = LoggerFactory.getLogger("device." + delegate.getClass().getSimpleName() + "." + delegate.getConfig().getId());
         this.maxLogLength = maxLogLength;
     }
 
