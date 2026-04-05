@@ -28,6 +28,13 @@ public record LineRequest(
         int fd
 ) {
 
+    public LineRequest {
+        // restrict string length to 32 chars, as per the memory layout for gpio_v2_line_request
+        if (consumer.length() > 31) {
+            consumer = consumer.substring(0, 31);
+        }
+    }
+
     @Override
     public String toString() {
         return "LineRequest{" +
