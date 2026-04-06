@@ -7,8 +7,12 @@ import io.github.iamnicknack.pjs.http.spi.SpiTransferHandler
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.koin.ktor.ext.inject
 
-fun Route.spiRoutes(handler: SpiHandler, transferHandler: SpiTransferHandler) {
+fun Route.spiRoutes() {
+    val handler: SpiHandler by inject()
+    val transferHandler: SpiTransferHandler by inject()
+
     route("/api/v1/spi/{deviceId}") {
 
         /**

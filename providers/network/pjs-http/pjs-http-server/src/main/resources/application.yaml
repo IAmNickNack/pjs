@@ -4,5 +4,5 @@ ktor:
   application:
     modules:
       - io.github.iamnicknack.pjs.http.server.ApplicationKt.koinModule
-      - io.github.iamnicknack.pjs.http.server.ApplicationKt.module
+      - io.github.iamnicknack.pjs.http.server.ApplicationKt.ktorModule
   development: false

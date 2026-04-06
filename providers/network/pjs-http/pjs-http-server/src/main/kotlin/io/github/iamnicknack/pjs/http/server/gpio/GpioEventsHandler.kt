@@ -2,10 +2,11 @@ package io.github.iamnicknack.pjs.http.server.gpio
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.http.event.EventBroadcaster
-import io.github.iamnicknack.pjs.http.gpio.GpioPortHandler
 
-interface GpioPortServerHandler : GpioPortHandler {
-
+/**
+ * Interface for handling GPIO events through the HTTP server.
+ */
+interface GpioEventsHandler {
     /**
      * Activate event listening for the device
      * @param deviceId the device id

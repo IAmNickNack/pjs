@@ -2,7 +2,7 @@ package io.github.iamnicknack.pjs.http
 
 import io.github.iamnicknack.pjs.http.client.HttpDeviceRegistry
 import io.github.iamnicknack.pjs.http.server.handlerModule
-import io.github.iamnicknack.pjs.http.server.module
+import io.github.iamnicknack.pjs.http.server.ktorModule
 import io.github.iamnicknack.pjs.mock.MockDeviceRegistry
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import io.ktor.client.plugins.contentnegotiation.*
@@ -36,7 +36,7 @@ fun pjsHttpTestCase(block: suspend PjsHttpTestCase.() -> Unit) = testApplication
     }
 
     application {
-        module()
+        ktorModule()
     }
 
     val client = createClient {

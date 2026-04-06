@@ -11,10 +11,12 @@ import io.ktor.server.routing.*
 import io.ktor.server.sse.*
 import io.ktor.sse.*
 import io.ktor.util.date.*
+import org.koin.ktor.ext.inject
 
-fun Route.gpioPortRoutes(
-    handler: GpioPortServerHandler,
-) {
+fun Route.gpioPortRoutes() {
+    val handler: GpioPortHandler by inject()
+    val eventsHandler: GpioEventsHandler by inject()
+
     route("/api/v1/gpio/{deviceId}") {
         /**
          * Read the current value of the port
@@ -41,7 +43,7 @@ fun Route.gpioPortRoutes(
 
         configRoutes(
             handler,
-            { call.receive(GpioPortHandler.GpioPortConfigPayload::class) },
+            { call.receive<GpioPortHandler.GpioPortConfigPayload>() },
             { call.respond(it) }
         )
 
@@ -49,7 +51,7 @@ fun Route.gpioPortRoutes(
          * Unsubscribe from state change events
          */
         delete("/events") {
-            handler.unlisten(call.deviceId)
+            eventsHandler.unlisten(call.deviceId)
             call.respond(HttpStatusCode.OK)
         }
 
@@ -58,11 +60,11 @@ fun Route.gpioPortRoutes(
          */
         sse("/events") {
             val deviceId = call.parameters["deviceId"] ?: throw IllegalArgumentException("Invalid deviceId")
-            handler.listen(deviceId)
+            eventsHandler.listen(deviceId)
 
             send(ServerSentEvent(event = GpioPortHandler.SseEventType.CONNECTED.toString()))
 
-            handler.eventBroadcasterForDevice(deviceId)
+            eventsHandler.eventBroadcasterForDevice(deviceId)
                 .events
                 .collect { event ->
                     ServerSentEvent(

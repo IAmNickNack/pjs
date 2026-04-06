@@ -4,6 +4,7 @@ import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.http.config.ConfigHandler
 import io.github.iamnicknack.pjs.http.event.EventBroadcaster
+import io.github.iamnicknack.pjs.http.gpio.GpioPortHandler
 import io.github.iamnicknack.pjs.http.server.deviceOrThrow
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 
@@ -13,7 +14,7 @@ import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 class GpioPortHandlerImpl(
     private val deviceRegistry: DeviceRegistry,
     private val configHandler: ConfigHandler<GpioPort>
-) : GpioPortServerHandler, ConfigHandler<GpioPort> by configHandler {
+) : GpioPortHandler, GpioEventsHandler, ConfigHandler<GpioPort> by configHandler {
 
     private val _deviceEvents: MutableMap<String, EventBroadcaster<GpioPort>> = mutableMapOf()
 
