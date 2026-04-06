@@ -15,7 +15,7 @@ public class LoggingSpiTransfer implements SpiTransfer {
 
     public LoggingSpiTransfer(SpiTransfer delegate, String deviceId) {
         this.delegate = delegate;
-        this.logger = LoggerFactory.getLogger("device." + delegate.getClass().getSimpleName() + "::" + deviceId);
+        this.logger = LoggerFactory.getLogger("device." + delegate.getClass().getSimpleName() + "." + deviceId);
     }
 
     @Override

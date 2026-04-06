@@ -13,7 +13,7 @@ public class LoggingPwm implements Pwm, WithDelegateDevice<Pwm> {
 
     public LoggingPwm(Pwm delegate) {
         this.delegate = delegate;
-        this.logger = LoggerFactory.getLogger("device." + delegate.getClass().getSimpleName() + "::" + delegate.getConfig().getId());
+        this.logger = LoggerFactory.getLogger("device." + delegate.getClass().getSimpleName() + "." + delegate.getConfig().getId());
     }
 
     @Override

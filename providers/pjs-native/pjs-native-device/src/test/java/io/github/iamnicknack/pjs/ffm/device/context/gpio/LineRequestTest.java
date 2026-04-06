@@ -13,7 +13,6 @@ class LineRequestTest {
 
     @Test
     void canWriteRead() {
-
         var original = new LineRequest(
                 new int[]{1, 2, 3},
                 "consumer",
@@ -30,5 +29,21 @@ class LineRequestTest {
         Assertions.assertThat(restored.config().flags()).isEqualTo(original.config().flags());
         Assertions.assertThat(restored.eventBufferSize()).isEqualTo(original.eventBufferSize());
         Assertions.assertThat(restored.fd()).isEqualTo(original.fd());
+    }
+
+    @Test
+    void testInvalidConsumerLength() {
+        var original = new LineRequest(
+                new int[]{1, 2, 3},
+                "0123456789012345678901234567890123",
+                new LineConfig(5, new LineConfigAttribute[0]),
+                16,
+                42
+        );
+
+        var segment = mapper.segment(original, LineRequest.class);
+        var restored = mapper.value(segment, LineRequest.class);
+
+        Assertions.assertThat(restored.consumer()).isEqualTo("0123456789012345678901234567890");
     }
 }
