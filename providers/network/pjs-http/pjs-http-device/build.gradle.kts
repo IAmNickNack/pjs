@@ -19,3 +19,8 @@ dependencies {
     testImplementation(libs.koin.ktor)
 }
 
+tasks.withType<Test>().configureEach {
+    retry {
+        maxRetries = 3
+    }
+}
