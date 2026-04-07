@@ -6,7 +6,7 @@ import io.github.iamnicknack.pjs.http.i2c.I2CHandler
 import io.github.iamnicknack.pjs.model.device.DeviceConfig
 import kotlinx.coroutines.runBlocking
 
-class HttpI2C(
+sealed class HttpI2C(
     private val i2cHandler: I2CHandler,
     private val config: I2CConfig
 ) : I2C {
@@ -22,4 +22,21 @@ class HttpI2C(
     override fun close() = runBlocking {
         i2cHandler.removeDevice(config.id)
     }
+
+    /**
+     * Proxy implementation used when the device is not managed by the local registry
+     */
+    class Proxy(handler: I2CHandler, config: I2CConfig) : HttpI2C(handler, config) {
+        /**
+         * Do nothing as the device is not managed by the local registry
+         */
+        override fun close() {
+            // do nothing
+        }
+    }
+
+    /**
+     * Default implementation used when the device is managed by the local registry
+     */
+    class Default(handler: I2CHandler, config: I2CConfig) : HttpI2C(handler, config)
 }

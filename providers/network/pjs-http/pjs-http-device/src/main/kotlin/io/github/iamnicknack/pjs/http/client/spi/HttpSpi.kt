@@ -6,7 +6,7 @@ import io.github.iamnicknack.pjs.http.spi.SpiHandler
 import io.github.iamnicknack.pjs.model.device.DeviceConfig
 import kotlinx.coroutines.runBlocking
 
-class HttpSpi(
+sealed class HttpSpi(
     private val spiHandler: SpiHandler,
     private val config: SpiConfig
 ) : Spi {
@@ -28,4 +28,21 @@ class HttpSpi(
     override fun close() = runBlocking {
         spiHandler.removeDevice(config.id)
     }
+
+    /**
+     * Proxy implementation used when the device is not managed by the local registry
+     */
+    class Proxy(spiHandler: SpiHandler, config: SpiConfig) : HttpSpi(spiHandler, config) {
+        /**
+         * Do nothing as the device is not managed by the local registry
+         */
+        override fun close() {
+            // do nothing
+        }
+    }
+
+    /**
+     * Default implementation used when the device is managed by the local registry
+     */
+    class Default(spiHandler: SpiHandler, config: SpiConfig) : HttpSpi(spiHandler, config)
 }

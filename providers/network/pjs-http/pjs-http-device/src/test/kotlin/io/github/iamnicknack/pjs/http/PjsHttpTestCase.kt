@@ -19,7 +19,8 @@ import org.koin.ktor.plugin.Koin
  */
 class PjsHttpTestCase(
     val mockDeviceRegistry: MockDeviceRegistry,
-    val httpDeviceRegistry: HttpDeviceRegistry
+    val httpDeviceRegistry: HttpDeviceRegistry.Default,
+    val httpProxyDeviceRegistry: HttpDeviceRegistry.Proxy
 )
 
 fun pjsHttpTestCase(block: suspend PjsHttpTestCase.() -> Unit) = testApplication {
@@ -46,8 +47,9 @@ fun pjsHttpTestCase(block: suspend PjsHttpTestCase.() -> Unit) = testApplication
         install(SSE)
     }
 
-    val httpDeviceRegistry = HttpDeviceRegistry(client)
+    val httpDeviceRegistry = HttpDeviceRegistry.Default(client)
+    val httpProxyDeviceRegistry = HttpDeviceRegistry.Proxy(client)
 
-    block(PjsHttpTestCase(mockDeviceRegistry, httpDeviceRegistry))
+    block(PjsHttpTestCase(mockDeviceRegistry, httpDeviceRegistry, httpProxyDeviceRegistry))
 
 }

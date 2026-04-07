@@ -15,7 +15,7 @@ class HttpSpiProvider(
 
     override fun create(config: SpiConfig): Spi {
         val config = runBlocking { spiHandler.createDevice(config.id, config.asSpiConfigPayload()) }
-        return HttpSpi(spiHandler, config as SpiConfig)
+        return HttpSpi.Default(spiHandler, config as SpiConfig)
     }
 
     override fun createTransfer(spi: Spi): SpiTransfer {

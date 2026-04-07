@@ -3,6 +3,7 @@ package io.github.iamnicknack.pjs.http.client.gpio
 import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.http.client.config.HttpConfigHandler
+import io.github.iamnicknack.pjs.http.client.ensureSuccess
 import io.github.iamnicknack.pjs.http.config.ConfigHandler
 import io.github.iamnicknack.pjs.http.gpio.GpioPortHandler
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
@@ -41,15 +42,21 @@ class HttpGpioPortHandler(
             .get("/api/v1/gpio/$deviceId/value") {
                 accept(ContentType.Application.Json)
             }
+            .ensureSuccess(deviceId)
             .body<Int>()
     }
 
     override suspend fun writeDevice(deviceId: String, value: Int) {
-        httpClient.put("/api/v1/gpio/$deviceId/value/$value")
+        httpClient
+            .put("/api/v1/gpio/$deviceId/value/$value")
+            .ensureSuccess(deviceId)
+
     }
 
     override suspend fun setDeviceDirection(deviceId: String, direction: GpioPortMode) {
-        httpClient.put("/api/v1/gpio/$deviceId/direction/${direction.name}")
+        httpClient
+            .put("/api/v1/gpio/$deviceId/direction/${direction.name}")
+            .ensureSuccess(deviceId)
     }
 
     override suspend fun listen(deviceId: String, listener: GpioEventListener<GpioPort>) {
@@ -89,7 +96,9 @@ class HttpGpioPortHandler(
     override suspend fun unlisten(deviceId: String) {
         if (jobsMap[deviceId]?.isActive == true) {
             jobsMap[deviceId]?.cancel()
-            httpClient.delete("/api/v1/gpio/$deviceId/events")
+            httpClient
+                .delete("/api/v1/gpio/$deviceId/events")
+                .ensureSuccess(deviceId)
         }
     }
 }

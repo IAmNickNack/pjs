@@ -2,6 +2,7 @@ package io.github.iamnicknack.pjs.http.client.i2c
 
 import io.github.iamnicknack.pjs.device.i2c.I2C
 import io.github.iamnicknack.pjs.http.client.config.HttpConfigHandler
+import io.github.iamnicknack.pjs.http.client.ensureSuccess
 import io.github.iamnicknack.pjs.http.config.ConfigHandler
 import io.github.iamnicknack.pjs.http.i2c.I2CHandler
 import io.ktor.client.*
@@ -29,6 +30,7 @@ class HttpI2CHandler(
                 accept(ContentType.Application.Json)
                 setBody(payload)
             }
+            .ensureSuccess(deviceId)
             .body<I2CHandler.I2CTransferPayload>()
     }
 }
