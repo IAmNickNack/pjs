@@ -5,7 +5,7 @@ import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader
 /**
  * [DeviceRegistryLoader] for [HttpDeviceRegistry]
  */
-class HttpDeviceRegistryLoader : DeviceRegistryLoader {
+class HttpDeviceRegistryLoader : DeviceRegistryLoader<HttpDeviceRegistryConfig> {
 
     override fun isLoadable(properties: Map<String, Any>) = config(properties)
         ?.let { properties["pjs.mode"]?.toString() == "http" }
@@ -14,12 +14,17 @@ class HttpDeviceRegistryLoader : DeviceRegistryLoader {
     override fun load(properties: Map<String, Any>) = config(properties)
         ?.let(this::load)
 
-    fun load(config: HttpDeviceRegistryConfig) = if (config.mode == HttpDeviceRegistryConfig.Mode.PROXY) {
+    override fun load(config: HttpDeviceRegistryConfig) = if (config.mode == HttpDeviceRegistryConfig.Mode.PROXY) {
         HttpDeviceRegistry.Proxy(config.proxyHost, config.proxyPort)
     } else {
         HttpDeviceRegistry.Default(config.proxyHost, config.proxyPort)
     }
 
+    /**
+     * Load configuration from the provided properties
+     * @param properties the properties to load from
+     * @return the configuration, or null if the properties are not valid
+     */
     private fun config(properties: Map<String, Any>): HttpDeviceRegistryConfig? {
         return if (properties["pjs.proxy.port"] != null && properties["pjs.proxy.host"] != null) {
             HttpDeviceRegistryConfig(

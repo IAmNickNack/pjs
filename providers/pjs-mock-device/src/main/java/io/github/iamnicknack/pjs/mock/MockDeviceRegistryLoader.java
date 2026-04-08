@@ -7,7 +7,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.Map;
 import java.util.Optional;
 
-public class MockDeviceRegistryLoader implements DeviceRegistryLoader {
+public class MockDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRegistryLoader.NoConfig> {
 
     @Override
     public boolean isLoadable(Map<String, Object> properties) {
@@ -17,7 +17,12 @@ public class MockDeviceRegistryLoader implements DeviceRegistryLoader {
     }
 
     @Override
-    public @Nullable DeviceRegistry load(Map<String, Object> properties) {
+    public DeviceRegistry load(NoConfig ignored) {
         return new MockDeviceRegistry();
+    }
+
+    @Override
+    public @Nullable DeviceRegistry load(Map<String, Object> properties) {
+        return load(NoConfig.INSTANCE);
     }
 }

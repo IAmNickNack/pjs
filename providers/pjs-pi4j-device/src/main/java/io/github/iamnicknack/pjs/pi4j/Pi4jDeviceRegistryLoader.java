@@ -11,11 +11,12 @@ import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader;
 import org.jspecify.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class Pi4jDeviceRegistryLoader implements DeviceRegistryLoader {
+public class Pi4jDeviceRegistryLoader implements DeviceRegistryLoader<Pi4jDeviceRegistryLoader.Config> {
 
     @Nullable
     private final Class<? extends Plugin> preferredPlugin;
@@ -36,15 +37,12 @@ public class Pi4jDeviceRegistryLoader implements DeviceRegistryLoader {
     }
 
     @Override
-    public @Nullable DeviceRegistry load(Map<String, Object> properties) {
-        var javaProperties = properties.entrySet().stream()
-                .filter(e -> e.getValue() != null)
-                .map(e -> Map.entry(e.getKey(), e.getValue().toString()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    public DeviceRegistry load(Config registryConfig) {
+        var javaProperties = new HashMap<>(registryConfig.javaProperties());
 
-        if (javaProperties.containsKey("pjs.grpc.host") && javaProperties.containsKey("pjs.grpc.port")) {
-            javaProperties.put("pi4j.grpc.host", javaProperties.get("pjs.grpc.host"));
-            javaProperties.put("pi4j.grpc.port", javaProperties.get("pjs.grpc.port"));
+        if (registryConfig.grpcHost() != null) {
+            javaProperties.put("pi4j.grpc.host", registryConfig.grpcHost());
+            javaProperties.put("pi4j.grpc.port", String.valueOf(registryConfig.grpcPort));
         }
 
         if (preferredPlugin != null) {
@@ -59,6 +57,11 @@ public class Pi4jDeviceRegistryLoader implements DeviceRegistryLoader {
                     .build()
             );
         }
+    }
+
+    @Override
+    public @Nullable DeviceRegistry load(Map<String, Object> properties) {
+        return load(new Config(properties));
     }
 
     /**
@@ -112,6 +115,22 @@ public class Pi4jDeviceRegistryLoader implements DeviceRegistryLoader {
                 contextBuilder.addPlatform(p);
             }
             return this;
+        }
+    }
+
+    public record Config(
+            @Nullable String grpcHost,
+            int grpcPort,
+            Map<String, String> javaProperties
+    ) {
+        Config(Map<String, Object> properties) {
+            this(
+                    (String) properties.get("pi4j.grpc.host"),
+                    (Integer) properties.get("pi4j.grpc.port"),
+                    properties.entrySet().stream()
+                            .filter(e -> e.getValue() != null)
+                            .map(e -> Map.entry(e.getKey(), e.getValue().toString()))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
         }
     }
 }
