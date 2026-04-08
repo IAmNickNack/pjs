@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
-public class NativeDeviceRegistryLoader implements DeviceRegistryLoader {
+public class NativeDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRegistryLoader.NoConfig> {
 
     @Override
     public boolean isLoadable(Map<String, Object> properties) {
@@ -31,7 +31,16 @@ public class NativeDeviceRegistryLoader implements DeviceRegistryLoader {
     }
 
     @Override
-    public @Nullable DeviceRegistry load(Map<String, Object> properties) {
+    public DeviceRegistry load() {
+        return load(DeviceRegistryLoader.NoConfig.INSTANCE);
+    }
+
+    public DeviceRegistry load(Map<String, Object> ignored) {
+        return load(DeviceRegistryLoader.NoConfig.INSTANCE);
+    }
+
+    @Override
+    public DeviceRegistry load(NoConfig ignored) {
         var context = ServiceLoader.load(NativeContext.class, NativeContext.class.getClassLoader()).stream()
                 .findFirst()
                 .map(ServiceLoader.Provider::get)

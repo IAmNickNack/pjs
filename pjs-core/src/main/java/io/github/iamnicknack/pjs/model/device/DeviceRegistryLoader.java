@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * Configure a device registry from a map of properties.
  * Delegating construction of a registry to the loader allows the loading
  */
-public interface DeviceRegistryLoader {
+public interface DeviceRegistryLoader<T> {
 
     /**
      * Assert that the registry can be loaded from the given properties.
@@ -37,6 +37,13 @@ public interface DeviceRegistryLoader {
     default boolean isLoadable() {
         return isLoadable(System.getProperties());
     }
+
+    /**
+     * Load a device registry from the given registry configuration.
+     * @param registryConfig the registry configuration to load from.
+     * @return the loaded device registry.
+     */
+    DeviceRegistry load(T registryConfig);
 
     /**
      * Load a device registry from the given properties.
@@ -84,4 +91,9 @@ public interface DeviceRegistryLoader {
                 .orElseThrow(() -> new IllegalStateException("No device registry loader found."));
 
     }
+
+    /**
+     * Marker class for when no configuration is required.
+     */
+    enum NoConfig { INSTANCE }
 }

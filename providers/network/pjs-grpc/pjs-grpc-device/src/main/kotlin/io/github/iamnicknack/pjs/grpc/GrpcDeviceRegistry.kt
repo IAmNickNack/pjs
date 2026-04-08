@@ -7,6 +7,7 @@ import io.github.iamnicknack.pjs.device.spi.SpiConfig
 import io.github.iamnicknack.pjs.impl.DefaultDeviceRegistry
 import io.github.iamnicknack.pjs.model.device.Device
 import io.grpc.Channel
+import io.grpc.ManagedChannelBuilder
 
 /**
  * A registry of devices that is backed by gRPC.
@@ -15,6 +16,11 @@ import io.grpc.Channel
 class GrpcDeviceRegistry(
     channel: Channel
 ) : DefaultDeviceRegistry() {
+
+    constructor(
+        host: String,
+        port: Int
+    ) : this(ManagedChannelBuilder.forAddress(host, port).usePlaintext().build())
 
     init {
         registerProvider(GrpcGpioPortProvider(channel), GpioPortConfig::class.java)
