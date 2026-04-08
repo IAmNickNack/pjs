@@ -73,15 +73,15 @@ sealed class HttpDeviceRegistry(client: HttpClient) : DefaultDeviceRegistry() {
                 val deviceConfig = portHandler.getDevice(id) as GpioPortConfig
                 HttpGpioPort.Proxy(portHandler, deviceConfig) as T
             }
-            I2CConfig::class.java -> runBlocking {
+            I2C::class.java -> runBlocking {
                 val deviceConfig = i2cHandler.getDevice(id) as I2CConfig
                 HttpI2C.Proxy(i2cHandler, deviceConfig) as T
             }
-            SpiConfig::class.java -> runBlocking {
+            Spi::class.java -> runBlocking {
                 val deviceConfig = spiHandler.getDevice(id) as SpiConfig
                 HttpSpi.Proxy(spiHandler, deviceConfig) as T
             }
-            PwmConfig::class.java -> runBlocking {
+            Pwm::class.java -> runBlocking {
                 val deviceConfig = pwmHandler.getDevice(id) as PwmConfig
                 HttpPwm.Proxy(pwmHandler, deviceConfig) as T
             }

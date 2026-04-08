@@ -39,6 +39,7 @@ fun Route.gpioPortRoutes() {
                 ?.let { GpioPortMode.valueOf(it) }
                 ?: throw IllegalArgumentException("Invalid direction")
             handler.setDeviceDirection(call.deviceId, direction)
+            call.respond(HttpStatusCode.OK)
         }
 
         configRoutes(
