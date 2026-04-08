@@ -132,7 +132,7 @@ public class Main {
 
                 yield new GrpcDeviceRegistry(channel);
             }
-            case "http" -> new HttpDeviceRegistry(
+            case "http" -> new HttpDeviceRegistry.Default(
                     commandLineArgs.getOptionValue("grpc-host"),
                     commandLineArgs.getParsedOptionValue("grpc-port", 9090)
             );

@@ -1,5 +1,6 @@
 package io.github.iamnicknack.pjs.http.client.config
 
+import io.github.iamnicknack.pjs.http.client.ensureSuccess
 import io.github.iamnicknack.pjs.http.config.ConfigHandler
 import io.github.iamnicknack.pjs.model.device.Device
 import io.github.iamnicknack.pjs.model.device.DeviceConfig
@@ -30,19 +31,23 @@ class HttpConfigHandler<T : Device<T>>(
                 accept(ContentType.Application.Json)
                 configAsBody(config)
             }
+            .ensureSuccess(deviceId)
             .bodyAsConfig()
             .asDeviceConfig(deviceId)
     }
 
     override suspend fun removeDevice(deviceId: String) {
         httpClient
-            .delete("/api/v1/$deviceTypeUrlComponent/$deviceId")    }
+            .delete("/api/v1/$deviceTypeUrlComponent/$deviceId")
+            .ensureSuccess(deviceId)
+    }
 
     override suspend fun getDevice(deviceId: String): DeviceConfig<T> {
         return httpClient
             .get("/api/v1/$deviceTypeUrlComponent/$deviceId") {
                 accept(ContentType.Application.Json)
             }
+            .ensureSuccess(deviceId)
             .bodyAsConfig()
             .asDeviceConfig(deviceId)
     }

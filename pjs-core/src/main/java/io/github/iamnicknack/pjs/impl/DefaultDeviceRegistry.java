@@ -149,4 +149,18 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
         });
     }
 
+    /**
+     * Append a device to the registry. Used by descendent classes to append devices which could be lazily created.
+     * <p>
+     * E.g. A remote device provider could eagerly create a device which gets added to the registry as normal, but
+     * not created via the client-side registry.
+     * <p>
+     * The intention here is to allow the client-side registry to know about devices which are managed by remote providers.
+     * @param device the device to append
+     */
+    protected void appendDevice(Device<?> device) {
+        if (!devices.containsKey(device.getConfig().getId())) {
+            devices.put(device.getConfig().getId(), device);
+        }
+    }
 }

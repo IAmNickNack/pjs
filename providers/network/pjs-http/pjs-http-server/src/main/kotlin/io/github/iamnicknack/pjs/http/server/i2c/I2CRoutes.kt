@@ -6,8 +6,10 @@ import io.github.iamnicknack.pjs.http.server.deviceId
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.koin.ktor.ext.inject
 
-fun Route.i2cRoutes(handler: I2CHandler) {
+fun Route.i2cRoutes() {
+    val handler: I2CHandler by inject()
 
     route("/api/v1/i2c/{deviceId}") {
         /**

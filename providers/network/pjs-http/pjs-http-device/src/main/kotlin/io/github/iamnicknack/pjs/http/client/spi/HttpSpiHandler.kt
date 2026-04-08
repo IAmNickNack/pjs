@@ -2,6 +2,7 @@ package io.github.iamnicknack.pjs.http.client.spi
 
 import io.github.iamnicknack.pjs.device.spi.Spi
 import io.github.iamnicknack.pjs.http.client.config.HttpConfigHandler
+import io.github.iamnicknack.pjs.http.client.ensureSuccess
 import io.github.iamnicknack.pjs.http.config.ConfigHandler
 import io.github.iamnicknack.pjs.http.spi.SpiHandler
 import io.ktor.client.*
@@ -29,6 +30,7 @@ class HttpSpiHandler(
                 contentType(ContentType.Application.Json)
                 setBody(payload)
             }
+            .ensureSuccess(deviceId)
             .body<SpiHandler.TransferPayload>()
     }
 }

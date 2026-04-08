@@ -7,9 +7,9 @@ import io.github.iamnicknack.pjs.model.device.DeviceConfig
 import io.github.iamnicknack.pjs.model.event.GpioEventListener
 import kotlinx.coroutines.runBlocking
 
-class HttpGpioPort(
-    private val handler: GpioPortClientHandler,
-    private val config: GpioPortConfig
+sealed class HttpGpioPort(
+    protected val handler: GpioPortClientHandler,
+    protected val config: GpioPortConfig
 ) : GpioPort {
 
     override fun read(): Int = runBlocking {
@@ -39,4 +39,20 @@ class HttpGpioPort(
         handler.removeDevice(config.id)
     }
 
+    /**
+     * Proxy implementation used when the device is not managed by the local registry
+     */
+    class Proxy(handler: GpioPortClientHandler, config: GpioPortConfig) : HttpGpioPort(handler, config) {
+        /**
+         * Unregister the device from events, but do not remove it from the remote registry
+         */
+        override fun close() = runBlocking {
+            handler.unlisten(config.id)
+        }
+    }
+
+    /**
+     * Default implementation used when the device is managed by the local registry
+     */
+    class Default(handler: GpioPortClientHandler, config: GpioPortConfig) : HttpGpioPort(handler, config)
 }

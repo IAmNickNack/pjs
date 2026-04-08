@@ -13,7 +13,7 @@ class HttpI2CProvider(
         val config = runBlocking {
             i2cHandler.createDevice(config.id, config.asI2CConfigPayload())
         }
-        return HttpI2C(i2cHandler, config as I2CConfig)
+        return HttpI2C.Default(i2cHandler, config as I2CConfig)
     }
 
     fun I2CConfig.asI2CConfigPayload() = I2CHandler.I2CConfigPayload(bus)

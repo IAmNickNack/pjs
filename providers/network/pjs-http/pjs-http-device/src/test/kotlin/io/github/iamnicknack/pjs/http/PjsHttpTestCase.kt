@@ -2,7 +2,7 @@ package io.github.iamnicknack.pjs.http
 
 import io.github.iamnicknack.pjs.http.client.HttpDeviceRegistry
 import io.github.iamnicknack.pjs.http.server.handlerModule
-import io.github.iamnicknack.pjs.http.server.module
+import io.github.iamnicknack.pjs.http.server.ktorModule
 import io.github.iamnicknack.pjs.mock.MockDeviceRegistry
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import io.ktor.client.plugins.contentnegotiation.*
@@ -19,7 +19,8 @@ import org.koin.ktor.plugin.Koin
  */
 class PjsHttpTestCase(
     val mockDeviceRegistry: MockDeviceRegistry,
-    val httpDeviceRegistry: HttpDeviceRegistry
+    val httpDeviceRegistry: HttpDeviceRegistry.Default,
+    val httpProxyDeviceRegistry: HttpDeviceRegistry.Proxy
 )
 
 fun pjsHttpTestCase(block: suspend PjsHttpTestCase.() -> Unit) = testApplication {
@@ -36,7 +37,7 @@ fun pjsHttpTestCase(block: suspend PjsHttpTestCase.() -> Unit) = testApplication
     }
 
     application {
-        module()
+        ktorModule()
     }
 
     val client = createClient {
@@ -46,8 +47,9 @@ fun pjsHttpTestCase(block: suspend PjsHttpTestCase.() -> Unit) = testApplication
         install(SSE)
     }
 
-    val httpDeviceRegistry = HttpDeviceRegistry(client)
+    val httpDeviceRegistry = HttpDeviceRegistry.Default(client)
+    val httpProxyDeviceRegistry = HttpDeviceRegistry.Proxy(client)
 
-    block(PjsHttpTestCase(mockDeviceRegistry, httpDeviceRegistry))
+    block(PjsHttpTestCase(mockDeviceRegistry, httpDeviceRegistry, httpProxyDeviceRegistry))
 
 }

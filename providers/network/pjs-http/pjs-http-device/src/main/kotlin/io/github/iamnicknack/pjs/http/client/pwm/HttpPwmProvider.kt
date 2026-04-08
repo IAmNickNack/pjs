@@ -12,7 +12,7 @@ class HttpPwmProvider(
 
     override fun create(config: PwmConfig): Pwm {
         val config = runBlocking { pwmHandler.createDevice(config.id, config.asPwmConfigPayload()) }
-        return HttpPwm(pwmHandler, config as PwmConfig)
+        return HttpPwm.Default(pwmHandler, config as PwmConfig)
     }
 
     fun PwmConfig.asPwmConfigPayload() = PwmHandler.PwmConfigPayload(

@@ -8,8 +8,11 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.koin.ktor.ext.inject
 
-fun Route.pwmRoutes(handler: PwmHandler) {
+fun Route.pwmRoutes() {
+    val handler: PwmHandler by inject()
+
     route("/api/v1/pwm/{deviceId}") {
         /**
          * Turn the PWM pin on

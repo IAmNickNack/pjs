@@ -12,7 +12,7 @@ class HttpGpioPortProvider(
 
     override fun create(config: GpioPortConfig): GpioPort {
         val config = runBlocking { portHandler.createDevice(config.id, config.asGpioPortConfigPayload()) }
-        return HttpGpioPort(portHandler, config as GpioPortConfig)
+        return HttpGpioPort.Default(portHandler, config as GpioPortConfig)
     }
 
     fun GpioPortConfig.asGpioPortConfigPayload() = GpioPortHandler.GpioPortConfigPayload(

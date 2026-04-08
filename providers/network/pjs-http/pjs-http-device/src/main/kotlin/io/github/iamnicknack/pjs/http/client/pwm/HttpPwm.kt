@@ -6,7 +6,7 @@ import io.github.iamnicknack.pjs.http.pwm.PwmHandler
 import io.github.iamnicknack.pjs.model.device.DeviceConfig
 import kotlinx.coroutines.runBlocking
 
-class HttpPwm(
+sealed class HttpPwm(
     private val pwmHandler: PwmHandler,
     private val config: PwmConfig
 ) : Pwm {
@@ -52,4 +52,21 @@ class HttpPwm(
     override fun close() = runBlocking {
         pwmHandler.removeDevice(config.id)
     }
+
+    /**
+     * Proxy implementation used when the device is not managed by the local registry
+     */
+    class Proxy(pwmHandler: PwmHandler, config: PwmConfig) : HttpPwm(pwmHandler, config) {
+        /**
+         * Do nothing as the device is not managed by the local registry
+         */
+        override fun close() {
+            // do nothing
+        }
+    }
+
+    /**
+     * Default implementation used when the device is managed by the local registry
+     */
+    class Default(pwmHandler: PwmHandler, config: PwmConfig) : HttpPwm(pwmHandler, config)
 }
