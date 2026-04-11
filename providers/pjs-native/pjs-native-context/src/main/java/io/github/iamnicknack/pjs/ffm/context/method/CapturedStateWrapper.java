@@ -35,7 +35,10 @@ public class CapturedStateWrapper {
             if (result < 0) {
                 int errno = (int) ERRNO_HANDLE.get(capturedState, 0L);
                 var errnoStr = (MemorySegment) STR_ERROR.invokeExact(errno);
-                throw new CapturedStateException(errno, errnoStr.getString(0L));
+                var str = (errnoStr.byteSize() > 0)
+                        ? errnoStr.getString(0L)
+                        : "Empty error string for errno: " + errno;
+                throw new CapturedStateException(errno, str);
             }
             
             return result;

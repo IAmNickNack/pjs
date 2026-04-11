@@ -110,6 +110,7 @@ public class EventPollerFactoryImpl implements EventPoller.Factory {
 
         @Override
         public void stop() {
+            logger.info("Stopping event poller on fd {}", fileDescriptor.fd());
             running = false;
         }
 
@@ -120,6 +121,10 @@ public class EventPollerFactoryImpl implements EventPoller.Factory {
 
         @Override
         public void run() {
+            if (running) {
+                logger.warn("Event poller is already running");
+                return;
+            }
             var pollData = new Poll(fileDescriptor.fd());
             logger.info("Starting event poller on fd {}", fileDescriptor.fd());
             running = true;
