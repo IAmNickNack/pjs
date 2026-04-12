@@ -34,7 +34,7 @@ class NativePort implements GpioPort, AutoCloseable {
     private final Logger logger = LoggerFactory.getLogger(NativePort.class);
 
     private final GpioPortConfig config;
-    private final NativePortProvider.LineConfigPair lineConfigs;
+    private final NativePortProvider.LineConfigTriple lineConfigs;
     private final IoctlOperations ioctlOperations;
     private final FileDescriptor fileDescriptor;
     private final Set<GpioEventListener<GpioPort>> listeners = new CopyOnWriteArraySet<>();
@@ -53,7 +53,7 @@ class NativePort implements GpioPort, AutoCloseable {
      */
     public NativePort(
             GpioPortConfig config,
-            NativePortProvider.LineConfigPair lineConfigs,
+            NativePortProvider.LineConfigTriple lineConfigs,
             FileDescriptor fileDescriptor,
             IoctlOperations ioctlOperations,
             EventPoller.Factory eventPollerFactory
@@ -84,7 +84,7 @@ class NativePort implements GpioPort, AutoCloseable {
      */
     public NativePort(
             GpioPortConfig config,
-            NativePortProvider.LineConfigPair lineConfigs,
+            NativePortProvider.LineConfigTriple lineConfigs,
             FileDescriptor fileDescriptor,
             IoctlOperations ioctlOperations
     ) {
@@ -136,6 +136,8 @@ class NativePort implements GpioPort, AutoCloseable {
     @Override
     public void addListener(GpioEventListener<GpioPort> listener) {
         if (listeners.add(listener) && !eventPoller.isRunning()) {
+            // assert config with possible event attributes
+            ioctlOperations.ioctl(fileDescriptor, GpioConstants.GPIO_V2_LINE_SET_CONFIG_IOCTL, lineConfigs.inputConfig());
             eventPoller.start();
         }
     }
@@ -143,6 +145,8 @@ class NativePort implements GpioPort, AutoCloseable {
     @Override
     public void removeListener(GpioEventListener<GpioPort> listener) {
         if (listeners.remove(listener) && listeners.isEmpty() && eventPoller.isRunning()) {
+            // set config with no event attributes
+            ioctlOperations.ioctl(fileDescriptor, GpioConstants.GPIO_V2_LINE_SET_CONFIG_IOCTL, lineConfigs.inputConfigNoEvents());
             eventPoller.stop();
         }
     }

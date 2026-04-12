@@ -33,6 +33,7 @@ class NativePortTest {
     private final IoctlOperations ioctlOperations = AbstractIoctlOperations.builder()
             .addHandler(GpioConstants.GPIO_V2_LINE_GET_VALUES_IOCTL)
             .addHandler(GpioConstants.GPIO_V2_LINE_SET_VALUES_IOCTL)
+            .addHandler(GpioConstants.GPIO_V2_LINE_SET_CONFIG_IOCTL)
             .build();
 
     @Test
@@ -238,7 +239,8 @@ class NativePortTest {
     ) {
         return new NativePort(
                 config,
-                new NativePortProvider.LineConfigPair(
+                new NativePortProvider.LineConfigTriple(
+                        new LineConfig(PinFlag.INPUT.value, new LineConfigAttribute[0]),
                         new LineConfig(PinFlag.INPUT.value, new LineConfigAttribute[0]),
                         new LineConfig(PinFlag.OUTPUT.value, new LineConfigAttribute[0])
                 ),
