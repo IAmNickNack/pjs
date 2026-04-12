@@ -125,12 +125,12 @@ public class NativePortProvider implements GpioPortProvider {
     }
 
     /**
-     * Create a {@link LineConfigPair} from the given {@link GpioPortConfig}. For the opposite port direction
+     * Create a {@link LineConfigTriple} from the given {@link GpioPortConfig}. For the opposite port direction
      * a basic {@link LineConfig} is returned.
      * @param config the requested config
-     * @return the constructed {@link LineConfigPair}
+     * @return the constructed {@link LineConfigTriple}
      */
-    private @NonNull LineConfigPair createLineConfigPair(GpioPortConfig config) {
+    private @NonNull LineConfigTriple createLineConfigPair(GpioPortConfig config) {
         var eventFlags = switch (config.eventMode()) {
             case NONE -> 0;
             case RISING -> PinFlag.EDGE_RISING.value;
@@ -174,15 +174,24 @@ public class NativePortProvider implements GpioPortProvider {
                 ? lineConfig
                 : new LineConfig(PinFlag.INPUT.value, new LineConfigAttribute[0]);
 
+        var inputConfigNoEvents = new LineConfig(modeFlags, new LineConfigAttribute[0]);
+
         var outputConfig = (config.portMode().isSet(GpioPortMode.OUTPUT))
                 ? lineConfig
                 : new LineConfig(PinFlag.OUTPUT.value, new LineConfigAttribute[0]);
 
-        return new LineConfigPair(inputConfig, outputConfig);
+        return new LineConfigTriple(inputConfig, inputConfigNoEvents, outputConfig);
     }
 
-    record LineConfigPair(
+    /**
+     * Data container for a line config triple.
+     * @param inputConfig the user-provided input config (or default)
+     * @param inputConfigNoEvents the input config without event flags
+     * @param outputConfig the user-provided output config (or default)
+     */
+    record LineConfigTriple(
             LineConfig inputConfig,
+            LineConfig inputConfigNoEvents,
             LineConfig outputConfig
     ) {}
 }
