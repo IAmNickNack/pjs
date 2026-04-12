@@ -41,14 +41,14 @@ public class IoctlOperationsImpl implements IoctlOperations {
     public int ioctl(int fd, long command, int data) {
         var dataMemorySegment = segmentAllocator.allocate(ValueLayout.JAVA_INT);
         dataMemorySegment.set(ValueLayout.JAVA_INT, 0, data);
-        ioctlIntByReference.call(fd, command, dataMemorySegment);
+        call(fd, command, dataMemorySegment);
         return dataMemorySegment.get(ValueLayout.JAVA_INT, 0);
     }
 
     @Override
     public <T> T ioctl(int fd, long command, T data, Class<T> type) {
         var dataMemorySegment = memorySegmentMapper.segment(data, type);
-        ioctlIntByReference.call(fd, command, dataMemorySegment);
+        call(fd, command, dataMemorySegment);
         return memorySegmentMapper.value(dataMemorySegment, type);
     }
 
@@ -61,8 +61,12 @@ public class IoctlOperationsImpl implements IoctlOperations {
     @Override
     public <T> T ioctl(int fd, long command, Class<T> type) {
         var data = segmentAllocator.allocate(memorySegmentMapper.layout(type));
-        ioctlIntByReference.call(fd, command, data);
+        call(fd, command, data);
         return memorySegmentMapper.value(data, type);
+    }
+
+    private synchronized void call(int fd, long cmd, Object arg) {
+        ioctlIntByReference.call(fd, cmd, arg);
     }
 
     static class Descriptors {
