@@ -17,7 +17,7 @@ dependencies {
     implementation(libs.gradle.versions)
     implementation(libs.protobuf.plugin)
     implementation(libs.publish.vanniktech)
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin")
+    implementation(libs.kotlin.gradle)
     implementation("org.jetbrains.kotlin:kotlin-stdlib") {
         version {
             // force stdlib to avoid confusion with transitive dependencies
