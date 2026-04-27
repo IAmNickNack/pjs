@@ -2,7 +2,7 @@
   <configuration default="false" name="Test Harness - Rotary Encoder" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="io.github.iamnicknack.pjs.sandbox.Main" />
     <module name="pjs-sandbox.pjs-examples.main" />
-    <option name="PROGRAM_PARAMETERS" value="--plugin ffm --grpc-host 10.0.0.2 --grpc-port 9090 --rotary --logging" />
+    <option name="PROGRAM_PARAMETERS" value="--plugin grpc --grpc-host 10.0.0.2 --grpc-port 9090 --rotary --logging" />
     <option name="VM_PARAMETERS" value="--sun-misc-unsafe-memory-access=allow --enable-native-access=ALL-UNNAMED " />
     <extension name="coverage">
       <pattern>
