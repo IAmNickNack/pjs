@@ -80,7 +80,7 @@ data class ServerConfiguration(
                 preferredMode = commandLine.getParsedOptionValue<Mode>("mode")?.name?.lowercase(),
                 proxyHost = commandLine.getParsedOptionValue<String>("proxy-host"),
                 proxyPort = commandLine.getParsedOptionValue<Int>("proxy-port"),
-                logging = commandLine.getParsedOptionValue("logging", false),
+                logging = commandLine.hasOption("logging"),
                 help = commandLine.hasOption("help")
             )
         }
