@@ -16,6 +16,11 @@ on:
         required: false
         default: false
         type: boolean
+      version:
+        description: 'Version to release'
+        required: false
+        default: ''
+        type: string
 
 jobs:
   build:

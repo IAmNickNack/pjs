@@ -6,8 +6,6 @@ plugins {
     application
 }
 
-version = libs.versions.pjs.get()
-
 dependencies {
     implementation(project(":pjs-network-common"))
     implementation(project(":pjs-native-device"))

@@ -1,3 +1,5 @@
+import buildlogic.buildVersion
+
 plugins {
     base
     id("buildlogic.gradle-versions")
@@ -9,7 +11,13 @@ subprojects {
 }
 
 tasks.register("printVersion") {
+    description = "Output the effective version"
+
+    val v = rootProject.version.toString()
+        .takeIf { it.isNotBlank() && it != "unspecified" }
+        ?: buildVersion
+
     doLast {
-        println("version: ${libs.versions.pjs.get()}")
+        println("version: $v")
     }
 }

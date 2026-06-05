@@ -7,15 +7,22 @@ fun Project.withVersionCatalog(block: WithVersionCatalog.() -> Unit) {
     RealWithVersionCatalog(this).block()
 }
 
-val Project.librariesForLibs: LibrariesForLibs? get() {
+val Project.buildVersion: String
+    get() = providers.gradleProperty("version")
+        .getOrElse(librariesForLibs.versions.buildVersion.get())
+        .takeIf { it.isNotBlank() }
+        ?: librariesForLibs.versions.buildVersion.get()
+
+val Project.librariesForLibs: LibrariesForLibs get() {
     return (this as org.gradle.api.plugins.ExtensionAware)
         .extensions.getByName("libs") as? LibrariesForLibs
+        ?: error("Version catalog 'libs' is not available in this project.")
 }
 
 interface WithVersionCatalog {
     val project: Project
     val Project.libs: LibrariesForLibs
-        get() = librariesForLibs ?: error("Version catalog 'libs' is not available in this project.")
+        get() = librariesForLibs
 }
 
 private class RealWithVersionCatalog(

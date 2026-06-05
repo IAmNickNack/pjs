@@ -9,8 +9,6 @@ plugins {
     application
 }
 
-version = libs.versions.pjs.get()
-
 dependencies {
     implementation(libs.logback.classic)
     implementation(libs.koin.ktor)

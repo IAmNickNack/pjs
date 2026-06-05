@@ -8,10 +8,7 @@ plugins {
     id("com.vanniktech.maven.publish")
 }
 
-withVersionCatalog {
-    version = providers.gradleProperty("version")
-        .getOrElse(libs.versions.pjs.get())
-}
+version = buildVersion
 
 mavenPublishing {
     coordinates(
