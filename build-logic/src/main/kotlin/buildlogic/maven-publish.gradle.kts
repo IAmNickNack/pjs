@@ -6,9 +6,8 @@ import groovy.util.Node
 plugins {
     id("org.jetbrains.dokka-javadoc")
     id("com.vanniktech.maven.publish")
+    id("buildlogic.build-version")
 }
-
-version = buildVersion
 
 mavenPublishing {
     coordinates(

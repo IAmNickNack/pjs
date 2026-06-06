@@ -1,0 +1,3 @@
+package buildlogic
+
+version = buildVersion
