@@ -11,7 +11,7 @@ is_snapshot() {
 
 # `true` if gh release list contains "v${BUILD_VERSION}"
 release_exists() {
-  if gh release list | grep -q "^v${BUILD_VERSION}\b"; then
+  if gh release list | grep -q "^v${BUILD_VERSION}\s"; then
     return 0
   else
     return 1
@@ -56,6 +56,8 @@ create_github_release() {
 upload_github_packages() {
   if can_release; then
     echo "Uploading v${BUILD_VERSION}"
+    echo "gRPC distribution: ${GRPC_DIST_ZIP}"
+    echo "HTTP distribution: ${HTTP_DIST_ZIP}"
     gh release upload "v${BUILD_VERSION}" "${GRPC_DIST_ZIP}" "${HTTP_DIST_ZIP}" --clobber
     RC=$?
     if [ ${RC} -ne 0 ]; then
@@ -72,7 +74,7 @@ upload_github_packages() {
 do_release() {
   if can_release; then
     create_github_release && \
-      ./gradlew publishToMavenCentral :providers:publishToMavenCentral --console plain && \
+      ./gradlew publishToMavenCentral :providers:publishToMavenCentral -Pversion=${BUILD_VERSION} --console plain && \
       upload_github_packages
   fi
 }

@@ -16,6 +16,11 @@ on:
         required: false
         default: false
         type: boolean
+      version:
+        description: 'Version to release'
+        required: false
+        default: ''
+        type: string
 
 jobs:
   build:
@@ -35,7 +40,8 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          ./gradlew build :providers:build :sandbox:build
+          export VERSION=${{ github.event.inputs.version }}
+          ./gradlew --configuration-cache build :providers:build :sandbox:build
 
       - name: Do Release
         if: github.ref == 'refs/heads/main' || github.event.inputs.manual_release == 'true'
@@ -48,6 +54,7 @@ jobs:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
         run: |
+          export VERSION=${{ github.event.inputs.version }}
           source ./.github/scripts/release-operations.sh && \
             do_release && \
             release_summary

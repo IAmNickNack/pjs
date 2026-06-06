@@ -3,10 +3,9 @@ plugins {
     id("buildlogic.grpc.grpc-kotlin")
     id("buildlogic.kotlin-core")
     id("buildlogic.test.test-kotlin")
+    id("buildlogic.build-version")
     application
 }
-
-version = libs.versions.pjs.get()
 
 dependencies {
     implementation(project(":pjs-network-common"))

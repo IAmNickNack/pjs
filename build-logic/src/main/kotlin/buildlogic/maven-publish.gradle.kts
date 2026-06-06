@@ -6,11 +6,7 @@ import groovy.util.Node
 plugins {
     id("org.jetbrains.dokka-javadoc")
     id("com.vanniktech.maven.publish")
-}
-
-withVersionCatalog {
-    version = providers.gradleProperty("version")
-        .getOrElse(libs.versions.pjs.get())
+    id("buildlogic.build-version")
 }
 
 mavenPublishing {
