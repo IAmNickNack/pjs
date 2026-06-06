@@ -72,7 +72,7 @@ upload_github_packages() {
 do_release() {
   if can_release; then
     create_github_release && \
-      ./gradlew publishToMavenCentral :providers:publishToMavenCentral --console plain && \
+      ./gradlew publishToMavenCentral :providers:publishToMavenCentral -Pversion=${BUILD_VERSION} --console plain && \
       upload_github_packages
   fi
 }
