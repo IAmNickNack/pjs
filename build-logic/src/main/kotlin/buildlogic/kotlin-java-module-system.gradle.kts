@@ -10,8 +10,16 @@ plugins {
  * Extension for configuring the Java Module System.
  * @property moduleName the module name to patch
  */
-open class JavaModuleSystemExtension {
-    var moduleName: String? = null
+abstract class JavaModuleSystemExtension @Inject constructor() : CommandLineArgumentProvider {
+    @get:Input
+    abstract val moduleName: Property<String>
+
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val kotlinClassesDir: DirectoryProperty
+
+    override fun asArguments(): Iterable<String> =
+        listOf("--patch-module", "${moduleName.get()}=${kotlinClassesDir.get().asFile.absolutePath}")
 }
 
 /**
@@ -23,21 +31,12 @@ val javaModuleExt = extensions.create("javaModuleSystem", JavaModuleSystemExtens
  * Apply the Java Module System patch to the java compiler
  */
 tasks.named<JavaCompile>("compileJava") {
-    options.compilerArgumentProviders += object : CommandLineArgumentProvider {
+    val compileKotlin = tasks.named<KotlinCompile>("compileKotlin")
 
-        @InputFiles
-        @PathSensitive(PathSensitivity.RELATIVE)
-        val kotlinClasses = tasks.named<KotlinCompile>("compileKotlin")
-            .flatMap(KotlinCompile::destinationDirectory)
-
-        override fun asArguments(): Iterable<String> {
-            val module = javaModuleExt.moduleName
-                ?: throw IllegalStateException("`javaModuleSystem.moduleName` must be set in the module build script")
-
-            return listOf(
-                "--patch-module",
-                "$module=${kotlinClasses.get().asFile.absolutePath}",
-            )
-        }
+    val provider = objects.newInstance(JavaModuleSystemExtension::class.java).apply {
+        moduleName.set(javaModuleExt.moduleName)
+        kotlinClassesDir.set(compileKotlin.flatMap { it.destinationDirectory })
     }
+
+    options.compilerArgumentProviders.add(provider)
 }

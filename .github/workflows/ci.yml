@@ -41,7 +41,7 @@ jobs:
       - name: Build with Gradle
         run: |
           export VERSION=${{ github.event.inputs.version }}
-          ./gradlew build :providers:build :sandbox:build
+          ./gradlew --configuration-cache build :providers:build :sandbox:build
 
       - name: Do Release
         if: github.ref == 'refs/heads/main' || github.event.inputs.manual_release == 'true'
