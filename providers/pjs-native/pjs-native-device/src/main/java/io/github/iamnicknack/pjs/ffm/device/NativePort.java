@@ -34,7 +34,7 @@ class NativePort implements GpioPort, AutoCloseable {
     private final Logger logger = LoggerFactory.getLogger(NativePort.class);
 
     private final GpioPortConfig config;
-    private final NativePortProvider.LineConfigTriple lineConfigs;
+    private final NativePortFactory.LineConfigTriple lineConfigs;
     private final IoctlOperations ioctlOperations;
     private final FileDescriptor fileDescriptor;
     private final Set<GpioEventListener<GpioPort>> listeners = new CopyOnWriteArraySet<>();
@@ -53,7 +53,7 @@ class NativePort implements GpioPort, AutoCloseable {
      */
     public NativePort(
             GpioPortConfig config,
-            NativePortProvider.LineConfigTriple lineConfigs,
+            NativePortFactory.LineConfigTriple lineConfigs,
             FileDescriptor fileDescriptor,
             IoctlOperations ioctlOperations,
             EventPoller.Factory eventPollerFactory
@@ -84,7 +84,7 @@ class NativePort implements GpioPort, AutoCloseable {
      */
     public NativePort(
             GpioPortConfig config,
-            NativePortProvider.LineConfigTriple lineConfigs,
+            NativePortFactory.LineConfigTriple lineConfigs,
             FileDescriptor fileDescriptor,
             IoctlOperations ioctlOperations
     ) {

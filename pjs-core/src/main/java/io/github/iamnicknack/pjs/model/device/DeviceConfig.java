@@ -3,7 +3,7 @@ package io.github.iamnicknack.pjs.model.device;
 /**
  * Configuration object for a device of type T.
  * <p>
- * Configurations are used by a {@link DeviceProvider} to create a device of type T.
+ * Configurations are used by a {@link DeviceFactory} to create a device of type T.
  * </p>
  * @param <T> the device type
  */

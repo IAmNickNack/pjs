@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Configuration for a GPIO port which can be used by a {@link GpioPortProvider} to construct a {@link GpioPort} instance.
+ * Configuration for a GPIO port which can be used by a {@link GpioPortFactory} to construct a {@link GpioPort} instance.
  * @param pinNumber array of pin numbers
  * @param portMode initial portMode of the port
  * @param debounceDelay debounce delay in microseconds

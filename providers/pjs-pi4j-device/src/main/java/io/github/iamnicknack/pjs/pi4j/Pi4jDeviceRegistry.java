@@ -9,9 +9,9 @@ import io.github.iamnicknack.pjs.impl.DefaultDeviceRegistry;
 
 public class Pi4jDeviceRegistry extends DefaultDeviceRegistry {
     public Pi4jDeviceRegistry(Context pi4jContext) {
-        this.registerProvider(new Pi4jPortProvider(pi4jContext), GpioPortConfig.class);
-        this.registerProvider(new Pi4jSpiProvider(pi4jContext), SpiConfig.class);
-        this.registerProvider(new Pi4jPwmProvider(pi4jContext), PwmConfig.class);
-        this.registerProvider(new Pi4jI2CProvider(pi4jContext), I2CConfig.class);
+        this.registerFactory(new Pi4JPortFactory(pi4jContext), GpioPortConfig.class);
+        this.registerFactory(new Pi4JSpiFactory(pi4jContext), SpiConfig.class);
+        this.registerFactory(new Pi4JPwmFactory(pi4jContext), PwmConfig.class);
+        this.registerFactory(new Pi4JI2CFactory(pi4jContext), I2CConfig.class);
     }
 }

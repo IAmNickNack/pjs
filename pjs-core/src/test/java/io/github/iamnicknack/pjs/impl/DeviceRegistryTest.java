@@ -2,7 +2,7 @@ package io.github.iamnicknack.pjs.impl;
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
-import io.github.iamnicknack.pjs.mock.MockGpioPortProvider;
+import io.github.iamnicknack.pjs.mock.MockGpioPortFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
@@ -12,7 +12,7 @@ class DeviceRegistryTest {
     @Test
     void canCreateDevice() {
         try (var registry = new DefaultDeviceRegistry()
-                .registerProvider(new MockGpioPortProvider(), GpioPortConfig.class)
+                .registerFactory(new MockGpioPortFactory(), GpioPortConfig.class)
         ) {
             var config = GpioPortConfig.builder().pin(1).build();
             var device = registry.create(config);
@@ -25,7 +25,7 @@ class DeviceRegistryTest {
     @Test
     void canRemoveDevice() {
         try (var registry = new DefaultDeviceRegistry()
-                .registerProvider(new MockGpioPortProvider(), GpioPortConfig.class)
+                .registerFactory(new MockGpioPortFactory(), GpioPortConfig.class)
         ) {
             var config = GpioPortConfig.builder().pin(1).build();
             var device = registry.create(config);

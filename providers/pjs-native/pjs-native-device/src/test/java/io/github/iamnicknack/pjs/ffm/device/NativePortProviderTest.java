@@ -56,14 +56,14 @@ class NativePortProviderTest {
                 })
                 .build();
 
-        try (var provider = new NativePortProvider(
+        try (var factory = new NativePortFactory(
                 new ChipInfo("test", "test", 1),
                 fileOperations,
                 ioctlOperations,
                 eventPollerFactory
         )) {
             var config = GpioPortConfig.builder().pin(1).build();
-            var device = provider.create(config);
+            var device = factory.create(config);
             assertThat(device).isNotNull();
         }
     }
@@ -88,14 +88,14 @@ class NativePortProviderTest {
                 })
                 .build();
 
-        try (var provider = new NativePortProvider(
+        try (var factory = new NativePortFactory(
                 new ChipInfo("test", "test", 1),
                 fileOperations,
                 ioctlOperations,
                 eventPollerFactory
         )) {
             var config = GpioPortConfig.builder().pin(1, 2).build();
-            assertThatThrownBy(() -> provider.create(config)).isInstanceOf(IllegalStateException.class);
+            assertThatThrownBy(() -> factory.create(config)).isInstanceOf(IllegalStateException.class);
             assertThat(invocationCount.get()).isEqualTo(2);
         }
     }
@@ -107,14 +107,14 @@ class NativePortProviderTest {
                 .addHandler(GpioConstants.GPIO_V2_GET_LINE_IOCTL)
                 .build();
 
-        try (var provider = new NativePortProvider(
+        try (var factory = new NativePortFactory(
                 new ChipInfo("test", "test", 1),
                 fileOperations,
                 ioctlOperations,
                 eventPollerFactory
         )) {
             var config = GpioPortConfig.builder().pin(1).build();
-            var device = (NativePort)provider.create(config);
+            var device = (NativePort)factory.create(config);
             assertThat(device).isNotNull();
         }
     }

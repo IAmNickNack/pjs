@@ -3,7 +3,7 @@ package io.github.iamnicknack.pjs.grpc.service
 import com.google.protobuf.ByteString
 import io.github.iamnicknack.pjs.device.spi.Spi
 import io.github.iamnicknack.pjs.device.spi.SpiConfig
-import io.github.iamnicknack.pjs.device.spi.SpiProvider
+import io.github.iamnicknack.pjs.device.spi.SpiFactory
 import io.github.iamnicknack.pjs.device.spi.SpiTransfer
 import io.github.iamnicknack.pjs.grpc.deviceOrThrow
 import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiTransferMessage
@@ -15,10 +15,10 @@ class GrpcSpiTransferService(
     private val deviceRegistry: DeviceRegistry
 ) : SpiTransferServiceGrpcKt.SpiTransferServiceCoroutineImplBase() {
 
-    private val provider: SpiProvider = deviceRegistry.getProvider(SpiConfig::class.java) as SpiProvider
+    private val factory: SpiFactory = deviceRegistry.getFactory(SpiConfig::class.java) as SpiFactory
 
     override suspend fun transfer(request: SpiTransferMessageList): SpiTransferMessageList {
-        val transfer = provider.createTransfer(deviceRegistry.deviceOrThrow<Spi>(request.deviceId))
+        val transfer = factory.createTransfer(deviceRegistry.deviceOrThrow<Spi>(request.deviceId))
 
         val messagesToSend = request.messageList
             .map {

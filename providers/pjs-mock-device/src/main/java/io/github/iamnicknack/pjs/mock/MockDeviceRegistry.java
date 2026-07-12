@@ -7,13 +7,13 @@ import io.github.iamnicknack.pjs.device.spi.SpiConfig;
 import io.github.iamnicknack.pjs.impl.DefaultDeviceRegistry;
 
 /**
- * A {@link DefaultDeviceRegistry} with mock providers registered
+ * A {@link DefaultDeviceRegistry} with mock factories registered
  */
 public class MockDeviceRegistry extends DefaultDeviceRegistry {
     public MockDeviceRegistry() {
-        this.registerProvider(new MockGpioPortProvider(), GpioPortConfig.class);
-        this.registerProvider(new MockSpiProvider(), SpiConfig.class);
-        this.registerProvider(new MockPwmProvider(), PwmConfig.class);
-        this.registerProvider(new MockI2CProvider(), I2CConfig.class);
+        this.registerFactory(new MockGpioPortFactory(), GpioPortConfig.class);
+        this.registerFactory(new MockSpiFactory(), SpiConfig.class);
+        this.registerFactory(new MockPwmFactory(), PwmConfig.class);
+        this.registerFactory(new MockI2CFactory(), I2CConfig.class);
     }
 }

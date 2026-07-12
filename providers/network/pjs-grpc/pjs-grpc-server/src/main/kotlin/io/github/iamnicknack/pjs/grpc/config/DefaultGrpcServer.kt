@@ -2,7 +2,7 @@ package io.github.iamnicknack.pjs.grpc.config
 
 import io.github.iamnicknack.pjs.grpc.service.*
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
-import io.github.iamnicknack.pjs.server.DeviceRegistryProvider
+import io.github.iamnicknack.pjs.server.DeviceRegistryFactory
 import io.grpc.Server
 import io.grpc.ServerBuilder
 import io.grpc.protobuf.services.ProtoReflectionServiceV1
@@ -13,8 +13,8 @@ import java.util.concurrent.TimeUnit
  * Default implementation of [GrpcServer].
  */
 class DefaultGrpcServer(
-    deviceRegistryProvider: DeviceRegistryProvider,
-    serverBuilderProvider: ServerBuilderProvider
+    deviceRegistryFactory: DeviceRegistryFactory,
+    serverBuilderFactory: ServerBuilderFactory
 ) : GrpcServer {
 
     init {
@@ -26,11 +26,11 @@ class DefaultGrpcServer(
     private val logger = LoggerFactory.getLogger(DefaultGrpcServer::class.java)
 
     override val deviceRegistry: DeviceRegistry by lazy {
-        deviceRegistryProvider.createDeviceRegistry()
+        deviceRegistryFactory.createDeviceRegistry()
     }
 
     override val server: Server by lazy {
-        serverBuilderProvider.createServerBuilder()
+        serverBuilderFactory.createServerBuilder()
             .addService(GrpcPortService(deviceRegistry))
             .addService(GrpcPortConfigService(deviceRegistry))
             .addService(GrpcI2CBusService(deviceRegistry))
@@ -54,10 +54,10 @@ class DefaultGrpcServer(
     }
 
     /**
-     * Lazy provider for the gRPC server builder.
+     * Lazy factory for the gRPC server builder.
      * Allows customising the server builder before applying the default configuration of services.
      */
-    fun interface ServerBuilderProvider {
+    fun interface ServerBuilderFactory {
         fun createServerBuilder(): ServerBuilder<*>
     }
 }

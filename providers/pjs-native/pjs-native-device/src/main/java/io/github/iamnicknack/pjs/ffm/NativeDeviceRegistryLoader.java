@@ -3,10 +3,10 @@ package io.github.iamnicknack.pjs.ffm;
 import io.github.iamnicknack.pjs.ffm.context.DefaultNativeContext;
 import io.github.iamnicknack.pjs.ffm.context.NativeContext;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapperImpl;
-import io.github.iamnicknack.pjs.ffm.device.NativeI2CProvider;
-import io.github.iamnicknack.pjs.ffm.device.NativePortProvider;
-import io.github.iamnicknack.pjs.ffm.device.NativePwmProvider;
-import io.github.iamnicknack.pjs.ffm.device.NativeSpiProvider;
+import io.github.iamnicknack.pjs.ffm.device.NativeI2CFactory;
+import io.github.iamnicknack.pjs.ffm.device.NativePortFactory;
+import io.github.iamnicknack.pjs.ffm.device.NativePwmFactory;
+import io.github.iamnicknack.pjs.ffm.device.NativeSpiFactory;
 import io.github.iamnicknack.pjs.ffm.device.context.FileOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.device.context.GpioOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperationsImpl;
@@ -14,7 +14,6 @@ import io.github.iamnicknack.pjs.ffm.device.context.PollingOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.event.EventPollerFactoryImpl;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader;
-import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.Map;
@@ -59,15 +58,15 @@ public class NativeDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRe
                 4
         );
 
-        var i2cProvider = new NativeI2CProvider(fileOperations, ioctlOperations);
-        var portProvider = new NativePortProvider(
+        var i2cFactory = new NativeI2CFactory(fileOperations, ioctlOperations);
+        var portFactory = new NativePortFactory(
                 gpioOperations.chipInfo("/dev/gpiochip0"),
                 fileOperations,
                 ioctlOperations,
                 eventPollerFactory
         );
-        var pwmProvider = new NativePwmProvider(fileOperations);
-        var spiProvider = new NativeSpiProvider(
+        var pwmFactory = new NativePwmFactory(fileOperations);
+        var spiFactory = new NativeSpiFactory(
                 fileOperations,
                 ioctlOperations,
                 mapper,
@@ -75,10 +74,10 @@ public class NativeDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRe
         );
 
         return new NativeDeviceRegistry(
-                portProvider,
-                spiProvider,
-                pwmProvider,
-                i2cProvider
+                portFactory,
+                spiFactory,
+                pwmFactory,
+                i2cFactory
         );
     }
 }

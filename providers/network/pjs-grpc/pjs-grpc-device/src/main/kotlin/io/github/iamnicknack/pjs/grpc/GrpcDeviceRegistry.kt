@@ -23,10 +23,10 @@ class GrpcDeviceRegistry(
     ) : this(ManagedChannelBuilder.forAddress(host, port).usePlaintext().build())
 
     init {
-        registerProvider(GrpcGpioPortProvider(channel), GpioPortConfig::class.java)
-        registerProvider(GrpcPwmProvider(channel), PwmConfig::class.java)
-        registerProvider(GrpcSpiProvider(channel), SpiConfig::class.java)
-        registerProvider(GrpcI2CProvider(channel), I2CConfig::class.java)
+        registerFactory(GrpcGpioPortFactory(channel), GpioPortConfig::class.java)
+        registerFactory(GrpcPwmFactory(channel), PwmConfig::class.java)
+        registerFactory(GrpcSpiFactory(channel), SpiConfig::class.java)
+        registerFactory(GrpcI2CFactory(channel), I2CConfig::class.java)
     }
 
     override fun iterator(): MutableIterator<Device<*>?> {

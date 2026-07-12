@@ -1,5 +1,5 @@
 /**
- * I2C bus abstraction and provider.
+ * I2C bus abstraction and factory.
  */
 package io.github.iamnicknack.pjs.device.i2c;
 
