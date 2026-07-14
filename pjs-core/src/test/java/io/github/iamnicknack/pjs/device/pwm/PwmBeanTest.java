@@ -3,6 +3,7 @@ package io.github.iamnicknack.pjs.device.pwm;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 class PwmBeanTest {
 
@@ -13,7 +14,7 @@ class PwmBeanTest {
                 .build();
 
         var pwm = new PwmBean(config);
-        assertThat(pwm.getFrequency()).isEqualTo(1000);
+        assertThat(pwm.getFrequency()).isEqualTo(1000.0);
         assertThat(pwm.getPeriod()).isEqualTo(1_000_000_000 / 1000);
     }
 
@@ -25,7 +26,17 @@ class PwmBeanTest {
 
         var pwm = new PwmBean(config);
         assertThat(pwm.getPeriod()).isEqualTo(1_000_000);
-        assertThat(pwm.getFrequency()).isEqualTo(1000);
+        assertThat(pwm.getFrequency()).isEqualTo(1000.0);
+    }
+
+    @Test
+    void exposesFractionalFrequencyFromPeriod() {
+        var config = PwmConfig.builder()
+                .period(3)
+                .build();
+
+        var pwm = new PwmBean(config);
+        assertThat(pwm.getFrequency()).isCloseTo(1_000_000_000.0 / 3.0, within(1.0e-9));
     }
 
     @Test

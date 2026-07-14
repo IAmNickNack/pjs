@@ -56,7 +56,7 @@ public class PwmExample implements Runnable {
         portsPwm.enablePin.high();
 
         frequencyRange.forEach(frequency -> {
-            portsPwm.frequencyPort.write(frequency);
+            portsPwm.frequencyPort.write((double) frequency);
             sleep(100);
         });
 
@@ -95,7 +95,7 @@ public class PwmExample implements Runnable {
      */
     record PortsPwm(
             Port<Double> dutyRatioPort,
-            Port<Integer> frequencyPort,
+            Port<Double> frequencyPort,
             Pin enablePin,
             Pin inversePolarityPin
     ) {

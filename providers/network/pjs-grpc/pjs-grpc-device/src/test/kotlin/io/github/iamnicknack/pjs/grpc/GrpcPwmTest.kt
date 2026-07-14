@@ -17,7 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 class GrpcPwmTest {
 
     private val config = PwmConfig.builder()
-        .frequency(220)
+        .frequency(220.0)
         .dutyCycle(25)
         .id("test")
         .build()
@@ -30,7 +30,7 @@ class GrpcPwmTest {
         val device = localRegistry.create(config)
         assertThat(device.config.id).isEqualTo(config.id)
         assertThat(device.dutyCycle).isEqualTo(config.dutyCycle)
-        assertThat(device.frequency).isEqualTo((1_000_000_000 / config.period).toInt())
+        assertThat(device.frequency).isEqualTo(1_000_000_000.0 / config.period)
 
         val remoteDevice = remoteRegistry.device<Pwm>(config.id) as? MockPwm ?: fail("cannot find device")
         assertThat(remoteDevice).isNotNull()
@@ -47,9 +47,9 @@ class GrpcPwmTest {
     @Test
     fun `can set frequency`(@PjsExtension.Local registry: DeviceRegistry) {
         val device = registry.create(config)
-        assertThat(device.frequency).isEqualTo(220)
-        device.frequency = 100
-        assertThat(device.frequency).isEqualTo(100)
+        assertThat(device.frequency).isEqualTo(220.0)
+        device.frequency = 100.0
+        assertThat(device.frequency).isEqualTo(100.0)
     }
 
     @Test
