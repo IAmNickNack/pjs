@@ -2,7 +2,7 @@ package io.github.iamnicknack.pjs.ffm.device;
 
 import io.github.iamnicknack.pjs.device.spi.Spi;
 import io.github.iamnicknack.pjs.device.spi.SpiConfig;
-import io.github.iamnicknack.pjs.device.spi.SpiProvider;
+import io.github.iamnicknack.pjs.device.spi.SpiFactory;
 import io.github.iamnicknack.pjs.device.spi.SpiTransfer;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapperImpl;
 import io.github.iamnicknack.pjs.ffm.device.context.AbstractIoctlOperations;
@@ -47,7 +47,7 @@ class NativeSpiTest {
     void canTransferMessage() {
         performTest(
                 builder -> builder.addHandler(SpiConstants.SPI_IOC_MESSAGE(1)),
-                (spi, provider) -> provider
+                (spi, factory) -> factory
                         .createTransfer(spi)
                         .transfer(SpiTransfer.Message.write(new byte[0], 0, 0))
         );
@@ -55,7 +55,7 @@ class NativeSpiTest {
 
     private void performTest(
             UnaryOperator<AbstractIoctlOperations.Builder> ioctlHandlers,
-            BiConsumer<Spi, SpiProvider> verifier
+            BiConsumer<Spi, SpiFactory> verifier
     ) {
         var fileOperations = new VirtualFileOperations();
         var ioctlOperations = AbstractIoctlOperations.builder()
@@ -66,9 +66,9 @@ class NativeSpiTest {
         var mapper = new MemorySegmentMapperImpl(segmentAllocator);
         var config = SpiConfig.builder().chipSelect(0).bus(0).build();
 
-        try (var provider = new NativeSpiProvider(fileOperations, ioctlOperations, mapper, segmentAllocator);
-             var spi = provider.create(config)) {
-            verifier.accept(spi, provider);
+        try (var factory = new NativeSpiFactory(fileOperations, ioctlOperations, mapper, segmentAllocator);
+             var spi = factory.create(config)) {
+            verifier.accept(spi, factory);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

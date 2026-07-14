@@ -239,7 +239,7 @@ class NativePortTest {
     ) {
         return new NativePort(
                 config,
-                new NativePortProvider.LineConfigTriple(
+                new NativePortFactory.LineConfigTriple(
                         new LineConfig(PinFlag.INPUT.value, new LineConfigAttribute[0]),
                         new LineConfig(PinFlag.INPUT.value, new LineConfigAttribute[0]),
                         new LineConfig(PinFlag.OUTPUT.value, new LineConfigAttribute[0])

@@ -1,5 +1,5 @@
 /**
- * PWM abstraction and provider.
+ * PWM abstraction and factory.
  */
 package io.github.iamnicknack.pjs.device.pwm;
 

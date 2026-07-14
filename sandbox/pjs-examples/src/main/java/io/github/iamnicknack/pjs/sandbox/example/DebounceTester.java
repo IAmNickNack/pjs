@@ -6,7 +6,7 @@ import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
 import io.github.iamnicknack.pjs.device.spi.SpiConfig;
 import io.github.iamnicknack.pjs.device.spi.SpiTransfer;
-import io.github.iamnicknack.pjs.device.spi.SpiTransferProvider;
+import io.github.iamnicknack.pjs.device.spi.SpiTransferFactory;
 import io.github.iamnicknack.pjs.model.WriteOperation;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
 import io.github.iamnicknack.pjs.model.event.GpioEventListener;
@@ -40,18 +40,18 @@ public class DebounceTester implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(DebounceTester.class);
     private final DeviceRegistry deviceRegistry;
-    private final SpiTransferProvider spiTransferProvider;
+    private final SpiTransferFactory spiTransferFactory;
 
     public DebounceTester(DeviceRegistry deviceRegistry) {
         this.deviceRegistry = deviceRegistry;
-        this.spiTransferProvider = (SpiTransferProvider)deviceRegistry.getProvider(SpiConfig.class);
+        this.spiTransferFactory = (SpiTransferFactory)deviceRegistry.getFactory(SpiConfig.class);
     }
 
     @Override
     public void run() {
         try (var executor = Executors.newSingleThreadExecutor()) {
             var spi = deviceRegistry.create(PICO_SPI_CONFIG);
-            var spiTransfer = spiTransferProvider.createTransfer(spi);
+            var spiTransfer = spiTransferFactory.createTransfer(spi);
 
             var debounceDurationRegister = new IntegerRegister(0x01, spiTransfer);
             var armRegister = new VoidRegister(0x02, spi);

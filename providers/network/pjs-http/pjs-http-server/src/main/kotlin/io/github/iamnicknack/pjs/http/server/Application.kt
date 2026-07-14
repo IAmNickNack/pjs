@@ -5,8 +5,8 @@ import io.github.iamnicknack.pjs.http.server.i2c.i2cRoutes
 import io.github.iamnicknack.pjs.http.server.pwm.pwmRoutes
 import io.github.iamnicknack.pjs.http.server.spi.spiRoutes
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
-import io.github.iamnicknack.pjs.server.ConfigurableDeviceRegistryProvider
-import io.github.iamnicknack.pjs.server.DeviceRegistryProvider
+import io.github.iamnicknack.pjs.server.ConfigurableDeviceRegistryFactory
+import io.github.iamnicknack.pjs.server.DeviceRegistryFactory
 import io.github.iamnicknack.pjs.server.ServerConfiguration
 import io.github.iamnicknack.pjs.util.LoggingUtils
 import io.github.iamnicknack.pjs.util.StartupUtils
@@ -62,8 +62,8 @@ fun Application.koinModule(config: ServerConfiguration) {
         modules(
             module {
                 single<DeviceRegistry>(createdAtStart = true) {
-                    val registryProvider: DeviceRegistryProvider = ConfigurableDeviceRegistryProvider(config)
-                    registryProvider.createDeviceRegistry()
+                    val registryFactory: DeviceRegistryFactory = ConfigurableDeviceRegistryFactory(config)
+                    registryFactory.createDeviceRegistry()
                 }
             },
             handlerModule

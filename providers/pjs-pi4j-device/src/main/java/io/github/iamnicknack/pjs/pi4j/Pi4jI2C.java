@@ -15,18 +15,18 @@ public class Pi4jI2C implements I2C {
     private final I2CConfig config;
 
     /**
-     * The PJs I2C provider owning and used by this device.
+     * The PJs I2C factory owning and used by this device.
      */
-    private final Pi4jI2CProvider provider;
+    private final Pi4JI2CFactory factory;
 
     /**
      * Constructor.
      * @param config the PJs configuration for this device.
-     * @param provider the PJs I2C provider owning and used by this device.
+     * @param factory the PJs I2C factory owning and used by this device.
      */
-    public Pi4jI2C(I2CConfig config, Pi4jI2CProvider provider) {
+    public Pi4jI2C(I2CConfig config, Pi4JI2CFactory factory) {
         this.config = config;
-        this.provider = provider;
+        this.factory = factory;
     }
 
     /**
@@ -60,7 +60,7 @@ public class Pi4jI2C implements I2C {
     }
 
     private void transferSingleMessage(Message message) {
-        var device = provider.deviceForAddress(message.address(), this.config);
+        var device = factory.deviceForAddress(message.address(), this.config);
         if (message.type() == Message.Type.READ) {
             device.read(message.data(), message.offset(), message.length());
         } else if (message.type() == Message.Type.WRITE) {
@@ -71,7 +71,7 @@ public class Pi4jI2C implements I2C {
     }
 
     private void transferRegisterMessage(Message opMessage, Message dataMessage) {
-        var device = provider.deviceForAddress(opMessage.address(), this.config);
+        var device = factory.deviceForAddress(opMessage.address(), this.config);
         if (opMessage.type() == Message.Type.READ) {
             device.readRegister(opMessage.data()[0], dataMessage.data(), dataMessage.offset(), dataMessage.length());
         } else if (opMessage.type() == Message.Type.WRITE) {

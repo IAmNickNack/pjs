@@ -16,7 +16,7 @@
   - `providers/network/pjs-grpc/pjs-grpc-device/src/main/java/module-info.java`
   - `providers/pjs-pi4j-device/src/main/java/module-info.java`
 - Some providers rely on service descriptors instead of `provides` clauses (example: `providers/pjs-mock-device/src/main/resources/META-INF/services/io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader`).
-- Network servers resolve registries from config and fall back to mock (`providers/network/pjs-network-common/src/main/kotlin/io/github/iamnicknack/pjs/server/ConfigurableDeviceRegistryProvider.kt`).
+- Network servers resolve registries from config and fall back to mock (`providers/network/pjs-network-common/src/main/kotlin/io/github/iamnicknack/pjs/server/ConfigurableDeviceRegistryFactory.kt`).
 
 ## Runtime configuration conventions
 - Provider selection is property-driven (`pjs.mode`): `mock`, `grpc`, `ffm`, `pi4j`.

@@ -11,16 +11,16 @@ import io.github.iamnicknack.pjs.device.spi.SpiConfig
 import io.github.iamnicknack.pjs.http.client.gpio.GpioPortClientHandler
 import io.github.iamnicknack.pjs.http.client.gpio.HttpGpioPort
 import io.github.iamnicknack.pjs.http.client.gpio.HttpGpioPortHandler
-import io.github.iamnicknack.pjs.http.client.gpio.HttpGpioPortProvider
+import io.github.iamnicknack.pjs.http.client.gpio.HttpGpioPortFactory
 import io.github.iamnicknack.pjs.http.client.i2c.HttpI2C
 import io.github.iamnicknack.pjs.http.client.i2c.HttpI2CHandler
-import io.github.iamnicknack.pjs.http.client.i2c.HttpI2CProvider
+import io.github.iamnicknack.pjs.http.client.i2c.HttpI2CFactory
 import io.github.iamnicknack.pjs.http.client.pwm.HttpPwm
 import io.github.iamnicknack.pjs.http.client.pwm.HttpPwmHandler
-import io.github.iamnicknack.pjs.http.client.pwm.HttpPwmProvider
+import io.github.iamnicknack.pjs.http.client.pwm.HttpPwmFactory
 import io.github.iamnicknack.pjs.http.client.spi.HttpSpi
 import io.github.iamnicknack.pjs.http.client.spi.HttpSpiHandler
-import io.github.iamnicknack.pjs.http.client.spi.HttpSpiProvider
+import io.github.iamnicknack.pjs.http.client.spi.HttpSpiFactory
 import io.github.iamnicknack.pjs.http.client.spi.HttpSpiTransferHandler
 import io.github.iamnicknack.pjs.http.i2c.I2CHandler
 import io.github.iamnicknack.pjs.http.pwm.PwmHandler
@@ -60,10 +60,10 @@ sealed class HttpDeviceRegistry(client: HttpClient) : DefaultDeviceRegistry() {
     constructor(host: String, port: Int) : this("http://$host:$port")
 
     init {
-        registerProvider(HttpGpioPortProvider(this.portHandler), GpioPortConfig::class.java)
-        registerProvider(HttpI2CProvider(i2cHandler), I2CConfig::class.java)
-        registerProvider(HttpSpiProvider(spiHandler, spiTransferHandler), SpiConfig::class.java)
-        registerProvider(HttpPwmProvider(pwmHandler), PwmConfig::class.java)
+        registerFactory(HttpGpioPortFactory(this.portHandler), GpioPortConfig::class.java)
+        registerFactory(HttpI2CFactory(i2cHandler), I2CConfig::class.java)
+        registerFactory(HttpSpiFactory(spiHandler, spiTransferHandler), SpiConfig::class.java)
+        registerFactory(HttpPwmFactory(pwmHandler), PwmConfig::class.java)
     }
 
     @Suppress("UNCHECKED_CAST")

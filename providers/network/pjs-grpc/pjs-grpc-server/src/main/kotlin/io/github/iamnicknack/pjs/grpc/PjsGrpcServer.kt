@@ -1,7 +1,7 @@
 package io.github.iamnicknack.pjs.grpc
 
 import io.github.iamnicknack.pjs.grpc.config.DefaultGrpcServer
-import io.github.iamnicknack.pjs.server.ConfigurableDeviceRegistryProvider
+import io.github.iamnicknack.pjs.server.ConfigurableDeviceRegistryFactory
 import io.github.iamnicknack.pjs.server.ServerConfiguration
 import io.github.iamnicknack.pjs.util.LoggingUtils
 import io.github.iamnicknack.pjs.util.StartupUtils
@@ -21,8 +21,8 @@ object PjsGrpcServer {
                 .also { it.printOptions(ServerConfiguration.options) }
         } else {
             val port = config.port ?: 9090
-            val serverProvider = DefaultGrpcServer.ServerBuilderProvider  { ServerBuilder.forPort(port) }
-            val registry = ConfigurableDeviceRegistryProvider(
+            val serverProvider = DefaultGrpcServer.ServerBuilderFactory  { ServerBuilder.forPort(port) }
+            val registry = ConfigurableDeviceRegistryFactory(
                  preferredMode = config.preferredMode ?: "native",
                  proxyHost = config.proxyHost,
                  proxyPort = config.proxyPort,

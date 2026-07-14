@@ -20,11 +20,11 @@ class NativePwmProviderTest {
     @Test
     void canCreatePwmDevice() {
         var fileOperations = new VirtualFileOperations();
-        SysfsOperationsFactory factory = devicePath -> new FakePwmSysfsOperations(fileOperations, devicePath);
+        SysfsOperationsFactory sysfsFactory = devicePath -> new FakePwmSysfsOperations(fileOperations, devicePath);
         createChipSysfsFilesystem(fileOperations, "/sys/class/pwm/pwmchip0", 1);
 
-        try (var provider = new NativePwmProvider(factory);
-             var device = provider.create(PwmConfig.builder().chip(0).channel(0).build())) {
+        try (var factory = new NativePwmFactory(sysfsFactory);
+             var device = factory.create(PwmConfig.builder().chip(0).channel(0).build())) {
             device.setFrequency(440);
             device.setDutyRatio(0.50);
             device.setPolarity(Pwm.Polarity.NORMAL);
@@ -66,13 +66,13 @@ class NativePwmProviderTest {
         @Override
         public void writeInt(String path, int value) {
             super.writeInt(path, value);
-            if (path.equals(NativePwmProvider.CHIP_EXPORT_PATH)) {
+            if (path.equals(NativePwmFactory.CHIP_EXPORT_PATH)) {
                 try {
                     createPwmSysfsFilesystem(
                             fileOperations,
                             fileOperations.root()
                                     .resolve(devicePath)
-                                    .resolve(NativePwmProvider.PWM_PATH + value)
+                                    .resolve(NativePwmFactory.PWM_PATH + value)
                                     .toString()
                     );
                 } catch (Exception e) {
@@ -91,11 +91,11 @@ class NativePwmProviderTest {
             try {
                 var root = fileOperations.root().resolve(devicePath);
                 Files.createDirectories(root);
-                for (var path : List.of(NativePwmProvider.CHIP_EXPORT_PATH, NativePwmProvider.CHIP_UNEXPORT_PATH, NativePwmProvider.CHIP_NPWM_PATH)) {
+                for (var path : List.of(NativePwmFactory.CHIP_EXPORT_PATH, NativePwmFactory.CHIP_UNEXPORT_PATH, NativePwmFactory.CHIP_NPWM_PATH)) {
                     Files.createFile(root.resolve(path));
                 }
 
-                try (var out = new PrintWriter(new OutputStreamWriter(Files.newOutputStream(root.resolve(NativePwmProvider.CHIP_NPWM_PATH))))) {
+                try (var out = new PrintWriter(new OutputStreamWriter(Files.newOutputStream(root.resolve(NativePwmFactory.CHIP_NPWM_PATH))))) {
                     out.println(numChannels);
                 }
             } catch (Exception e) {

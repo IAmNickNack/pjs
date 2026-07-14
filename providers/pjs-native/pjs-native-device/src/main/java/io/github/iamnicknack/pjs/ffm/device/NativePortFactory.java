@@ -1,0 +1,197 @@
+package io.github.iamnicknack.pjs.ffm.device;
+
+import io.github.iamnicknack.pjs.device.gpio.GpioEventMode;
+import io.github.iamnicknack.pjs.device.gpio.GpioPort;
+import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
+import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
+import io.github.iamnicknack.pjs.device.gpio.GpioPortFactory;
+import io.github.iamnicknack.pjs.ffm.device.context.FileDescriptor;
+import io.github.iamnicknack.pjs.ffm.device.context.FileOperations;
+import io.github.iamnicknack.pjs.ffm.device.context.FileOperationsImpl;
+import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperations;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.ChipInfo;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.GpioConstants;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineAttribute;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineConfig;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineConfigAttribute;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineInfo;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineRequest;
+import io.github.iamnicknack.pjs.ffm.device.context.gpio.PinFlag;
+import io.github.iamnicknack.pjs.ffm.event.DebounceStrategy;
+import io.github.iamnicknack.pjs.ffm.event.EventPoller;
+import io.github.iamnicknack.pjs.util.GpioPinMask;
+import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+
+/**
+ * @see <a href="https://docs.kernel.org/userspace-api/gpio/gpio-v2-get-line-ioctl.html">gpio-v2-get-line-ioctl</a>
+ * @see <a href="https://docs.kernel.org/userspace-api/gpio/gpio-v2-get-lineinfo-ioctl.html">gpio-v2-get-lineinfo-ioctl</a>
+ */
+public class NativePortFactory implements GpioPortFactory {
+
+    private final Logger logger = LoggerFactory.getLogger(NativePortFactory.class);
+
+    private final ChipInfo chipInfo;
+    private final FileOperations fileOperations;
+    private final IoctlOperations ioctlOperations;
+    private final EventPoller.Factory eventPollerFactory;
+
+    public NativePortFactory(
+            ChipInfo chipInfo,
+            FileOperations fileOperations,
+            IoctlOperations ioctlOperations,
+            EventPoller.Factory eventPollerFactory
+    ) {
+        this.chipInfo = chipInfo;
+        this.fileOperations = fileOperations;
+        this.ioctlOperations = ioctlOperations;
+        this.eventPollerFactory = eventPollerFactory;
+    }
+
+    @Override
+    public void close() {
+        eventPollerFactory.close();
+    }
+
+    @Override
+    public GpioPort create(GpioPortConfig config) {
+        try(var fileDescriptor = fileOperations.openFd(
+                chipInfo.getPath(),
+                FileOperationsImpl.Flags.O_RDWR | FileOperationsImpl.Flags.O_CLOEXEC)
+        ) {
+            checkLines(config, fileDescriptor);
+
+            var lineConfigs = createLineConfigPair(config);
+            var lineRequest = new LineRequest(
+                    config.pinNumber(),
+                    config.id(),
+                    (config.portMode().isSet(GpioPortMode.INPUT) ? lineConfigs.inputConfig() : lineConfigs.outputConfig()),
+                    0,
+                    0
+            );
+
+            var lineRequestResult = ioctlOperations.ioctl(
+                    fileDescriptor,
+                    GpioConstants.GPIO_V2_GET_LINE_IOCTL,
+                    lineRequest
+            );
+
+            logger.debug("Created port {} with result {}", config.id(), lineRequestResult);
+
+            var port = ((config.eventMode() != GpioEventMode.NONE) && (config.portMode().isSet(GpioPortMode.INPUT))
+                    ? new NativePort(
+                            config,
+                            lineConfigs,
+                            fileOperations.createFileDescriptor(lineRequestResult.fd()),
+                            ioctlOperations,
+                            eventPollerFactory
+                    )
+                    : new NativePort(
+                            config,
+                            lineConfigs,
+                            fileOperations.createFileDescriptor(lineRequestResult.fd()),
+                            ioctlOperations
+                    )
+            );
+
+            if (config.defaultValue() >= 0) {
+                port.write(config.defaultValue());
+            }
+
+            return port;
+        }
+    }
+
+    /**
+     * Check lines are available or not currently in use
+     * @param config the requested config
+     * @param fileDescriptor the file descriptor for the GPIO port
+     */
+    private void checkLines(GpioPortConfig config, FileDescriptor fileDescriptor) {
+        Arrays.stream(config.pinNumber()).forEach(pinNumber -> {
+            var lineInfoResult = ioctlOperations.ioctl(
+                    fileDescriptor,
+                    GpioConstants.GPIO_V2_GET_LINEINFO_IOCTL,
+                    LineInfo.ofOffset(pinNumber)
+            );
+            if (PinFlag.USED.isSet(lineInfoResult.flags())) {
+                throw new IllegalStateException("Pin " + lineInfoResult.offset() + " is already in use.");
+            }
+        });
+
+    }
+
+    /**
+     * Create a {@link LineConfigTriple} from the given {@link GpioPortConfig}. For the opposite port direction
+     * a basic {@link LineConfig} is returned.
+     * @param config the requested config
+     * @return the constructed {@link LineConfigTriple}
+     */
+    private @NonNull LineConfigTriple createLineConfigPair(GpioPortConfig config) {
+        var eventFlags = switch (config.eventMode()) {
+            case NONE -> 0;
+            case RISING -> PinFlag.EDGE_RISING.value;
+            case FALLING -> PinFlag.EDGE_FALLING.value;
+            case BOTH -> PinFlag.EDGE_RISING.value | PinFlag.EDGE_FALLING.value;
+        };
+
+        var modeFlags = switch (config.portMode()) {
+            case INPUT -> PinFlag.INPUT.value;
+            case INPUT_PULLDOWN -> PinFlag.BIAS_PULL_DOWN.value | PinFlag.INPUT.value;
+            case INPUT_PULLUP -> PinFlag.BIAS_PULL_UP.value | PinFlag.INPUT.value;
+            case OUTPUT -> PinFlag.OUTPUT.value;
+            case OUTPUT_OPENDRAIN -> PinFlag.OPEN_DRAIN.value | PinFlag.OUTPUT.value;
+            case OUTPUT_OPENSOURCE -> PinFlag.OPEN_SOURCE.value | PinFlag.OUTPUT.value;
+        };
+
+        logger.debug("Creating line request for port {} with mode {} ({}), event mode {} ({}), debounce delay {}",
+                config.id(),
+                config.portMode(),
+                Integer.toBinaryString(modeFlags),
+                config.eventMode(),
+                Integer.toBinaryString(eventFlags),
+                config.debounceDelay()
+        );
+
+        LineConfigAttribute[] attributes;
+        if (config.portMode().isSet(GpioPortMode.INPUT) && eventFlags != 0
+                && DebounceStrategy.fromProperty() == DebounceStrategy.HARDWARE) {
+            logger.debug("Enabling hardware debounce filter for port {}", config.id());
+            var debounceAttr = new LineAttribute(LineAttribute.Id.DEBOUNCE_PERIOD_US, config.debounceDelay());
+            var mask = GpioPinMask.packBits(config.pinNumber());
+            var debounceConfig = new LineConfigAttribute(debounceAttr, mask);
+            attributes = new LineConfigAttribute[] { debounceConfig };
+        } else {
+            attributes = new LineConfigAttribute[0];
+        }
+
+        var lineConfig = new LineConfig(modeFlags | eventFlags, attributes);
+
+        var inputConfig = (config.portMode().isSet(GpioPortMode.INPUT))
+                ? lineConfig
+                : new LineConfig(PinFlag.INPUT.value, new LineConfigAttribute[0]);
+
+        var inputConfigNoEvents = new LineConfig(modeFlags, new LineConfigAttribute[0]);
+
+        var outputConfig = (config.portMode().isSet(GpioPortMode.OUTPUT))
+                ? lineConfig
+                : new LineConfig(PinFlag.OUTPUT.value, new LineConfigAttribute[0]);
+
+        return new LineConfigTriple(inputConfig, inputConfigNoEvents, outputConfig);
+    }
+
+    /**
+     * Data container for a line config triple.
+     * @param inputConfig the user-provided input config (or default)
+     * @param inputConfigNoEvents the input config without event flags
+     * @param outputConfig the user-provided output config (or default)
+     */
+    record LineConfigTriple(
+            LineConfig inputConfig,
+            LineConfig inputConfigNoEvents,
+            LineConfig outputConfig
+    ) {}
+}
