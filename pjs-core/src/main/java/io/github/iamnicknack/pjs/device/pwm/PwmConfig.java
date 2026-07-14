@@ -19,8 +19,8 @@ public record PwmConfig(
         String getId
 ) implements DeviceConfig<Pwm> {
 
-    public int frequency() {
-        return (int) (1_000_000_000 / period);
+    public double frequency() {
+        return Pwm.frequencyFromPeriod(period);
     }
 
     public int dutyCyclePercent() {
@@ -35,7 +35,7 @@ public record PwmConfig(
         private int chip;
         private int channel;
         private long period = 0;
-        private int frequency = 440;
+        private double frequency = 440.0;
         private long dutyCycle = 0; // Default duty cycle nanos
         private double dutyRatio = 0.5;
 
@@ -71,7 +71,7 @@ public record PwmConfig(
             return this;
         }
 
-        public Builder frequency(int frequency) {
+        public Builder frequency(double frequency) {
             this.frequency = frequency;
             return this;
         }
@@ -90,7 +90,7 @@ public record PwmConfig(
             var id = (this.id != null) ? this.id : String.format("PWM-%d-%d", chip, channel);
 
             if (period == 0) {
-                period = (frequency > 0) ?  (1_000_000_000 / frequency) : 0;
+                period = (frequency > 0) ? Pwm.periodFromFrequency(frequency) : 0;
             }
 
             if (dutyCycle == 0) {

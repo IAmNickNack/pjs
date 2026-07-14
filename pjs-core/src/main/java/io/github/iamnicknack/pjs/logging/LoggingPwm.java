@@ -39,13 +39,13 @@ public class LoggingPwm implements Pwm, WithDelegateDevice<Pwm> {
     }
 
     @Override
-    public void setFrequency(int frequency) {
+    public void setFrequency(double frequency) {
         logger.debug("Setting frequency: {}", frequency);
         delegate.setFrequency(frequency);
     }
 
     @Override
-    public int getFrequency() {
+    public double getFrequency() {
         return delegate.getFrequency();
     }
 

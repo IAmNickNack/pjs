@@ -24,7 +24,7 @@ public class Pi4JPwmFactory implements PwmFactory {
         com.pi4j.io.pwm.PwmConfig pi4jPwmConfig = PwmConfigBuilder.newInstance(pi4jContext)
                 .chip(config.chip())
                 .channel(config.channel())
-                .frequency(config.frequency())
+                .frequency(Math.toIntExact(Math.round(config.frequency())))
                 .dutyCycle(config.dutyCyclePercent())
                 .pwmType(PwmType.HARDWARE)
                 .build();

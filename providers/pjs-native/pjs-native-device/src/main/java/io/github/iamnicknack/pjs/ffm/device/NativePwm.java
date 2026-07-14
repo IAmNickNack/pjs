@@ -45,13 +45,13 @@ class NativePwm extends PwmBean implements Pwm, AutoCloseable {
     }
 
     @Override
-    public synchronized void setFrequency(int frequency) {
+    public synchronized void setFrequency(double frequency) {
         super.setFrequency(frequency);
         applySettings(); // write through to sysfs immediately
     }
 
     @Override
-    public synchronized int getFrequency() {
+    public synchronized double getFrequency() {
         return super.getFrequency();
     }
 

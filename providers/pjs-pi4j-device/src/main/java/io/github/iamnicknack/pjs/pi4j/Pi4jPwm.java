@@ -32,12 +32,12 @@ public class Pi4jPwm implements Pwm {
     }
 
     @Override
-    public void setFrequency(int frequency) {
-        pwm.setFrequency(frequency);
+    public void setFrequency(double frequency) {
+        pwm.setFrequency(Math.toIntExact(Math.round(frequency)));
     }
 
     @Override
-    public int getFrequency() {
+    public double getFrequency() {
         return pwm.getFrequency();
     }
 

@@ -57,20 +57,22 @@ public interface Pwm extends Pin, Device<Pwm> {
 
     /**
      * Set the frequency of the PWM.
+     * <p>
+     * By default, this is a utility function which calculates the period from the frequency.
      * @param frequency The frequency in Hz.
      */
-    default void setFrequency(int frequency) {
-        if (frequency <= 0) {
-            throw new IllegalArgumentException("frequency must be > 0");
-        }
+    default void setFrequency(double frequency) {
         setPeriod(periodFromFrequency(frequency));
     }
 
     /**
      * Get the current frequency in Hz.
+     * <p>
+     * Frequency may be calculated from the period.
+     * The value returned may not equal a value set by {@link #setFrequency(double)} exactly .
      * @return The frequency in Hz.
      */
-    default int getFrequency() {
+    default double getFrequency() {
         return frequencyFromPeriod(getPeriod());
     }
 
@@ -135,14 +137,22 @@ public interface Pwm extends Pin, Device<Pwm> {
         }
     }
 
-    static long periodFromFrequency(int frequency) {
-        return 1_000_000_000 / frequency;
+    static long periodFromFrequency(double frequency) {
+        if (!Double.isFinite(frequency) || frequency <= 0.0) {
+            throw new IllegalArgumentException("frequency must be finite and > 0");
+        }
+
+        long period = Math.round(1_000_000_000d / frequency);
+        if (period <= 0) {
+            throw new IllegalArgumentException("frequency must map to a positive period: " + frequency);
+        }
+        return period;
     }
 
-    static int frequencyFromPeriod(long period) {
+    static double frequencyFromPeriod(long period) {
         return (period != 0)
-                ? (int) (1_000_000_000 / period)
-                : 0;
+                ? 1_000_000_000d / period
+                : 0.0;
     }
 
     static long dutyCycleFromRatio(double ratio, long period) {

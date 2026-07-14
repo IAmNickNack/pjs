@@ -25,7 +25,7 @@ class NativePwmProviderTest {
 
         try (var factory = new NativePwmFactory(sysfsFactory);
              var device = factory.create(PwmConfig.builder().chip(0).channel(0).build())) {
-            device.setFrequency(440);
+            device.setFrequency(440.0);
             device.setDutyRatio(0.50);
             device.setPolarity(Pwm.Polarity.NORMAL);
             device.on();
