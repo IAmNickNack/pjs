@@ -1,6 +1,7 @@
 package io.github.iamnicknack.pjs.grpc
 
 import assertk.assertThat
+import assertk.assertions.isCloseTo
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
@@ -47,7 +48,7 @@ class GrpcPwmTest {
     @Test
     fun `can set frequency`(@PjsExtension.Local registry: DeviceRegistry) {
         val device = registry.create(config)
-        assertThat(device.frequency).isEqualTo(220.0)
+        assertThat(device.frequency).isCloseTo(220.0, 0.0001)
         device.frequency = 100.0
         assertThat(device.frequency).isEqualTo(100.0)
     }

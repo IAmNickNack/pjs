@@ -57,6 +57,8 @@ public interface Pwm extends Pin, Device<Pwm> {
 
     /**
      * Set the frequency of the PWM.
+     * <p>
+     * By default, this is a utility function which calculates the period from the frequency.
      * @param frequency The frequency in Hz.
      */
     default void setFrequency(double frequency) {
@@ -65,6 +67,9 @@ public interface Pwm extends Pin, Device<Pwm> {
 
     /**
      * Get the current frequency in Hz.
+     * <p>
+     * Frequency may be calculated from the period.
+     * The value returned may not equal a value set by {@link #setFrequency(double)} exactly .
      * @return The frequency in Hz.
      */
     default double getFrequency() {
