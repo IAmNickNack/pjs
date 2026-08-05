@@ -18,7 +18,7 @@ class HardwareAllocationIndexImplTest {
     fun showAllLines() {
         val index = HardwareAllocationIndexImpl.fromPinctrlOutput(readPinctrlOutput())
         for (line in index) {
-            println("${line.lineType}: ${line.name}: ${line.allocation.offsets}")
+            println(line)
         }
     }
 

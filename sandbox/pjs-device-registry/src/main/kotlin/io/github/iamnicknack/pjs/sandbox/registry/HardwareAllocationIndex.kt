@@ -62,11 +62,16 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
 
     /**
      * Represents a line allocation in the hardware allocation index.
+     * @param lineType the IO type of line
+     * @param name the name of the line
+     * @param allocation the hardware allocation of the line
+     * @param bus the device bus number the line is connected to
      */
     data class Line(
         val lineType: LineType,
         val name: String,
-        val allocation: HardwareAllocation
+        val allocation: HardwareAllocation,
+        val bus: Int? = null,
     )
 
     /**

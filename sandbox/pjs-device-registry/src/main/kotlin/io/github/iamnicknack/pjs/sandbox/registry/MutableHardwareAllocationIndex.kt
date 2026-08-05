@@ -1,7 +1,7 @@
 package io.github.iamnicknack.pjs.sandbox.registry
 
 class MutableHardwareAllocationIndex<T>(
-    private val keyFunction: (HardwareAllocationIndex.Line) -> T
+    private val keySelector: (HardwareAllocationIndex.Line) -> T
 ) : HardwareAllocationIndex, KeyedHardwareAllocationIndex<T> {
 
     private var hardwareAllocation: HardwareAllocation = HardwareAllocation.EMPTY
@@ -10,7 +10,7 @@ class MutableHardwareAllocationIndex<T>(
 
     fun add(line: HardwareAllocationIndex.Line): MutableHardwareAllocationIndex<T> {
 
-        val key = keyFunction(line)
+        val key = keySelector(line)
         val current = indexByKey[key] ?: Node.EMPTY
 
         (current.allocation and line.allocation).takeIf { it != HardwareAllocation.EMPTY }
@@ -39,7 +39,16 @@ class MutableHardwareAllocationIndex<T>(
         .toSet()
 
     override fun indexForType(lineType: HardwareAllocationIndex.LineType): HardwareAllocationIndex {
-        TODO("Not yet implemented")
+        return HardwareAllocationIndexImpl(findAllByType(lineType))
+    }
+
+    fun <T> indexForType(
+        lineType: HardwareAllocationIndex.LineType,
+        keySelector: (HardwareAllocationIndex.Line) -> T
+    ): KeyedHardwareAllocationIndex<T> {
+        return MutableHardwareAllocationIndex(keySelector).apply {
+            this.findAllByType(lineType).forEach { add(it) }
+        }
     }
 
     override fun iterator(): Iterator<HardwareAllocationIndex.Line> = indexByKey.values.flatMap { it.lines }.iterator()

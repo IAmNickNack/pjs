@@ -27,7 +27,8 @@ class PinctrlParser {
                 HardwareAllocationIndex.Line(
                     lineType = key.lineType,
                     name = key.name,
-                    allocation = HardwareAllocation(offsets.toList().sorted())
+                    allocation = HardwareAllocation(offsets.toList().sorted()),
+                    bus = key.bus
                 )
             }
     }
@@ -53,19 +54,19 @@ class PinctrlParser {
         }
 
         spiPattern.find(normalized)?.groupValues?.get(1)?.let {
-            return LineKey(LineType.SPI, "SPI$it")
+            return LineKey(LineType.SPI, "SPI$it", it.toIntOrNull())
         }
         pwmPattern.find(normalized)?.groupValues?.get(1)?.let {
-            return LineKey(LineType.PWM, "PWM$it")
+            return LineKey(LineType.PWM, "PWM$it", it.toIntOrNull())
         }
         i2cSdaSclPattern.find(normalized)?.groupValues?.get(1)?.let {
-            return LineKey(LineType.I2C, "I2C$it")
+            return LineKey(LineType.I2C, "I2C$it", it.toIntOrNull())
         }
         i2cBscPattern.find(normalized)?.groupValues?.get(1)?.let {
-            return LineKey(LineType.I2C, "I2C$it")
+            return LineKey(LineType.I2C, "I2C$it", it.toIntOrNull())
         }
         uartPattern.find(normalized)?.groupValues?.get(1)?.let {
-            return LineKey(LineType.UART, "UART$it")
+            return LineKey(LineType.UART, "UART$it", it.toIntOrNull())
         }
 
         return null
@@ -73,7 +74,8 @@ class PinctrlParser {
 
     private data class LineKey(
         val lineType: LineType,
-        val name: String
+        val name: String,
+        val bus: Int? = null
     )
 
     companion object {
