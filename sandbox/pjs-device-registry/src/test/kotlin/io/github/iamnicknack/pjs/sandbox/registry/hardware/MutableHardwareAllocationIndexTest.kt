@@ -1,6 +1,6 @@
-package io.github.iamnicknack.pjs.sandbox.registry
+package io.github.iamnicknack.pjs.sandbox.registry.hardware
 
-import io.github.iamnicknack.pjs.sandbox.registry.HardwareAllocationIndex.Line
+import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.Line
 import org.junit.jupiter.api.Test
 
 class MutableHardwareAllocationIndexTest {

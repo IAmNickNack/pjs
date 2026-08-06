@@ -1,5 +1,10 @@
-package io.github.iamnicknack.pjs.sandbox.registry
+package io.github.iamnicknack.pjs.sandbox.registry.hardware
 
+/**
+ * Represents a hardware allocation of pin offsets and bitmasks.
+ * @param offsets the offsets / pins
+ * @param mask the bitmask of offsets
+ */
 data class HardwareAllocation(
     val offsets: List<Int>,
     val mask: Long = offsets.fold(0L) { acc, offset -> acc or (1L shl offset) }
@@ -23,6 +28,14 @@ data class HardwareAllocation(
      * Check if this [HardwareAllocation] intersects with another allocation.
      */
     infix fun intersects(other: HardwareAllocation): Boolean = (this.mask and other.mask) != 0L
+
+    override fun equals(other: Any?): Boolean {
+        return this.mask == (other as? HardwareAllocation)?.mask
+    }
+
+    override fun hashCode(): Int {
+        return mask.hashCode()
+    }
 
     companion object {
         @JvmStatic

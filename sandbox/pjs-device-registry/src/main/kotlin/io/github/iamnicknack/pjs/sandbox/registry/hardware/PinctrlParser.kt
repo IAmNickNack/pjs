@@ -1,6 +1,5 @@
-package io.github.iamnicknack.pjs.sandbox.registry
+package io.github.iamnicknack.pjs.sandbox.registry.hardware
 
-import io.github.iamnicknack.pjs.sandbox.registry.HardwareAllocationIndex.LineType
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.Reader
@@ -42,38 +41,38 @@ class PinctrlParser {
 
         val currentValue = match.groupValues[2]
         val token = match.groupValues[3]
-        val lineKey = classifyLineKey(offset = offset, token = token, currentValue = currentValue) ?: return null
+        val lineKey = classifyLineKey(token = token, currentValue = currentValue) ?: return null
         return offset to lineKey
     }
 
-    private fun classifyLineKey(offset: Int, token: String, currentValue: String): LineKey? {
+    private fun classifyLineKey(token: String, currentValue: String): LineKey? {
         val normalized = token.uppercase()
 
         if (normalized == "INPUT" || normalized == "OUTPUT" || normalized == "NONE") {
-            return if (currentValue == "--") LineKey(LineType.GPIO, "GPIO$offset") else null
+            return if (currentValue == "--") LineKey(HardwareAllocationIndex.LineType.GPIO, "GPIO") else null
         }
 
         spiPattern.find(normalized)?.groupValues?.get(1)?.let {
-            return LineKey(LineType.SPI, "SPI$it", it.toIntOrNull())
+            return LineKey(HardwareAllocationIndex.LineType.SPI, "SPI$it", it.toIntOrNull())
         }
         pwmPattern.find(normalized)?.groupValues?.get(1)?.let {
-            return LineKey(LineType.PWM, "PWM$it", it.toIntOrNull())
+            return LineKey(HardwareAllocationIndex.LineType.PWM, "PWM$it", it.toIntOrNull())
         }
         i2cSdaSclPattern.find(normalized)?.groupValues?.get(1)?.let {
-            return LineKey(LineType.I2C, "I2C$it", it.toIntOrNull())
+            return LineKey(HardwareAllocationIndex.LineType.I2C, "I2C$it", it.toIntOrNull())
         }
         i2cBscPattern.find(normalized)?.groupValues?.get(1)?.let {
-            return LineKey(LineType.I2C, "I2C$it", it.toIntOrNull())
+            return LineKey(HardwareAllocationIndex.LineType.I2C, "I2C$it", it.toIntOrNull())
         }
         uartPattern.find(normalized)?.groupValues?.get(1)?.let {
-            return LineKey(LineType.UART, "UART$it", it.toIntOrNull())
+            return LineKey(HardwareAllocationIndex.LineType.UART, "UART$it", it.toIntOrNull())
         }
 
         return null
     }
 
     private data class LineKey(
-        val lineType: LineType,
+        val lineType: HardwareAllocationIndex.LineType,
         val name: String,
         val bus: Int? = null
     )

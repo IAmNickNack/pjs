@@ -1,13 +1,22 @@
-package io.github.iamnicknack.pjs.sandbox.registry
+package io.github.iamnicknack.pjs.sandbox.registry.hardware
 
 class MutableHardwareAllocationIndex<T>(
     private val keySelector: (HardwareAllocationIndex.Line) -> T
 ) : HardwareAllocationIndex, KeyedHardwareAllocationIndex<T> {
 
+    /**
+     * [HardwareAllocation] indicating current allocation of all device types
+     */
     private var hardwareAllocation: HardwareAllocation = HardwareAllocation.EMPTY
 
+    /**
+     * The index of allocations keyed by the result of [keySelector]
+     */
     private val indexByKey: MutableMap<T, Node> = mutableMapOf()
 
+    /**
+     * Adds a new line to the index
+     */
     fun add(line: HardwareAllocationIndex.Line): MutableHardwareAllocationIndex<T> {
 
         val key = keySelector(line)
@@ -39,16 +48,7 @@ class MutableHardwareAllocationIndex<T>(
         .toSet()
 
     override fun indexForType(lineType: HardwareAllocationIndex.LineType): HardwareAllocationIndex {
-        return HardwareAllocationIndexImpl(findAllByType(lineType))
-    }
-
-    fun <T> indexForType(
-        lineType: HardwareAllocationIndex.LineType,
-        keySelector: (HardwareAllocationIndex.Line) -> T
-    ): KeyedHardwareAllocationIndex<T> {
-        return MutableHardwareAllocationIndex(keySelector).apply {
-            this.findAllByType(lineType).forEach { add(it) }
-        }
+        return BasicHardwareAllocationIndex(findAllByType(lineType))
     }
 
     override fun iterator(): Iterator<HardwareAllocationIndex.Line> = indexByKey.values.flatMap { it.lines }.iterator()
@@ -60,6 +60,17 @@ class MutableHardwareAllocationIndex<T>(
         companion object {
             @JvmStatic
             val EMPTY = Node(HardwareAllocation.EMPTY, emptySet())
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        fun byLineType(vararg lines: HardwareAllocationIndex.Line): MutableHardwareAllocationIndex<HardwareAllocationIndex.LineType> {
+            return MutableHardwareAllocationIndex {
+                it.lineType
+            }.apply {
+                lines.forEach { add(it) }
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-package io.github.iamnicknack.pjs.sandbox.registry
+package io.github.iamnicknack.pjs.sandbox.registry.hardware
 
 interface KeyedHardwareAllocationIndex<KEY> : HardwareAllocationIndex {
 

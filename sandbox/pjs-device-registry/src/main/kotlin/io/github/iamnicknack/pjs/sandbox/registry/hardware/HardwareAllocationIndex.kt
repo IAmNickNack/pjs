@@ -1,4 +1,4 @@
-package io.github.iamnicknack.pjs.sandbox.registry
+package io.github.iamnicknack.pjs.sandbox.registry.hardware
 
 interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
 
@@ -31,11 +31,18 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
     fun containsPin(pin: Int): Boolean = findByPin(pin) != null
 
     /**
+     * Fetch the line allocation which can satisfy the specified mask
+     * @param mask the mask to match
+     * @return the line allocation for a given mask
+     */
+    fun findByMask(mask: Long): Line? = this.firstOrNull { it.allocation.mask and mask == mask }
+
+    /**
      * Fetch all line allocations with a mask that intersects with the specified mask
      * @param mask the mask to match
      * @return all line allocations with a mask that intersects with the specified mask
      */
-    fun findAllByMask(mask: Long): Set<Line> = this
+    fun findAllIntersectingByMask(mask: Long): Set<Line> = this
         .filter { it.allocation.mask and mask != 0L }
         .toSet()
 
@@ -59,6 +66,16 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
      * @return true if the index contains a line allocation of the specified type, false otherwise
      */
     fun containsType(lineType: LineType): Boolean = findAllByType(lineType).isNotEmpty()
+
+    /**
+     * Calculate the remainder of [allocation] after negating all valid allocations in the index
+     * @param allocation the allocation to check
+     * @return the remainder of [allocation] representing pins not available in this index
+     */
+    fun remainder(allocation: HardwareAllocation): HardwareAllocation = this
+        .fold(allocation.mask) { acc, m -> acc and m.allocation.mask.inv() }
+        .let { HardwareAllocation.fromMask(it) }
+
 
     /**
      * Represents a line allocation in the hardware allocation index.
