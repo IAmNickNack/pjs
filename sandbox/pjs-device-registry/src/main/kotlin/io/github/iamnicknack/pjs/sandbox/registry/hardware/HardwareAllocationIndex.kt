@@ -31,20 +31,29 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
     fun containsPin(pin: Int): Boolean = findByPin(pin) != null
 
     /**
-     * Fetch the line allocation which can satisfy the specified mask
-     * @param mask the mask to match
-     * @return the line allocation for a given mask
+     * Fetch the line allocation which can satisfy the specified allocation
+     * @param allocation the allocation to match
+     * @return the line allocation for a given allocation
      */
-    fun findByMask(mask: Long): Line? = this.firstOrNull { it.allocation.mask and mask == mask }
+    fun findByAllocation(allocation: HardwareAllocation): Line? = this
+        .firstOrNull { it.allocation.mask and allocation.mask == allocation.mask }
 
     /**
-     * Fetch all line allocations with a mask that intersects with the specified mask
-     * @param mask the mask to match
-     * @return all line allocations with a mask that intersects with the specified mask
+     * Fetch all line allocations which interset the specified allocation
+     * @param allocation the allocation to match
+     * @return all line allocations which intersect with the specified allocation
      */
-    fun findAllIntersectingByMask(mask: Long): Set<Line> = this
-        .filter { it.allocation.mask and mask != 0L }
+    fun findAllIntersectingByAllocation(allocation: HardwareAllocation): Set<Line> = this
+        .filter { it.allocation.intersects(allocation) }
         .toSet()
+
+    /**
+     * Fetch the line allocation which can satisfy the specified offsets
+     * @param offsets the offsets to match
+     * @return the line allocation for given offsets
+     */
+    fun findByOffsets(vararg offsets: Int): Line? = this
+        .findByAllocation(HardwareAllocation.fromOffsets(*offsets))
 
     /**
      * Fetch all line allocations of the specified type
@@ -61,20 +70,12 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
     fun indexForType(lineType: LineType): HardwareAllocationIndex
 
     /**
-     * Check if the index contains a line allocation of the specified type
-     * @param lineType the type of line to check for
-     * @return true if the index contains a line allocation of the specified type, false otherwise
-     */
-    fun containsType(lineType: LineType): Boolean = findAllByType(lineType).isNotEmpty()
-
-    /**
      * Calculate the remainder of [allocation] after negating all valid allocations in the index
      * @param allocation the allocation to check
      * @return the remainder of [allocation] representing pins not available in this index
      */
     fun remainder(allocation: HardwareAllocation): HardwareAllocation = this
-        .fold(allocation.mask) { acc, m -> acc and m.allocation.mask.inv() }
-        .let { HardwareAllocation.fromMask(it) }
+        .fold(HardwareAllocation.fromMask(allocation.mask)) { acc, m -> acc not m.allocation }
 
 
     /**
@@ -100,5 +101,31 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
         PWM,
         I2C,
         UART
+    }
+
+    /**
+     * Mutable hardware allocation which allows for adding and removing line allocations at runtime
+     */
+    interface Mutable : HardwareAllocationIndex {
+        /**
+         * Add a line allocation to the index
+         * @param line the line to add
+         * @return the updated mutable hardware allocation index
+         */
+        fun add(line: Line): Mutable
+        /**
+         * Remove a line allocation from the index
+         * @param line the line to remove
+         * @return the updated mutable hardware allocation index
+         */
+        fun remove(line: Line): Mutable
+    }
+
+    /**
+     * Hardware allocation index which allows for retrieving line allocations a specific key type
+     * @param K the key type
+     */
+    interface Keyed<K> : HardwareAllocationIndex {
+        operator fun get(key: K): Set<Line>
     }
 }

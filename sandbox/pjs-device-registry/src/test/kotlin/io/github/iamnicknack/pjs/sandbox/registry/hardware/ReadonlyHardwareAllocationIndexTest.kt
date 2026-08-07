@@ -1,60 +1,39 @@
 package io.github.iamnicknack.pjs.sandbox.registry.hardware
 
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.LineType
-import java.io.ByteArrayInputStream
-import java.io.IOException
-import java.io.StringReader
-import java.nio.charset.StandardCharsets
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class BasicHardwareAllocationIndexTest {
+class ReadonlyHardwareAllocationIndexTest {
+
+    private val lineSupplier = LineSupplier.fromPinctrlResource("/pinctrl-output.txt")
 
     @Test
     fun showAllLines() {
-        val index = BasicHardwareAllocationIndex.fromPinctrlOutput(readPinctrlOutput())
+        val index = lineSupplier.lines()
         for (line in index) {
             println(line)
         }
     }
 
     @Test
-    fun parsesPinctrlOutputIntoExpectedGroupedLines() {
-        val index = BasicHardwareAllocationIndex.fromPinctrlOutput(readPinctrlOutput())
-
-        assertExpectedLines(index)
-    }
-
-    @Test
     fun pinctrlParserParsesFromReader() {
-        val lines = PinctrlParser().parse(StringReader(readPinctrlOutput()))
-        val index = BasicHardwareAllocationIndex(lines)
-
-        assertExpectedLines(index)
-    }
-
-    @Test
-    fun pinctrlParserParsesFromInputStream() {
-        val input = ByteArrayInputStream(readPinctrlOutput().toByteArray(StandardCharsets.UTF_8))
-        val lines = PinctrlParser().parse(input)
-        val index = BasicHardwareAllocationIndex(lines)
-
+        val index = ReadonlyHardwareAllocationIndex(lineSupplier.lines())
         assertExpectedLines(index)
     }
 
     @Test
     fun excludesOffsetsAbove63() {
-        val index = BasicHardwareAllocationIndex.fromPinctrlOutput(readPinctrlOutput())
-
+        val index = ReadonlyHardwareAllocationIndex(lineSupplier.lines())
         assertTrue(index.flatMap { it.allocation.offsets }.all { it in 0..63 })
     }
 
     @Test
     fun gpioOnlyIncludesEntriesWithDashedCurrentValue() {
-        val index = BasicHardwareAllocationIndex.fromPinctrlOutput(readPinctrlOutput())
+        val index = ReadonlyHardwareAllocationIndex(lineSupplier.lines())
         val gpio = assertNotNull(index.findByName("GPIO"))
         assertFalse(gpio.allocation.offsets.contains(7))
         assertFalse(gpio.allocation.offsets.contains(8))
@@ -66,7 +45,7 @@ class BasicHardwareAllocationIndexTest {
         assertFalse(gpio.allocation.offsets.contains(35))
     }
 
-    private fun assertExpectedLines(index: BasicHardwareAllocationIndex) {
+    private fun assertExpectedLines(index: ReadonlyHardwareAllocationIndex) {
         val expectedGpios =
             listOf(2, 3, 4, 5, 6, 12, 13, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 30, 31, 50, 51, 52)
 
@@ -98,12 +77,5 @@ class BasicHardwareAllocationIndexTest {
         assertEquals(listOf(45), pwm1.allocation.offsets)
         assertEquals(listOf(14, 15), i2c3.allocation.offsets)
         assertEquals(listOf(0, 1), uart1.allocation.offsets)
-    }
-
-    private fun readPinctrlOutput(): String {
-        val input = javaClass.getResourceAsStream("/pinctrl-output.txt")
-            ?: throw IOException("Missing test resource pinctrl-output.txt")
-
-        return input.use { String(it.readAllBytes(), StandardCharsets.UTF_8) }
     }
 }

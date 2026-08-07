@@ -6,10 +6,10 @@ import java.io.Reader
 import java.nio.charset.StandardCharsets
 
 class PinctrlParser {
-    fun parse(inputStream: InputStream): Set<HardwareAllocationIndex.Line> =
-        inputStream.bufferedReader(StandardCharsets.UTF_8).use { parse(it) }
+    fun readLines(inputStream: InputStream): Set<HardwareAllocationIndex.Line> =
+        inputStream.bufferedReader(StandardCharsets.UTF_8).use { readLines(it) }
 
-    fun parse(reader: Reader): Set<HardwareAllocationIndex.Line> {
+    fun readLines(reader: Reader): Set<HardwareAllocationIndex.Line> {
         val allocations = mutableMapOf<LineKey, MutableSet<Int>>()
         val bufferedReader = reader as? BufferedReader ?: reader.buffered()
 

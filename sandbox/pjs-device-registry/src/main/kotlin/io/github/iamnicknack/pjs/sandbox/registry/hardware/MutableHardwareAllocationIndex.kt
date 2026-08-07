@@ -1,8 +1,11 @@
 package io.github.iamnicknack.pjs.sandbox.registry.hardware
 
-class MutableHardwareAllocationIndex<T>(
-    private val keySelector: (HardwareAllocationIndex.Line) -> T
-) : HardwareAllocationIndex, KeyedHardwareAllocationIndex<T> {
+/**
+ * Mutable implementation of [HardwareAllocationIndex] which allows lines to be added at runtime
+ */
+class MutableHardwareAllocationIndex<K>(
+    private val keySelector: (HardwareAllocationIndex.Line) -> K
+) : HardwareAllocationIndex.Mutable, HardwareAllocationIndex.Keyed<K> {
 
     /**
      * [HardwareAllocation] indicating current allocation of all device types
@@ -12,13 +15,13 @@ class MutableHardwareAllocationIndex<T>(
     /**
      * The index of allocations keyed by the result of [keySelector]
      */
-    private val indexByKey: MutableMap<T, Node> = mutableMapOf()
+    private val indexByKey: MutableMap<K, Node> = mutableMapOf()
 
     /**
      * Adds a new line to the index
+     * @param line the line to add
      */
-    fun add(line: HardwareAllocationIndex.Line): MutableHardwareAllocationIndex<T> {
-
+    override fun add(line: HardwareAllocationIndex.Line): MutableHardwareAllocationIndex<K> {
         val key = keySelector(line)
         val current = indexByKey[key] ?: Node.EMPTY
 
@@ -31,7 +34,25 @@ class MutableHardwareAllocationIndex<T>(
         return this
     }
 
-    override operator fun get(key: T): Set<HardwareAllocationIndex.Line> = indexByKey[key]?.lines ?: emptySet()
+    /**
+     * Remove a line from the index
+     * @param line the line to remove
+     */
+    override fun remove(line: HardwareAllocationIndex.Line): MutableHardwareAllocationIndex<K> {
+        val key = keySelector(line)
+        val current = indexByKey[key] ?: Node.EMPTY
+
+        if (!current.lines.contains(line)) {
+            return this
+        }
+
+        hardwareAllocation = hardwareAllocation not line.allocation
+        indexByKey[key] = Node(current.allocation not line.allocation, current.lines - line)
+
+        return this
+    }
+
+    override operator fun get(key: K): Set<HardwareAllocationIndex.Line> = indexByKey[key]?.lines ?: emptySet()
 
     override fun findByName(name: String): HardwareAllocationIndex.Line? = indexByKey.values
         .flatMap { it.lines }
@@ -48,7 +69,7 @@ class MutableHardwareAllocationIndex<T>(
         .toSet()
 
     override fun indexForType(lineType: HardwareAllocationIndex.LineType): HardwareAllocationIndex {
-        return BasicHardwareAllocationIndex(findAllByType(lineType))
+        return ReadonlyHardwareAllocationIndex(findAllByType(lineType))
     }
 
     override fun iterator(): Iterator<HardwareAllocationIndex.Line> = indexByKey.values.flatMap { it.lines }.iterator()

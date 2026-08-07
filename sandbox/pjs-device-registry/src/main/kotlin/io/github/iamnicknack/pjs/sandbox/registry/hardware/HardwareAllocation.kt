@@ -20,14 +20,21 @@ data class HardwareAllocation(
     infix fun or(other: HardwareAllocation): HardwareAllocation = fromMask(this.mask or other.mask)
 
     /**
-     * Check if this [HardwareAllocation] contains a given pin.
+     * Create a new [HardwareAllocation] from the difference of this and another allocation.
+     *
+     * Removes the pins from this allocation that are also in the other allocation.
      */
-    fun contains(pin: Int): Boolean = mask and (1L shl pin) != 0L
+    infix fun not(other: HardwareAllocation): HardwareAllocation = fromMask(this.mask and other.mask.inv())
 
     /**
      * Check if this [HardwareAllocation] intersects with another allocation.
      */
     infix fun intersects(other: HardwareAllocation): Boolean = (this.mask and other.mask) != 0L
+
+    /**
+     * Check if this [HardwareAllocation] contains a given pin.
+     */
+    fun contains(pin: Int): Boolean = mask and (1L shl pin) != 0L
 
     override fun equals(other: Any?): Boolean {
         return this.mask == (other as? HardwareAllocation)?.mask
@@ -60,8 +67,8 @@ data class HardwareAllocation(
          * @param mask the bitmask of offsets
          */
         @JvmStatic
-        fun fromMask(mask: Long): HardwareAllocation {
-            val offsets = (0..63)
+        fun fromMask(mask: Long, numBits: Int = 64): HardwareAllocation {
+            val offsets = (0 until numBits)
                 .mapNotNull { if (mask and (1L shl it) != 0L) it else null }
 
             return HardwareAllocation(offsets, mask)

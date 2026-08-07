@@ -3,7 +3,10 @@ package io.github.iamnicknack.pjs.sandbox.registry
 import assertk.assertThat
 import assertk.assertions.containsExactly
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
+import assertk.assertions.isNull
+import assertk.assertions.isTrue
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
 import io.github.iamnicknack.pjs.device.i2c.I2CConfig
 import io.github.iamnicknack.pjs.device.pwm.PwmConfig
@@ -35,6 +38,44 @@ class HardwareAllocationDeviceRegistryTest {
 
         val device = registry.create(config)
         assertThat(device).isNotNull()
+    }
+
+    @Test
+    fun `can remove gpio`() {
+        val availableHardware = MutableHardwareAllocationIndex.byLineType(
+            Line(LineType.GPIO, "available-gpio", HardwareAllocation.fromOffsets(2, 3, 4, 5))
+        )
+
+        val usedHardware = MutableHardwareAllocationIndex.byLineType()
+
+        val registry = HardwareAllocationDeviceRegistry(MockDeviceRegistry(), availableHardware, usedHardware)
+        val config1 = GpioPortConfig.builder()
+            .id("test-gpio")
+            .pin(2, 4)
+            .build()
+
+        val config2 = GpioPortConfig.builder()
+            .id("other-gpio")
+            .pin(3, 5)
+            .build()
+
+        registry.create(config2)
+        assertThat(usedHardware.containsName(config2.id())).isTrue()
+        assertThat(usedHardware.findByOffsets(*config2.pinNumber)).isNotNull()
+
+        val device = registry.create(config1)
+        assertThat(device).isNotNull()
+        assertThat(usedHardware.containsName(config1.id())).isTrue()
+
+        registry.remove(device)
+        assertThat(registry.contains(device.config.id)).isFalse()
+        assertThat(usedHardware.containsName(config1.id())).isFalse()
+        assertThat(usedHardware.findByOffsets(*config1.pinNumber)).isNull()
+        assertThat(usedHardware.findByOffsets(*config2.pinNumber)).isNotNull()
+
+        val recreatedDevice = registry.create(config1)
+        assertThat(recreatedDevice).isNotNull()
+        assertThat(usedHardware.containsName(config1.id())).isTrue()
     }
 
     @Test

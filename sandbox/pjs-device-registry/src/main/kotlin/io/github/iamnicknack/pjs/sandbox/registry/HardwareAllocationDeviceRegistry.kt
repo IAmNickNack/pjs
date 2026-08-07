@@ -7,13 +7,10 @@ import io.github.iamnicknack.pjs.device.spi.SpiConfig
 import io.github.iamnicknack.pjs.model.device.Device
 import io.github.iamnicknack.pjs.model.device.DeviceConfig
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
-import io.github.iamnicknack.pjs.sandbox.registry.hardware.BasicHardwareAllocationIndex
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocation
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.LineType
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.MutableHardwareAllocationIndex
-import java.io.IOException
-import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.function.Consumer
 
@@ -21,18 +18,20 @@ import java.util.function.Consumer
  * A [DeviceRegistry] able to validate device configurations based on hardware availability.
  * @param delegate The delegate [DeviceRegistry] to use for device configuration creation.
  * @param availableHardware The [HardwareAllocationIndex] representing the available hardware.
+ * @param usedHardware The index representing the hardware which has been allocated to devices in this registry.
  */
 class HardwareAllocationDeviceRegistry(
     private val delegate: DeviceRegistry,
-    private val availableHardware: HardwareAllocationIndex = BasicHardwareAllocationIndex.fromPinctrlOutput(readPinctrlOutput())
+    private val availableHardware: HardwareAllocationIndex,
+    private val usedHardware: HardwareAllocationIndex.Mutable
 ) : DeviceRegistry by delegate {
 
-    /**
-     * The index representing the hardware which has been allocated to devices in this registry.
-     */
-    private val usedHardware: MutableHardwareAllocationIndex<LineType> = MutableHardwareAllocationIndex {
+    constructor(
+        delegate: DeviceRegistry,
+        availableHardware: HardwareAllocationIndex
+    ) : this(delegate, availableHardware, MutableHardwareAllocationIndex {
         it.lineType
-    }
+    })
 
     /**
      * Factory for validating [GpioPortConfig] prior to constructing a port.
@@ -59,13 +58,27 @@ class HardwareAllocationDeviceRegistry(
      */
     override fun <T : Device<T>, V : DeviceConfig<T>> create(config: V): T {
         val line = when(config) {
-            is GpioPortConfig -> gpioConfigLineFactory.createLine(config)
-            is I2CConfig -> i2cConfigLineFactory.createLine(config)
-            is SpiConfig -> spiConfigLineFactory.createLine(config)
-            is PwmConfig -> pwmConfigLineFactory.createLine(config)
+            is GpioPortConfig -> gpioConfigLineFactory.validateLine(config)
+            is I2CConfig -> i2cConfigLineFactory.validateLine(config)
+            is SpiConfig -> spiConfigLineFactory.validateLine(config)
+            is PwmConfig -> pwmConfigLineFactory.validateLine(config)
             else -> throw IllegalArgumentException("Unsupported device configuration type: ${config::class.simpleName}")
         }
         return delegate.create(config).also { usedHardware.add(line) }
+    }
+
+    override fun remove(device: Device<*>) {
+        val line = when(device.config) {
+            is GpioPortConfig -> gpioConfigLineFactory.createLine(device.config as GpioPortConfig)
+            is I2CConfig -> i2cConfigLineFactory.createLine(device.config as I2CConfig)
+            is SpiConfig -> spiConfigLineFactory.createLine(device.config as SpiConfig)
+            is PwmConfig -> pwmConfigLineFactory.createLine(device.config as PwmConfig)
+            else -> throw IllegalArgumentException("Unsupported device configuration type: ${device.config::class.simpleName}")
+        }
+
+        usedHardware.remove(line)
+
+        delegate.remove(device)
     }
 
     /**
@@ -78,6 +91,11 @@ class HardwareAllocationDeviceRegistry(
          * @return The hardware allocation index line.
          */
         fun createLine(config: T): HardwareAllocationIndex.Line
+
+        /**
+         *
+         */
+        fun validateLine(config: T): HardwareAllocationIndex.Line = createLine(config)
     }
 
     /**
@@ -94,11 +112,17 @@ class HardwareAllocationDeviceRegistry(
                 HardwareAllocation.fromOffsets(*config.pinNumber)
             )
 
-            if (gpioIndex.findByMask(line.allocation.mask) == null) {
+            if (gpioIndex.findByAllocation(line.allocation) == null) {
                 throw PinsNotAvailableException(line, gpioIndex.remainder(line.allocation))
             }
 
-            val inUse = usedHardware.findAllIntersectingByMask(line.allocation.mask)
+            return line
+        }
+
+        override fun validateLine(config: GpioPortConfig): HardwareAllocationIndex.Line {
+            val line = createLine(config)
+
+            val inUse = usedHardware.findAllIntersectingByAllocation(line.allocation)
             if (inUse.isNotEmpty()) {
                 throw PinsInUseException(line, inUse)
             }
@@ -121,17 +145,23 @@ class HardwareAllocationDeviceRegistry(
                 throw BusNotConfiguredException(config.bus, LineType.I2C)
             }
 
-            val inUse = usedHardware.findAllIntersectingByMask(configured.allocation.mask)
-            if (inUse.isNotEmpty()) {
-                throw BusInUseException(configured, inUse.first())
-            }
-
             return HardwareAllocationIndex.Line(
                 LineType.I2C,
                 config.id,
                 configured.allocation,
                 config.bus
             )
+        }
+
+        override fun validateLine(config: I2CConfig): HardwareAllocationIndex.Line {
+            val line = createLine(config)
+
+            val inUse = usedHardware.findAllIntersectingByAllocation(line.allocation)
+            if (inUse.isNotEmpty()) {
+                throw BusInUseException(line, inUse.first())
+            }
+
+            return line
         }
     }
 
@@ -148,17 +178,23 @@ class HardwareAllocationDeviceRegistry(
                 throw BusNotConfiguredException(config.bus, LineType.SPI)
             }
 
-            val inUse = usedHardware.findAllIntersectingByMask(configured.allocation.mask)
-            if (inUse.isNotEmpty()) {
-                throw BusInUseException(configured, inUse.first())
-            }
-
             return HardwareAllocationIndex.Line(
                 LineType.SPI,
                 config.id,
                 configured.allocation,
                 config.bus
             )
+        }
+
+        override fun validateLine(config: SpiConfig): HardwareAllocationIndex.Line {
+            val line = createLine(config)
+
+            val inUse = usedHardware.findAllIntersectingByAllocation(line.allocation)
+            if (inUse.isNotEmpty()) {
+                throw BusInUseException(line, inUse.first())
+            }
+
+            return line
         }
     }
 
@@ -175,11 +211,6 @@ class HardwareAllocationDeviceRegistry(
                 throw BusNotConfiguredException(config.chip, LineType.PWM)
             }
 
-            val inUse = usedHardware.findAllIntersectingByMask(configured.allocation.mask)
-            if (inUse.isNotEmpty()) {
-                throw BusInUseException(configured, inUse.first())
-            }
-
             return HardwareAllocationIndex.Line(
                 LineType.PWM,
                 config.id,
@@ -187,13 +218,23 @@ class HardwareAllocationDeviceRegistry(
                 config.chip
             )
         }
-    }
 
+        override fun validateLine(config: PwmConfig): HardwareAllocationIndex.Line {
+            val line = super.validateLine(config)
+
+            val inUse = usedHardware.findAllIntersectingByAllocation(line.allocation)
+            if (inUse.isNotEmpty()) {
+                throw BusInUseException(line, inUse.first())
+            }
+
+            return line
+        }
+    }
 
     /**
      * Exception thrown when attempting to allocate pins that are not available.
      * @param requested the requested line
-     * @param available the available lines
+     * @param unavailable the unavailable lines
      */
     class PinsNotAvailableException(
         val requested: HardwareAllocationIndex.Line,
@@ -221,21 +262,6 @@ class HardwareAllocationDeviceRegistry(
      */
     class BusNotConfiguredException(val bus: Int, val lineType: LineType)
         : RuntimeException("Bus $bus is not configured for $lineType")
-
-
-    companion object {
-        /**
-         * Reads the contents of the pinctrl-output.txt resource file.
-         *
-         * Used for testing
-         */
-        private fun readPinctrlOutput(): String {
-            val input = javaClass.getResourceAsStream("/pinctrl-output.txt")
-                ?: throw IOException("Missing test resource pinctrl-output.txt")
-
-            return input.use { String(it.readAllBytes(), StandardCharsets.UTF_8) }
-        }
-    }
 
     override fun forEach(action: Consumer<in Device<*>>?) = delegate.forEach(action)
     override fun spliterator(): Spliterator<Device<*>?> = delegate.spliterator()
