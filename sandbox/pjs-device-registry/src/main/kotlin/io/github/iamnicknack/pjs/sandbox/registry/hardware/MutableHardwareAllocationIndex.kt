@@ -54,24 +54,6 @@ class MutableHardwareAllocationIndex<K>(
 
     override operator fun get(key: K): Set<HardwareAllocationIndex.Line> = indexByKey[key]?.lines ?: emptySet()
 
-    override fun findByName(name: String): HardwareAllocationIndex.Line? = indexByKey.values
-        .flatMap { it.lines }
-        .firstOrNull { it.name == name }
-
-    override fun findByPin(pin: Int): HardwareAllocationIndex.Line? = indexByKey.values
-        .firstOrNull { it.allocation.contains(pin) }
-        ?.lines
-        ?.firstOrNull { it.allocation.contains(pin) }
-
-    override fun findAllByType(lineType: HardwareAllocationIndex.LineType): Set<HardwareAllocationIndex.Line> = indexByKey.values
-        .flatMap { it.lines }
-        .filter { it.lineType == lineType }
-        .toSet()
-
-    override fun indexForType(lineType: HardwareAllocationIndex.LineType): HardwareAllocationIndex {
-        return ReadonlyHardwareAllocationIndex(findAllByType(lineType))
-    }
-
     override fun iterator(): Iterator<HardwareAllocationIndex.Line> = indexByKey.values.flatMap { it.lines }.iterator()
 
     private data class Node(

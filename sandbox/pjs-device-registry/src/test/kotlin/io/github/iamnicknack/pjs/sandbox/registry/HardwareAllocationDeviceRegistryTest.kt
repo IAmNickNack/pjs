@@ -13,6 +13,7 @@ import io.github.iamnicknack.pjs.device.pwm.PwmConfig
 import io.github.iamnicknack.pjs.device.spi.SpiConfig
 import io.github.iamnicknack.pjs.mock.MockDeviceRegistry
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
+import io.github.iamnicknack.pjs.sandbox.registry.HardwareAllocationDeviceRegistry.HardwareAllocationException
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocation
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.Line
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.LineType
@@ -91,7 +92,7 @@ class HardwareAllocationDeviceRegistryTest {
             .pin(2, 3, 4, 5)
             .build()
 
-        val error = assertFailsWith(HardwareAllocationDeviceRegistry.PinsNotAvailableException::class) {
+        val error = assertFailsWith(HardwareAllocationException.PinsNotAvailable::class) {
             registry.create(config)
         }
 
@@ -118,7 +119,7 @@ class HardwareAllocationDeviceRegistryTest {
             .pin(3, 4)
             .build()
 
-        val error = assertFailsWith(HardwareAllocationDeviceRegistry.PinsInUseException::class) {
+        val error = assertFailsWith(HardwareAllocationException.PinsInUse::class) {
             registry.create(config2)
         }
 
@@ -137,17 +138,14 @@ class HardwareAllocationDeviceRegistryTest {
 
         return listOf(
             Expectation(
-                Line(LineType.SPI, "spi0", HardwareAllocation.fromOffsets(12, 13), 1),
-                { registry: DeviceRegistry -> registry.create(SpiConfig.builder().id("spi1").bus(1).build()) }
-            ),
+                Line(LineType.SPI, "spi0", HardwareAllocation.fromOffsets(12, 13), 1)
+            ) { registry: DeviceRegistry -> registry.create(SpiConfig.builder().id("spi1").bus(1).build()) },
             Expectation(
-                Line(LineType.I2C, "i2c3", HardwareAllocation.fromOffsets(14, 15), 3),
-                { registry: DeviceRegistry -> registry.create(I2CConfig.builder().id("i2c3").bus(3).build()) }
-            ),
+                Line(LineType.I2C, "i2c3", HardwareAllocation.fromOffsets(14, 15), 3)
+            ) { registry: DeviceRegistry -> registry.create(I2CConfig.builder().id("i2c3").bus(3).build()) },
             Expectation(
-                Line(LineType.PWM, "pwm0", HardwareAllocation.fromOffsets(16), 1),
-                { registry: DeviceRegistry -> registry.create(PwmConfig.builder().id("pwm1").chip(1).build()) }
-            )
+                Line(LineType.PWM, "pwm0", HardwareAllocation.fromOffsets(16), 1)
+            ) { registry: DeviceRegistry -> registry.create(PwmConfig.builder().id("pwm1").chip(1).build()) }
         ).map { expectation ->
             DynamicTest.dynamicTest("can create ${expectation.line.lineType} device") {
                 val availableHardware = MutableHardwareAllocationIndex.byLineType(expectation.line)
@@ -167,17 +165,14 @@ class HardwareAllocationDeviceRegistryTest {
 
         return listOf(
             Expectation(
-                Line(LineType.SPI, "spi1", HardwareAllocation.fromOffsets(12, 13), 1),
-                { registry: DeviceRegistry -> registry.create(SpiConfig.builder().id("spi1").bus(1).build()) }
-            ),
+                Line(LineType.SPI, "spi1", HardwareAllocation.fromOffsets(12, 13), 1)
+            ) { registry: DeviceRegistry -> registry.create(SpiConfig.builder().id("spi1").bus(1).build()) },
             Expectation(
-                Line(LineType.I2C, "i2c3", HardwareAllocation.fromOffsets(14, 15), 3),
-                { registry: DeviceRegistry -> registry.create(I2CConfig.builder().id("i2c3").bus(3).build()) }
-            ),
+                Line(LineType.I2C, "i2c3", HardwareAllocation.fromOffsets(14, 15), 3)
+            ) { registry: DeviceRegistry -> registry.create(I2CConfig.builder().id("i2c3").bus(3).build()) },
             Expectation(
-                Line(LineType.PWM, "pwm1", HardwareAllocation.fromOffsets(16), 1),
-                { registry: DeviceRegistry -> registry.create(PwmConfig.builder().id("pwm1").chip(1).build()) }
-            )
+                Line(LineType.PWM, "pwm1", HardwareAllocation.fromOffsets(16), 1)
+            ) { registry: DeviceRegistry -> registry.create(PwmConfig.builder().id("pwm1").chip(1).build()) }
         ).map { expectation ->
             DynamicTest.dynamicTest("can create ${expectation.line.lineType} device when already in use") {
                 val availableHardware = MutableHardwareAllocationIndex.byLineType(expectation.line)
@@ -185,7 +180,7 @@ class HardwareAllocationDeviceRegistryTest {
                 val result = expectation.factory(registry)
                 assertThat(result).isNotNull()
 
-                val error = assertFailsWith(HardwareAllocationDeviceRegistry.BusInUseException::class) {
+                val error = assertFailsWith(HardwareAllocationException.BusInUse::class) {
                     expectation.factory(registry)
                 }
 
@@ -203,22 +198,19 @@ class HardwareAllocationDeviceRegistryTest {
 
         return listOf(
             Expectation(
-                Line(LineType.SPI, "spi0", HardwareAllocation.fromOffsets(12, 13), 1),
-                { registry: DeviceRegistry -> registry.create(SpiConfig.builder().bus(0).build()) }
-            ),
+                Line(LineType.SPI, "spi0", HardwareAllocation.fromOffsets(12, 13), 1)
+            ) { registry: DeviceRegistry -> registry.create(SpiConfig.builder().bus(0).build()) },
             Expectation(
-                Line(LineType.I2C, "i2c3", HardwareAllocation.fromOffsets(14, 15), 3),
-                { registry: DeviceRegistry -> registry.create(I2CConfig.builder().bus(0).build()) }
-            ),
+                Line(LineType.I2C, "i2c3", HardwareAllocation.fromOffsets(14, 15), 3)
+            ) { registry: DeviceRegistry -> registry.create(I2CConfig.builder().bus(0).build()) },
             Expectation(
-                Line(LineType.PWM, "pwm0", HardwareAllocation.fromOffsets(16), 1),
-                { registry: DeviceRegistry -> registry.create(PwmConfig.builder().chip(0).build()) }
-            )
+                Line(LineType.PWM, "pwm0", HardwareAllocation.fromOffsets(16), 1)
+            ) { registry: DeviceRegistry -> registry.create(PwmConfig.builder().chip(0).build()) }
         ).map { expectation ->
             DynamicTest.dynamicTest("cannot create ${expectation.line.lineType} device with invalid bus") {
                 val availableHardware = MutableHardwareAllocationIndex.byLineType(expectation.line)
                 val registry = HardwareAllocationDeviceRegistry(MockDeviceRegistry(), availableHardware)
-                val error = assertFailsWith(HardwareAllocationDeviceRegistry.BusNotConfiguredException::class) {
+                val error = assertFailsWith(HardwareAllocationException.BusNotConfigured::class) {
                     expectation.factory(registry)
                 }
                 assertThat(error.bus).isEqualTo(0)

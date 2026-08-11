@@ -113,7 +113,7 @@ class HardwareAllocationDeviceRegistry(
             )
 
             if (gpioIndex.findByAllocation(line.allocation) == null) {
-                throw PinsNotAvailableException(line, gpioIndex.remainder(line.allocation))
+                throw HardwareAllocationException.PinsNotAvailable(line, gpioIndex.remainder(line.allocation))
             }
 
             return line
@@ -124,7 +124,7 @@ class HardwareAllocationDeviceRegistry(
 
             val inUse = usedHardware.findAllIntersectingByAllocation(line.allocation)
             if (inUse.isNotEmpty()) {
-                throw PinsInUseException(line, inUse)
+                throw HardwareAllocationException.PinsInUse(line, inUse)
             }
 
             return line
@@ -142,7 +142,7 @@ class HardwareAllocationDeviceRegistry(
             val configured = i2cIndex.firstOrNull { it.bus == config.bus }
 
             if (configured == null) {
-                throw BusNotConfiguredException(config.bus, LineType.I2C)
+                throw HardwareAllocationException.BusNotConfigured(config.bus, LineType.I2C)
             }
 
             return HardwareAllocationIndex.Line(
@@ -158,7 +158,7 @@ class HardwareAllocationDeviceRegistry(
 
             val inUse = usedHardware.findAllIntersectingByAllocation(line.allocation)
             if (inUse.isNotEmpty()) {
-                throw BusInUseException(line, inUse.first())
+                throw HardwareAllocationException.BusInUse(line, inUse.first())
             }
 
             return line
@@ -175,7 +175,7 @@ class HardwareAllocationDeviceRegistry(
             val configured = spiIndex.firstOrNull { it.bus == config.bus }
 
             if (configured == null) {
-                throw BusNotConfiguredException(config.bus, LineType.SPI)
+                throw HardwareAllocationException.BusNotConfigured(config.bus, LineType.SPI)
             }
 
             return HardwareAllocationIndex.Line(
@@ -191,7 +191,7 @@ class HardwareAllocationDeviceRegistry(
 
             val inUse = usedHardware.findAllIntersectingByAllocation(line.allocation)
             if (inUse.isNotEmpty()) {
-                throw BusInUseException(line, inUse.first())
+                throw HardwareAllocationException.BusInUse(line, inUse.first())
             }
 
             return line
@@ -208,7 +208,7 @@ class HardwareAllocationDeviceRegistry(
             val configured = pwmIndex.firstOrNull { it.bus == config.chip }
 
             if (configured == null) {
-                throw BusNotConfiguredException(config.chip, LineType.PWM)
+                throw HardwareAllocationException.BusNotConfigured(config.chip, LineType.PWM)
             }
 
             return HardwareAllocationIndex.Line(
@@ -220,48 +220,60 @@ class HardwareAllocationDeviceRegistry(
         }
 
         override fun validateLine(config: PwmConfig): HardwareAllocationIndex.Line {
-            val line = super.validateLine(config)
+            val line = createLine(config)
 
             val inUse = usedHardware.findAllIntersectingByAllocation(line.allocation)
             if (inUse.isNotEmpty()) {
-                throw BusInUseException(line, inUse.first())
+                throw HardwareAllocationException.BusInUse(line, inUse.first())
             }
 
             return line
         }
     }
 
-    /**
-     * Exception thrown when attempting to allocate pins that are not available.
-     * @param requested the requested line
-     * @param unavailable the unavailable lines
-     */
-    class PinsNotAvailableException(
-        val requested: HardwareAllocationIndex.Line,
-        val unavailable: HardwareAllocation
-    ) : RuntimeException("Pins not available: ${requested.name}, unavailable: ${unavailable.offsets.joinToString(", ")}")
+    sealed class HardwareAllocationException(message: String) : RuntimeException(message) {
+        /**
+         * Exception thrown when attempting to allocate pins that are not available.
+         * @param requested the requested line
+         * @param unavailable the unavailable lines
+         */
+        class PinsNotAvailable(
+            val requested: HardwareAllocationIndex.Line,
+            val unavailable: HardwareAllocation
+        ) : HardwareAllocationException(
+            "Pins not available: ${requested.name}, unavailable: ${
+                unavailable.offsets.joinToString(
+                    ", "
+                )
+            }"
+        )
 
-    /**
-     * Exception thrown when attempting to allocate hardware that is already in use.
-     */
-    class PinsInUseException(val requested: HardwareAllocationIndex.Line, conflicts: Iterable<HardwareAllocationIndex.Line>)
-        : RuntimeException("Pins in use: ${requested.name}, conflicts: ${conflicts.joinToString(", ") { it.name }}") {
+        /**
+         * Exception thrown when attempting to allocate hardware that is already in use.
+         */
+        class PinsInUse(
+            val requested: HardwareAllocationIndex.Line,
+            conflicts: Iterable<HardwareAllocationIndex.Line>
+        ) : HardwareAllocationException("Pins in use: ${requested.name}, conflicts: ${conflicts.joinToString(", ") { it.name }}") {
 
-        val conflicts: List<HardwareAllocationIndex.Line> = conflicts
-            .map { HardwareAllocationIndex.Line(it.lineType, it.name, it.allocation and requested.allocation) }
+            val conflicts: List<HardwareAllocationIndex.Line> = conflicts
+                .map { HardwareAllocationIndex.Line(it.lineType, it.name, it.allocation and requested.allocation) }
+        }
+
+        /**
+         * Exception thrown when attempting to allocate hardware on a bus that is already in use.
+         */
+        class BusInUse(
+            val requested: HardwareAllocationIndex.Line,
+            val current: HardwareAllocationIndex.Line
+        ) : HardwareAllocationException("Bus ${requested.bus} is already in use for ${requested.lineType} by ${current.name}")
+
+        /**
+         * Exception thrown when attempting to allocate hardware on a bus that is not configured.
+         */
+        class BusNotConfigured(val bus: Int, val lineType: LineType) :
+            HardwareAllocationException("Bus $bus is not configured for $lineType")
     }
-
-    /**
-     * Exception thrown when attempting to allocate hardware on a bus that is already in use.
-     */
-    class BusInUseException(val requested: HardwareAllocationIndex.Line, val current: HardwareAllocationIndex.Line)
-        : RuntimeException("Bus ${requested.bus} is already in use for ${requested.lineType} by ${current.name}")
-
-    /**
-     * Exception thrown when attempting to allocate hardware on a bus that is not configured.
-     */
-    class BusNotConfiguredException(val bus: Int, val lineType: LineType)
-        : RuntimeException("Bus $bus is not configured for $lineType")
 
     override fun forEach(action: Consumer<in Device<*>>?) = delegate.forEach(action)
     override fun spliterator(): Spliterator<Device<*>?> = delegate.spliterator()

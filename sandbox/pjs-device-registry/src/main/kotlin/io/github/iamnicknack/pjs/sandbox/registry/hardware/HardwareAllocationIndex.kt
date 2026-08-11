@@ -7,7 +7,8 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
      * @param name the name of the line
      * @return the line allocation for a given name
      */
-    fun findByName(name: String): Line?
+    fun findByName(name: String): Line? = this
+        .firstOrNull { it.name == name }
 
     /**
      * Check if the index contains a line with the specified name
@@ -21,7 +22,8 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
      * @param pin the pin number
      * @return the line allocation for a given pin
      */
-    fun findByPin(pin: Int): Line?
+    fun findByPin(pin: Int): Line? = this
+        .firstOrNull { it.allocation.contains(pin) }
 
     /**
      * Check if the index contains a line with the specified pin
@@ -36,15 +38,15 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
      * @return the line allocation for a given allocation
      */
     fun findByAllocation(allocation: HardwareAllocation): Line? = this
-        .firstOrNull { it.allocation.mask and allocation.mask == allocation.mask }
+        .firstOrNull { it.allocation contains allocation }
 
     /**
-     * Fetch all line allocations which interset the specified allocation
+     * Fetch all line allocations which intersect the specified allocation
      * @param allocation the allocation to match
      * @return all line allocations which intersect with the specified allocation
      */
     fun findAllIntersectingByAllocation(allocation: HardwareAllocation): Set<Line> = this
-        .filter { it.allocation.intersects(allocation) }
+        .filter { it.allocation intersects allocation }
         .toSet()
 
     /**
@@ -60,14 +62,18 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
      * @param lineType the type of line to fetch
      * @return all line allocations of the specified type
      */
-    fun findAllByType(lineType: LineType): Set<Line>
+    fun findAllByType(lineType: LineType): Set<Line> = this
+        .filter { it.lineType == lineType }
+        .toSet()
 
     /**
      * Fetch an index of line allocations of the specified type
      * @param lineType the type of line to fetch
      * @return an index for the specified line type
      */
-    fun indexForType(lineType: LineType): HardwareAllocationIndex
+    fun indexForType(lineType: LineType): HardwareAllocationIndex = this
+        .findAllByType(lineType)
+        .let(::ReadonlyHardwareAllocationIndex)
 
     /**
      * Calculate the remainder of [allocation] after negating all valid allocations in the index

@@ -32,6 +32,11 @@ data class HardwareAllocation(
     infix fun intersects(other: HardwareAllocation): Boolean = (this.mask and other.mask) != 0L
 
     /**
+     * Check if this [HardwareAllocation] contains the entirety of another allocation.
+     */
+    infix fun contains(other: HardwareAllocation): Boolean = (this.mask and other.mask) == other.mask
+
+    /**
      * Check if this [HardwareAllocation] contains a given pin.
      */
     fun contains(pin: Int): Boolean = mask and (1L shl pin) != 0L
