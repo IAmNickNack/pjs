@@ -68,12 +68,12 @@ class HardwareAllocationDeviceRegistry(
     }
 
     override fun remove(device: Device<*>) {
-        val line = when(device.config) {
-            is GpioPortConfig -> gpioConfigLineFactory.createLine(device.config as GpioPortConfig)
-            is I2CConfig -> i2cConfigLineFactory.createLine(device.config as I2CConfig)
-            is SpiConfig -> spiConfigLineFactory.createLine(device.config as SpiConfig)
-            is PwmConfig -> pwmConfigLineFactory.createLine(device.config as PwmConfig)
-            else -> throw IllegalArgumentException("Unsupported device configuration type: ${device.config::class.simpleName}")
+        val line = when(val config = device.config) {
+            is GpioPortConfig -> gpioConfigLineFactory.createLine(config)
+            is I2CConfig -> i2cConfigLineFactory.createLine(config)
+            is SpiConfig -> spiConfigLineFactory.createLine(config)
+            is PwmConfig -> pwmConfigLineFactory.createLine(config)
+            else -> throw IllegalArgumentException("Unsupported device configuration type: ${config::class.simpleName}")
         }
 
         usedHardware.remove(line)
@@ -93,7 +93,9 @@ class HardwareAllocationDeviceRegistry(
         fun createLine(config: T): HardwareAllocationIndex.Line
 
         /**
-         *
+         * Validate the hardware allocation line for the given device configuration.
+         * @param config The device configuration to validate.
+         * @return The validated hardware allocation index line.
          */
         fun validateLine(config: T): HardwareAllocationIndex.Line = createLine(config)
     }
