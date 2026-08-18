@@ -5,9 +5,15 @@ plugins {
     id("buildlogic.gradle-versions")
 }
 
+version = buildVersion
+
 subprojects {
     group = "io.github.iamnicknack"
-    version = rootProject.version
+    if (this.projectDir.path.contains("pjs/sandbox")) {
+        version = rootProject.version.toString() + "-SNAPSHOT"
+    } else {
+        version = rootProject.version.toString()
+    }
 }
 
 tasks.register("printVersion") {

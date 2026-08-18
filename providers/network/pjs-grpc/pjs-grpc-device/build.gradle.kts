@@ -13,8 +13,8 @@ javaModuleSystem.moduleName = "pjs.grpc"
 
 dependencies {
     api(project(":pjs-core"))
-    api(project(":pjs-grpc-proto"))
+    api(project(":providers:network:pjs-grpc:pjs-grpc-proto"))
 
-    testImplementation(project(":pjs-mock-device"))
-    testImplementation(project(":pjs-grpc-server"))
+    testImplementation(project(":providers:pjs-mock-device"))
+    testImplementation(project(":providers:network:pjs-grpc:pjs-grpc-server"))
 }

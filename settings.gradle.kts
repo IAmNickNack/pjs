@@ -15,6 +15,9 @@ val projects = Files.find(projectPath, 5, { path, _ -> path.endsWith("build.grad
     .toList()
 
 projects.forEach { (name, path) ->
-    include(":$name")
-    project(":$name").projectDir = file(path)
+    val projectName = path.replace('/', ':')
+    include(":$projectName")
+    project(":$projectName").apply {
+        projectDir = file(path)
+    }
 }

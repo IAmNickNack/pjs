@@ -7,5 +7,5 @@ plugins {
 
 dependencies {
     api(project(":pjs-core"))
-    testImplementation(project(":pjs-mock-device"))
+    testImplementation(project(":providers:pjs-mock-device"))
 }

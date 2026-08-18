@@ -9,15 +9,15 @@ plugins {
 
 dependencies {
     api(project(":pjs-core"))
-    implementation(project(":pjs-mock-device"))
-    implementation(project(":pjs-native-device"))
-    implementation(project(":pjs-grpc-device"))
-    implementation(project(":pjs-http-device"))
-    api(project(":pjs-pi4j-device"))
+    implementation(project(":providers:pjs-mock-device"))
+    implementation(project(":providers:pjs-native:pjs-native-device"))
+    implementation(project(":providers:network:pjs-grpc::pjs-grpc-device"))
+    implementation(project(":providers:network:pjs-http:pjs-http-device"))
+    api(project(":providers:pjs-pi4j-device"))
 
-    implementation(project(":pjs-hardware-25lc"))
-    implementation(project(":pjs-hardware-mcp23x"))
-    implementation(project(":pjs-hardware-sh1106"))
+    implementation(project(":sandbox:pjs-hardware-25lc"))
+    implementation(project(":sandbox:pjs-hardware-mcp23x"))
+    implementation(project(":sandbox:pjs-hardware-sh1106"))
 
     implementation(libs.bundles.logging)
     implementation(libs.bundles.pi4j.plugins)

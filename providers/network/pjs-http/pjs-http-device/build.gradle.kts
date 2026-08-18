@@ -10,12 +10,12 @@ plugins {
 
 dependencies {
     implementation(libs.logback.classic)
-    implementation(project(":pjs-http-common"))
+    implementation(project(":providers:network:pjs-http:pjs-http-common"))
     implementation(project(":pjs-core"))
-    implementation("io.github.iamnicknack:pjs-utils")
+    implementation(project(":pjs-utils"))
 
-    testImplementation(project(":pjs-mock-device"))
-    testImplementation(project(":pjs-http-server"))
+    testImplementation(project(":providers:pjs-mock-device"))
+    testImplementation(project(":providers:network:pjs-http:pjs-http-server"))
     testImplementation(libs.koin.ktor)
 }
 
