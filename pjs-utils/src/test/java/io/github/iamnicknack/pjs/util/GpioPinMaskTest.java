@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -50,14 +51,14 @@ class GpioPinMaskTest {
     @Test
     void canCreateSimpleMask() {
         var pinMask = new GpioPinMask(new int[] { 2 });
-        assertThat(pinMask.getUnpackedMask()).isEqualTo(4);
+        assertThat(pinMask.unpackedMask()).isEqualTo(4);
         assertThat(GpioPinMask.gpioMaskFor(new int[] { 2 })).isEqualTo(4);
     }
 
     @Test
     void canCreateMultiPinMask() {
         var pinMask = new GpioPinMask(new int[] { 2, 4 });
-        assertThat(pinMask.getUnpackedMask()).isEqualTo(20);
+        assertThat(pinMask.unpackedMask()).isEqualTo(20);
         assertThat(GpioPinMask.gpioMaskFor(new int[] { 2, 4 })).isEqualTo(20);
     }
 
@@ -149,5 +150,20 @@ class GpioPinMaskTest {
                 "pins 0b" + Integer.toBinaryString(e.pinsMask) + " -> 0b" + Integer.toBinaryString(e.packed),
                 () -> assertThat(GpioPinMask.packBits(e.pinsMask)).isEqualTo(e.packed)
         ));
+    }
+
+    @Test
+    void canIterateOffsets() {
+        var mask = new GpioPinMask(0b101);
+        var offsets = new ArrayList<Integer>();
+        mask.iterator().forEachRemaining(offsets::add);
+        assertThat(offsets).containsExactly(0, 2);
+    }
+
+    @Test
+    void canGetOffsets() {
+        var mask = new GpioPinMask(0b101);
+        var offsets = mask.offsets();
+        assertThat(offsets).containsExactly(0, 2);
     }
 }

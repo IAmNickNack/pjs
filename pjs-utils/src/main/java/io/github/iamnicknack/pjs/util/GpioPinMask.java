@@ -1,22 +1,22 @@
 package io.github.iamnicknack.pjs.util;
 
 import java.util.Arrays;
-import java.util.stream.IntStream;
+import java.util.Iterator;
+import java.util.PrimitiveIterator;
 
 /**
  * Utility class to convert between pin numbers and GPIO bit masks.
+ * @param packedMask the mask applied to values before a value is converted to GPIO pins
+ * @param unpackedMask the mask as represented on GPIO pins
  */
-public class GpioPinMask {
-    private final int packedMask;
-    private final int unpackedMask;
+public record GpioPinMask(int packedMask, int unpackedMask) implements Iterable<Integer> {
 
     /**
      * Create a mask from the given pin numbers.
      * @param pins the pin numbers to create a mask for.
      */
     public GpioPinMask(int[] pins) {
-        packedMask = packBits(pins);
-        unpackedMask = gpioMaskFor(pins);
+        this(packBits(pins), gpioMaskFor(pins));
     }
 
     /**
@@ -24,26 +24,7 @@ public class GpioPinMask {
      * @param pinMask the pin mask to create a mask for.
      */
     public GpioPinMask(int pinMask) {
-        this(IntStream.range(0, 32)
-                .filter(i -> (pinMask & (1 << i)) != 0)
-                .toArray()
-        );
-    }
-
-    /**
-     * The mask applied to values before a value is converted to GPIO pins.
-     * @return the mask
-     */
-    public int getPackedMask() {
-        return packedMask;
-    }
-
-    /**
-     * The mask as represented on GPIO pins.
-     * @return the mask
-     */
-    public int getUnpackedMask() {
-        return unpackedMask;
+        this(packBits(pinMask), pinMask);
     }
 
     /**
@@ -95,12 +76,38 @@ public class GpioPinMask {
     }
 
     /**
+     * Returns the number of pins in this mask.
+     * @return the number of pins
+     */
+    public int length() {
+        return Integer.bitCount(unpackedMask);
+    }
+
+    /**
+     * Returns the pin numbers in this mask.
+     * @return the pin numbers
+     */
+    public int[] offsets() {
+        var result = new int[Integer.bitCount(unpackedMask)];
+        int i = 0;
+        for (var pin : this) {
+            result[i++] = pin;
+        }
+        return result;
+    }
+
+    @Override
+    public Iterator<Integer> iterator() {
+        return new OffsetsIterator(unpackedMask);
+    }
+
+    /**
      * Convert an array of pin numbers to a GPIO mask.
-     * @param pins the pin numbers to convert
+     * @param offsets the pin numbers to convert
      * @return the GPIO mask
      */
-    public static int gpioMaskFor(int[] pins) {
-        return Arrays.stream(pins)
+    public static int gpioMaskFor(int[] offsets) {
+        return Arrays.stream(offsets)
                 .reduce(0, (acc, pin) -> acc | (1 << pin));
     }
 
@@ -112,11 +119,12 @@ public class GpioPinMask {
     public static int packBits(int value) {
         int out = 0;
         int i = 0;
-        while (value != 0) {
-            int tz = Integer.numberOfTrailingZeros(value);
-            value >>>= tz;
-            out |= (value & 1) << i;
-            value >>>= 1;
+        int v = value;
+        while (v != 0) {
+            int tz = Integer.numberOfTrailingZeros(v);
+            v >>>= tz;
+            out |= (v & 1) << i;
+            v >>>= 1;
             i++;
         }
 
@@ -164,5 +172,28 @@ public class GpioPinMask {
             i++;
         }
         return out;
+    }
+
+    /**
+     * An iterator over the set bits in a mask.
+     */
+    private static class OffsetsIterator implements PrimitiveIterator.OfInt {
+        private long remaining;
+
+        private OffsetsIterator(long mask) {
+            this.remaining = mask;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return remaining != 0;
+        }
+
+        @Override
+        public int nextInt() {
+            int index = Long.numberOfTrailingZeros(remaining);
+            remaining &= ~(1L << index);
+            return index;
+        }
     }
 }
