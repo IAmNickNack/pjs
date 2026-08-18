@@ -9,5 +9,5 @@ plugins {
 
 dependencies {
     api(project(":pjs-utils"))
-    testImplementation("io.github.iamnicknack:pjs-mock-device")
+    testImplementation(project(":pjs-mock-device"))
 }

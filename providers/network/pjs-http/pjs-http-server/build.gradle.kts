@@ -15,7 +15,7 @@ dependencies {
     implementation(libs.apache.cli)
     runtimeOnly(libs.bundles.pi4j.plugins)
 
-    api("io.github.iamnicknack:pjs-core")
+    api(project(":pjs-core"))
     implementation(project(":pjs-network-common"))
     implementation(project(":pjs-http-common"))
     runtimeOnly(project(":pjs-native-device"))
