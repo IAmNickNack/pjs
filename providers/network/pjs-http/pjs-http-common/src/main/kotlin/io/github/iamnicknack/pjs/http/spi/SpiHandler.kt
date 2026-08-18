@@ -2,13 +2,13 @@ package io.github.iamnicknack.pjs.http.spi
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import io.github.iamnicknack.pjs.device.spi.Spi
 import io.github.iamnicknack.pjs.device.spi.SpiConfig
 import io.github.iamnicknack.pjs.http.config.ConfigHandler
 import io.github.iamnicknack.pjs.http.jackson.Base64ByteArrayDeserializer
 import io.github.iamnicknack.pjs.http.jackson.Base64ByteArraySerializer
+import tools.jackson.databind.annotation.JsonDeserialize
+import tools.jackson.databind.annotation.JsonSerialize
 
 /**
  * HTTP layer functionality for SPI devices

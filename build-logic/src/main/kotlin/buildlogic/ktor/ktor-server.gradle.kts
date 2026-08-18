@@ -14,10 +14,10 @@ dependencies {
     implementation("io.ktor:ktor-server-netty")
     implementation("io.ktor:ktor-server-config-yaml")
     implementation("io.ktor:ktor-server-content-negotiation")
-    implementation("io.ktor:ktor-serialization-jackson")
+    implementation("io.ktor:ktor-serialization-jackson3-jvm")
+//    implementation("io.ktor:ktor-serialization-jackson")
     implementation("io.ktor:ktor-server-status-pages")
     implementation("io.ktor:ktor-server-sse")
     implementation("io.ktor:ktor-server-swagger")
-
     testImplementation("io.ktor:ktor-server-test-host")
 }

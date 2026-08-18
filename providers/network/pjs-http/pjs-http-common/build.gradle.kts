@@ -12,5 +12,5 @@ dependencies {
     implementation(libs.jackson.databind)
     implementation(libs.kotlin.coroutines.core)
     implementation(project(":pjs-core"))
-    implementation("io.github.iamnicknack:pjs-utils")
+    implementation(project(":pjs-utils"))
 }
