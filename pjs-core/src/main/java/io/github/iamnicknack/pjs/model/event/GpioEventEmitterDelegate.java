@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 
 /**
  * Basic implementation of {@link GpioEventEmitter} which can be used to manage listeners and forward events
+ * @param <T> the type of the GPIO event emitter being listened to
  */
 public class GpioEventEmitterDelegate<T extends GpioEventEmitter<T>>
         implements GpioEventEmitter<T>, GpioEventListener<T>, AutoCloseable {

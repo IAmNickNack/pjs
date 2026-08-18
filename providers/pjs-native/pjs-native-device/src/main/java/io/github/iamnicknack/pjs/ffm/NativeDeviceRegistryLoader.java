@@ -40,7 +40,7 @@ public class NativeDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRe
 
     @Override
     public DeviceRegistry load(NoConfig ignored) {
-        var context = ServiceLoader.load(NativeContext.class, NativeContext.class.getClassLoader()).stream()
+        var context = ServiceLoader.load(NativeContext.class, Thread.currentThread().getContextClassLoader()).stream()
                 .findFirst()
                 .map(ServiceLoader.Provider::get)
                 .orElseGet(DefaultNativeContext::new);

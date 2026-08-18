@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * A {@link SpiTransfer.Message} implementation which can be composed of multiple {@link SpiTransfer.Message}s.
  */
-public class CompositeMessage implements SpiTransfer.Message, Iterable<SpiTransfer.Message> {
+public final class CompositeMessage implements SpiTransfer.Message, Iterable<SpiTransfer.Message> {
 
     private final List<MessagePair> messages;
     private final byte[] writeBuffer;

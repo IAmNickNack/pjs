@@ -81,7 +81,7 @@ public class Pi4jDeviceRegistryLoader implements DeviceRegistryLoader<Pi4jDevice
     /**
      * Workaround to get PI4J autoconfiguration to load a specific {@link Plugin} instance
      */
-    private static class CustomPluginService implements PluginService {
+    private static final class CustomPluginService implements PluginService {
         private final ContextBuilder contextBuilder;
         private final Context propertiesContext;
 

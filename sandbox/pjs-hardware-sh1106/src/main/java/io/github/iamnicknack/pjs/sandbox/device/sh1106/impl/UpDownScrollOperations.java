@@ -14,7 +14,7 @@ import static io.github.iamnicknack.pjs.sandbox.device.sh1106.DisplayOperations.
  * Delegates to {@link ShiftOperation} implementations to perform the actual shifting, allowing the workflow to be
  * generalised.
  */
-public class UpDownScrollOperations implements VerticalScrollOperations {
+public final class UpDownScrollOperations implements VerticalScrollOperations {
 
     /**
      * Create a scroll operation that scrolls up.

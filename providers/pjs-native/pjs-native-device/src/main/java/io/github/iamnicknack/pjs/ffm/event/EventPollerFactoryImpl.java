@@ -90,7 +90,7 @@ public class EventPollerFactoryImpl implements EventPoller.Factory {
     /**
      * Poller implementation.
      */
-    private class Poller implements EventPoller {
+    private final class Poller implements EventPoller {
 
         private volatile boolean running;
         private final FileDescriptor fileDescriptor;

@@ -3,10 +3,10 @@ package io.github.iamnicknack.pjs.ffm.context;
 import io.github.iamnicknack.pjs.ffm.context.method.MethodCallerFactory;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapper;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.lang.foreign.SegmentAllocator;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 
 /**
  * Container for components required to interact with native code.
@@ -19,12 +19,16 @@ public interface NativeContext {
      * @return true if the system is a Raspberry Pi, false otherwise
      */
     static boolean isAvailable() {
-        var cpuInfo = new File("/proc/cpuinfo");
-        if (!cpuInfo.exists()) {
+        return isAvailable(FileSystems.getDefault());
+    }
+
+    static boolean isAvailable(FileSystem fs) {
+        var path = fs.getPath("/proc/cpuinfo");
+        if (!Files.exists(path)) {
             return false;
         }
 
-        try (var reader = new BufferedReader(new FileReader(cpuInfo))) {
+        try (var reader = Files.newBufferedReader(path)) {
             String line;
             while ((line = reader.readLine()) != null) {
                 var lower = line.toLowerCase();
@@ -33,7 +37,7 @@ public interface NativeContext {
                 }
             }
         } catch (Exception e) {
-            // do nothing
+            return false;
         }
 
         return false;

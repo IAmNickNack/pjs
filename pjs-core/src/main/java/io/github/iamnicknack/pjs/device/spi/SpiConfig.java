@@ -36,7 +36,7 @@ public record SpiConfig(
     }
 
     public static class Builder {
-        private int baudRate = 500000;
+        private int baudRate = 500_000;
         private int bus = 0;
         private int chipSelect = 0;
         private int mode = 0;

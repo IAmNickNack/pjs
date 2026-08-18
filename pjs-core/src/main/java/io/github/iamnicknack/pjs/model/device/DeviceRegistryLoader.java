@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 /**
  * Configure a device registry from a map of properties.
  * Delegating construction of a registry to the loader allows the loading
+ * @param <T> The configuration object type for the registry
  */
 public interface DeviceRegistryLoader<T> {
 
@@ -83,7 +84,7 @@ public interface DeviceRegistryLoader<T> {
      * @return the default device registry.
      */
     static DeviceRegistry defaultRegistry() {
-        return ServiceLoader.load(DeviceRegistryLoader.class, DeviceRegistryLoader.class.getClassLoader()).stream()
+        return ServiceLoader.load(DeviceRegistryLoader.class, Thread.currentThread().getContextClassLoader()).stream()
                 .map(ServiceLoader.Provider::get)
                 .filter(DeviceRegistryLoader::isLoadable)
                 .findFirst()

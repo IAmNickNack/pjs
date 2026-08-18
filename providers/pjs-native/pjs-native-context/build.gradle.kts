@@ -5,3 +5,7 @@ plugins {
     id("buildlogic.java-library")
     id("buildlogic.maven-publish")
 }
+
+dependencies {
+    testImplementation(libs.jimfs)
+}

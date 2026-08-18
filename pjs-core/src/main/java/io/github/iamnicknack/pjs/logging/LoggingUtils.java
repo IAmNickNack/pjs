@@ -1,6 +1,6 @@
 package io.github.iamnicknack.pjs.logging;
 
-public class LoggingUtils {
+public final class LoggingUtils {
 
     private LoggingUtils() {}
 

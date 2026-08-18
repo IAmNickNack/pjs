@@ -110,10 +110,10 @@ class NativePort implements GpioPort, AutoCloseable {
 
     @Override
     public void setDirection(GpioPortMode mode) {
-        if (mode.isSet(GpioPortMode.OUTPUT) && currentLineConfig != lineConfigs.outputConfig()) {
+        if (mode.isSet(GpioPortMode.OUTPUT) && !currentLineConfig.equals(lineConfigs.outputConfig())) {
             ioctlOperations.ioctl(fileDescriptor, GpioConstants.GPIO_V2_LINE_SET_CONFIG_IOCTL, lineConfigs.outputConfig());
             currentLineConfig = lineConfigs.outputConfig();
-        } else if (mode.isSet(GpioPortMode.INPUT) && currentLineConfig != lineConfigs.inputConfig()) {
+        } else if (mode.isSet(GpioPortMode.INPUT) && !currentLineConfig.equals(lineConfigs.inputConfig())) {
             ioctlOperations.ioctl(fileDescriptor, GpioConstants.GPIO_V2_LINE_SET_CONFIG_IOCTL, lineConfigs.inputConfig());
             currentLineConfig = lineConfigs.inputConfig();
         }

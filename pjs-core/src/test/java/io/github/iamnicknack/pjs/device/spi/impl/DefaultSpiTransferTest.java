@@ -137,7 +137,7 @@ class DefaultSpiTransferTest {
         assertThat(bytes).containsExactly(1, 2, 3, 0, 0, 0, 4, 5, 6);
     }
 
-    private static class InvocationCheckTransfer implements SpiTransfer {
+    private static final class InvocationCheckTransfer implements SpiTransfer {
         private final AtomicBoolean invoked = new AtomicBoolean(false);
 
         @Override

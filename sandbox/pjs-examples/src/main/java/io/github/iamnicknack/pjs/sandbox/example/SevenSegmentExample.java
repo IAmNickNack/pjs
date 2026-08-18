@@ -45,7 +45,7 @@ public class SevenSegmentExample implements Runnable {
         display.reset();
         display.on();
 
-        IntStream.range(0, 100000).forEach(display::write);
+        IntStream.range(0, 100_000).forEach(display::write);
 
         display.off();
     }

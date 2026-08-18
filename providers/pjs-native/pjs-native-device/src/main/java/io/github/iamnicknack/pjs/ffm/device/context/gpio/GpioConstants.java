@@ -8,7 +8,7 @@ import static io.github.iamnicknack.pjs.ffm.device.context.IoctlConstants._IOWR;
  */
 public class GpioConstants {
 
-    public final static int GPIOHANDLES_MAX = 64;
+    public static final int GPIOHANDLES_MAX = 64;
 
     public static final long GPIO_GET_CHIPINFO_IOCTL = _IOR(0xB4, 0x01, 68);
 

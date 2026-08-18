@@ -227,7 +227,7 @@ public class DirtyTrackingDisplayBuffer implements BufferedDisplayOperations {
     /**
      * Container for dirty information.
      */
-    private static class DirtyDisplay {
+    private static final class DirtyDisplay {
        /**
          * Flags indicating that a block is "dirty"
          */

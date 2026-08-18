@@ -13,7 +13,7 @@ import io.github.iamnicknack.pjs.impl.DefaultDeviceRegistry;
 /**
  * A {@link DefaultDeviceRegistry} with native factories registered
  */
-public class NativeDeviceRegistry extends DefaultDeviceRegistry {
+public final class NativeDeviceRegistry extends DefaultDeviceRegistry {
     NativeDeviceRegistry(
             NativePortFactory nativePortFactory,
             NativeSpiFactory nativeSpiFactory,

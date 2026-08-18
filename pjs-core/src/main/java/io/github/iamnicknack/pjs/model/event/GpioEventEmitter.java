@@ -2,6 +2,7 @@ package io.github.iamnicknack.pjs.model.event;
 
 /**
  * Contract for devices which can emit GPIO events.
+ * @param <T> the type of the GPIO event emitter being listened to
  */
 public interface GpioEventEmitter<T extends GpioEventEmitter<T>> {
 

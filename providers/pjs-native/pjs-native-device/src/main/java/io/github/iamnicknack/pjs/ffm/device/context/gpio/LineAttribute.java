@@ -50,28 +50,43 @@ public record LineAttribute(
         }
     }
 
+    private enum ValueNames {
+        ID("ID"),
+        PADDING("padding"),
+        FLAGS("flags"),
+        VALUES("values"),
+        DEBOUNCE_PERIOD_US("debounce_period_us"),
+        UNION("union");
+
+        private final String name;
+
+        ValueNames(String name) {
+            this.name = name;
+        }
+    }
+
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-            ValueLayout.JAVA_INT.withName("id"),
-            ValueLayout.JAVA_INT.withName("padding"),
+            ValueLayout.JAVA_INT.withName(ValueNames.ID.name),
+            ValueLayout.JAVA_INT.withName(ValueNames.PADDING.name),
             MemoryLayout.unionLayout(
-                    ValueLayout.JAVA_LONG.withName("flags"),
-                    ValueLayout.JAVA_LONG.withName("values"),
-                    ValueLayout.JAVA_INT.withName("debounce_period_us")
-            ).withName("union")
+                    ValueLayout.JAVA_LONG.withName(ValueNames.FLAGS.name),
+                    ValueLayout.JAVA_LONG.withName(ValueNames.VALUES.name),
+                    ValueLayout.JAVA_INT.withName(ValueNames.DEBOUNCE_PERIOD_US.name)
+            ).withName(ValueNames.UNION.name)
     );
 
-    private static final VarHandle VH_ID = LAYOUT.varHandle(groupElement("id"));
+    private static final VarHandle VH_ID = LAYOUT.varHandle(groupElement(ValueNames.ID.name));
     private static final VarHandle VH_FLAGS = LAYOUT.varHandle(
-            groupElement("union"),
-            groupElement("flags")
+            groupElement(ValueNames.UNION.name),
+            groupElement(ValueNames.FLAGS.name)
     );
     private static final VarHandle VH_VALUES = LAYOUT.varHandle(
-            groupElement("union"),
-            groupElement("values")
+            groupElement(ValueNames.UNION.name),
+            groupElement(ValueNames.VALUES.name)
     );
     private static final VarHandle VH_DEBOUNCE = LAYOUT.varHandle(
-            groupElement("union"),
-            groupElement("debounce_period_us")
+            groupElement(ValueNames.UNION.name),
+            groupElement(ValueNames.DEBOUNCE_PERIOD_US.name)
     );
 
     public static class Serializer implements MemorySegmentSerializer<LineAttribute> {

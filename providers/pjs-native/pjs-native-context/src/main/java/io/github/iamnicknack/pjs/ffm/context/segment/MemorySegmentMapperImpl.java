@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MemorySegmentMapperImpl implements MemorySegmentMapper {
+public final class MemorySegmentMapperImpl implements MemorySegmentMapper {
 
     private final SegmentAllocator segmentAllocator;
     private final Map<Class<?>, MemorySegmentSerializer<?>> serializerMap = new ConcurrentHashMap<>();
