@@ -19,11 +19,7 @@ subprojects {
 tasks.register("printVersion") {
     description = "Output the effective version"
 
-    val v = rootProject.version.toString()
-        .takeIf { it.isNotBlank() && it != "unspecified" }
-        ?: buildVersion
-
     doLast {
-        println("version: $v")
+        println("version: ${rootProject.version}")
     }
 }
