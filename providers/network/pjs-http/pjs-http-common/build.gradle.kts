@@ -11,6 +11,6 @@ dependencies {
     implementation(libs.logback.classic)
     implementation(libs.jackson.databind)
     implementation(libs.kotlin.coroutines.core)
-    implementation("io.github.iamnicknack:pjs-core")
+    implementation(project(":pjs-core"))
     implementation("io.github.iamnicknack:pjs-utils")
 }

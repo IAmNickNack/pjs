@@ -8,12 +8,12 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":pjs-network-common"))
-    implementation(project(":pjs-native-device"))
-    implementation(project(":pjs-grpc-device"))
-    implementation(project(":pjs-pi4j-device"))
-    implementation(project(":pjs-mock-device"))
-    implementation("io.github.iamnicknack:pjs-utils")
+    implementation(project(":providers:network:pjs-network-common"))
+    implementation(project(":providers:pjs-native:pjs-native-device"))
+    implementation(project(":providers:network:pjs-grpc:pjs-grpc-device"))
+    implementation(project(":providers:pjs-pi4j-device"))
+    implementation(project(":providers:pjs-mock-device"))
+    implementation(project(":pjs-utils"))
     implementation(libs.apache.cli)
     implementation(libs.bundles.logging)
     implementation(libs.grpc.inprocess)

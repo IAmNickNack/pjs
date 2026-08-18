@@ -15,13 +15,13 @@ dependencies {
     implementation(libs.apache.cli)
     runtimeOnly(libs.bundles.pi4j.plugins)
 
-    api("io.github.iamnicknack:pjs-core")
-    implementation(project(":pjs-network-common"))
-    implementation(project(":pjs-http-common"))
-    runtimeOnly(project(":pjs-native-device"))
-    runtimeOnly(project(":pjs-grpc-device"))
-    runtimeOnly(project(":pjs-pi4j-device"))
-    runtimeOnly(project(":pjs-mock-device"))
+    api(project(":pjs-core"))
+    implementation(project(":providers:network:pjs-network-common"))
+    implementation(project(":providers:network:pjs-http:pjs-http-common"))
+    runtimeOnly(project(":providers:network:pjs-grpc:pjs-grpc-device"))
+    runtimeOnly(project(":providers:pjs-native:pjs-native-device"))
+    runtimeOnly(project(":providers:pjs-pi4j-device"))
+    runtimeOnly(project(":providers:pjs-mock-device"))
 
 }
 

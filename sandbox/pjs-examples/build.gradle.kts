@@ -8,16 +8,16 @@ plugins {
 }
 
 dependencies {
-    api("io.github.iamnicknack:pjs-core")
-    implementation("io.github.iamnicknack:pjs-mock-device")
-    implementation("io.github.iamnicknack:pjs-native-device")
-    implementation("io.github.iamnicknack:pjs-grpc-device")
-    implementation("io.github.iamnicknack:pjs-http-device")
-    api("io.github.iamnicknack:pjs-pi4j-device")
+    api(project(":pjs-core"))
+    implementation(project(":providers:pjs-mock-device"))
+    implementation(project(":providers:pjs-native:pjs-native-device"))
+    implementation(project(":providers:network:pjs-grpc::pjs-grpc-device"))
+    implementation(project(":providers:network:pjs-http:pjs-http-device"))
+    api(project(":providers:pjs-pi4j-device"))
 
-    implementation(project(":pjs-hardware-25lc"))
-    implementation(project(":pjs-hardware-mcp23x"))
-    implementation(project(":pjs-hardware-sh1106"))
+    implementation(project(":sandbox:pjs-hardware-25lc"))
+    implementation(project(":sandbox:pjs-hardware-mcp23x"))
+    implementation(project(":sandbox:pjs-hardware-sh1106"))
 
     implementation(libs.bundles.logging)
     implementation(libs.bundles.pi4j.plugins)

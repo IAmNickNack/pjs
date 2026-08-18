@@ -9,5 +9,9 @@ plugins {
 
 dependencies {
     api(project(":pjs-utils"))
-    testImplementation("io.github.iamnicknack:pjs-mock-device")
+    testImplementation(project(":providers:pjs-mock-device"))
+}
+
+subprojects.forEach {
+    println("Adding ${it.name} to ${project.name} dependencies")
 }
