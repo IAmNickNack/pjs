@@ -8,5 +8,5 @@ plugins {
 
 dependencies {
     api(project(":pjs-core"))
-    implementation(project(":pjs-mock-device"))
+    implementation(project(":providers:pjs-mock-device"))
 }
