@@ -4,6 +4,7 @@ import buildlogic.withVersionCatalog
 
 plugins {
     id("buildlogic.java-core")
+    jacoco
 }
 
 dependencies {
@@ -16,4 +17,12 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
+    }
 }
