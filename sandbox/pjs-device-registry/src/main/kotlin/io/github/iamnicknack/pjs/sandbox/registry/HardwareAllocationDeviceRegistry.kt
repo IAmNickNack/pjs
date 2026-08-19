@@ -246,6 +246,9 @@ class HardwareAllocationDeviceRegistry(
 
         /**
          * Exception thrown when attempting to allocate hardware that is already in use.
+         *
+         * @param requested the requested line
+         * @param conflicts the lines already in use which conflict with [requested]
          */
         class PinsInUse(
             val requested: HardwareAllocationIndex.Line,
@@ -258,6 +261,8 @@ class HardwareAllocationDeviceRegistry(
 
         /**
          * Exception thrown when attempting to allocate hardware on a bus that is already in use.
+         * @param requested the requested bus
+         * @param current the line already using the bus
          */
         class BusInUse(
             val requested: HardwareAllocationIndex.Line,
