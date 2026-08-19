@@ -242,13 +242,7 @@ class HardwareAllocationDeviceRegistry(
         class PinsNotAvailable(
             val requested: HardwareAllocationIndex.Line,
             val unavailable: HardwareAllocation
-        ) : HardwareAllocationException(
-            "Pins not available: ${requested.name}, unavailable: ${
-                unavailable.offsets.joinToString(
-                    ", "
-                )
-            }"
-        )
+        ) : HardwareAllocationException("Pins not available: ${requested.name}, unavailable: ${unavailable.joinToString(", ")}")
 
         /**
          * Exception thrown when attempting to allocate hardware that is already in use.

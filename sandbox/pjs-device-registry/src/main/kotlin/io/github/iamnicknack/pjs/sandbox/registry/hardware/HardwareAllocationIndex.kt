@@ -81,7 +81,7 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
      * @return the remainder of [allocation] representing pins not available in this index
      */
     fun remainder(allocation: HardwareAllocation): HardwareAllocation = this
-        .fold(HardwareAllocation.fromMask(allocation.mask)) { acc, m -> acc not m.allocation }
+        .fold(HardwareAllocation(allocation.mask)) { acc, m -> acc not m.allocation }
 
 
     /**

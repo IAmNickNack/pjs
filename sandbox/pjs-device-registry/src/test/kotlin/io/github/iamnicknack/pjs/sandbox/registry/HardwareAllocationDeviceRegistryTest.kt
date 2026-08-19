@@ -125,7 +125,7 @@ class HardwareAllocationDeviceRegistryTest {
 
         assertThat(error.conflicts)
             .containsExactly(
-                Line(LineType.GPIO, "valid-gpio", HardwareAllocation.fromOffset(3))
+                Line(LineType.GPIO, "valid-gpio", HardwareAllocation.fromOffsets(3))
             )
     }
 

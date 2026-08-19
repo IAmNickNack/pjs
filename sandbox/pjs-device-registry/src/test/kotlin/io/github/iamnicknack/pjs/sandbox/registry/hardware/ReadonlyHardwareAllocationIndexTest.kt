@@ -28,21 +28,22 @@ class ReadonlyHardwareAllocationIndexTest {
     @Test
     fun excludesOffsetsAbove63() {
         val index = ReadonlyHardwareAllocationIndex(lineSupplier.lines())
-        assertTrue(index.flatMap { it.allocation.offsets }.all { it in 0..63 })
+        assertTrue(index.flatMap { it.allocation.toList() }.all { it in 0..63 })
     }
 
     @Test
     fun gpioOnlyIncludesEntriesWithDashedCurrentValue() {
         val index = ReadonlyHardwareAllocationIndex(lineSupplier.lines())
         val gpio = assertNotNull(index.findByName("GPIO"))
-        assertFalse(gpio.allocation.offsets.contains(7))
-        assertFalse(gpio.allocation.offsets.contains(8))
-        assertFalse(gpio.allocation.offsets.contains(28))
-        assertFalse(gpio.allocation.offsets.contains(29))
-        assertFalse(gpio.allocation.offsets.contains(32))
-        assertFalse(gpio.allocation.offsets.contains(33))
-        assertFalse(gpio.allocation.offsets.contains(34))
-        assertFalse(gpio.allocation.offsets.contains(35))
+        val offsets = gpio.allocation.toList()
+        assertFalse(offsets.contains(7))
+        assertFalse(offsets.contains(8))
+        assertFalse(offsets.contains(28))
+        assertFalse(offsets.contains(29))
+        assertFalse(offsets.contains(32))
+        assertFalse(offsets.contains(33))
+        assertFalse(offsets.contains(34))
+        assertFalse(offsets.contains(35))
     }
 
     private fun assertExpectedLines(index: ReadonlyHardwareAllocationIndex) {
@@ -70,12 +71,12 @@ class ReadonlyHardwareAllocationIndexTest {
         assertEquals(LineType.I2C, i2c3.lineType)
         assertEquals(LineType.UART, uart1.lineType)
 
-        assertEquals(expectedGpios, gpio.allocation.offsets)
+        assertEquals(expectedGpios, gpio.allocation.toList())
 
-        assertEquals(listOf(9, 10, 11), spi0.allocation.offsets)
-        assertEquals(listOf(18), pwm0.allocation.offsets)
-        assertEquals(listOf(45), pwm1.allocation.offsets)
-        assertEquals(listOf(14, 15), i2c3.allocation.offsets)
-        assertEquals(listOf(0, 1), uart1.allocation.offsets)
+        assertEquals(listOf(9, 10, 11), spi0.allocation.toList())
+        assertEquals(listOf(18), pwm0.allocation.toList())
+        assertEquals(listOf(45), pwm1.allocation.toList())
+        assertEquals(listOf(14, 15), i2c3.allocation.toList())
+        assertEquals(listOf(0, 1), uart1.allocation.toList())
     }
 }

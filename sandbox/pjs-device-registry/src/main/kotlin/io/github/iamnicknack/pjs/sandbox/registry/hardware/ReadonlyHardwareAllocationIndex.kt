@@ -12,7 +12,7 @@ open class ReadonlyHardwareAllocationIndex(lines: Set<Line>) : HardwareAllocatio
     private val linesByName = lines
         .associateBy { it.name }
     private val linesByPin = lines
-        .flatMap { line -> line.allocation.offsets.map { it to line } }
+        .flatMap { line -> line.allocation.map { it to line } }
         .toMap()
     private val linesByType = lines
         .groupBy { it.lineType }

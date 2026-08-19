@@ -2,29 +2,33 @@ package io.github.iamnicknack.pjs.sandbox.registry.hardware
 
 /**
  * Represents a hardware allocation of pin offsets and bitmasks.
- * @param offsets the offsets / pins
  * @param mask the bitmask of offsets
  */
 data class HardwareAllocation(
-    val offsets: List<Int>,
-    val mask: Long = offsets.fold(0L) { acc, offset -> acc or (1L shl offset) }
-) {
+    val mask: Long
+) : Iterable<Int> {
+
+    /**
+     * @param offsets the offsets / pins
+     */
+    constructor(offsets: List<Int>) : this(offsets.fold(0L) { acc, offset -> acc or (1L shl offset) })
+
     /**
      * Create a new [HardwareAllocation] from the intersection of this and another allocation.
      */
-    infix fun and(other: HardwareAllocation): HardwareAllocation = fromMask(this.mask and other.mask)
+    infix fun and(other: HardwareAllocation): HardwareAllocation = HardwareAllocation(this.mask and other.mask)
 
     /**
      * Create a new [HardwareAllocation] from the union of this and another allocation.
      */
-    infix fun or(other: HardwareAllocation): HardwareAllocation = fromMask(this.mask or other.mask)
+    infix fun or(other: HardwareAllocation): HardwareAllocation = HardwareAllocation(this.mask or other.mask)
 
     /**
      * Create a new [HardwareAllocation] from the difference of this and another allocation.
      *
      * Removes the pins from this allocation that are also in the other allocation.
      */
-    infix fun not(other: HardwareAllocation): HardwareAllocation = fromMask(this.mask and other.mask.inv())
+    infix fun not(other: HardwareAllocation): HardwareAllocation = HardwareAllocation(this.mask and other.mask.inv())
 
     /**
      * Check if this [HardwareAllocation] intersects with another allocation.
@@ -41,24 +45,11 @@ data class HardwareAllocation(
      */
     fun contains(pin: Int): Boolean = mask and (1L shl pin) != 0L
 
-    override fun equals(other: Any?): Boolean {
-        return this.mask == (other as? HardwareAllocation)?.mask
-    }
-
-    override fun hashCode(): Int {
-        return mask.hashCode()
-    }
+    override fun iterator(): Iterator<Int> = OffsetsIterator(mask)
 
     companion object {
         @JvmStatic
-        val EMPTY = fromMask(0L)
-
-        /**
-         * Creates a HardwareAllocation from a single offset / pin.
-         * @param offset the offset / pin
-         */
-        @JvmStatic
-        fun fromOffset(offset: Int) = HardwareAllocation(listOf(offset))
+        val EMPTY = HardwareAllocation(0L)
 
         /**
          * Creates a HardwareAllocation from a list of offsets / pins.
@@ -66,17 +57,20 @@ data class HardwareAllocation(
          */
         @JvmStatic
         fun fromOffsets(vararg offsets: Int) = HardwareAllocation(offsets.toList())
+    }
 
-        /**
-         * Creates a HardwareAllocation from a mask, calculating the offsets.
-         * @param mask the bitmask of offsets
-         */
-        @JvmStatic
-        fun fromMask(mask: Long, numBits: Int = 64): HardwareAllocation {
-            val offsets = (0 until numBits)
-                .mapNotNull { if (mask and (1L shl it) != 0L) it else null }
+    /**
+     * An iterator over the set bits in a mask.
+     */
+    private class OffsetsIterator(private var remaining: Long) : Iterator<Int> {
+        override fun hasNext(): Boolean {
+            return remaining != 0L
+        }
 
-            return HardwareAllocation(offsets, mask)
+        override fun next(): Int {
+            val index = java.lang.Long.numberOfTrailingZeros(remaining)
+            remaining = remaining and (1L shl index).inv()
+            return index
         }
     }
 }
