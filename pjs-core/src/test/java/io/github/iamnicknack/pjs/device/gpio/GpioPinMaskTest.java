@@ -51,7 +51,7 @@ class GpioPinMaskTest {
     void canCreateSimpleMask() {
         var pinMask = GpioPinMask.fromOffsets(2);
         assertThat(pinMask.getMask()).isEqualTo(4);
-        assertThat(GpioPinMask.mask(new int[] { 2 })).isEqualTo(4);
+        assertThat(GpioPinMask.mask(2)).isEqualTo(4);
     }
 
     @Test

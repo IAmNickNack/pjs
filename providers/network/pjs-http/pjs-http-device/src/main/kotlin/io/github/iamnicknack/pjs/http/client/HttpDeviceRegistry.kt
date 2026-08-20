@@ -57,8 +57,6 @@ sealed class HttpDeviceRegistry(client: HttpClient) : DefaultDeviceRegistry() {
         }
     )
 
-    constructor(host: String, port: Int) : this("http://$host:$port")
-
     init {
         registerFactory(HttpGpioPortFactory(this.portHandler), GpioPortConfig::class.java)
         registerFactory(HttpI2CFactory(i2cHandler), I2CConfig::class.java)
@@ -95,7 +93,6 @@ sealed class HttpDeviceRegistry(client: HttpClient) : DefaultDeviceRegistry() {
     @Suppress("UNCHECKED_CAST")
     class Proxy(httpClient: HttpClient) : HttpDeviceRegistry(httpClient) {
 
-        constructor(baseUrl: String) : this(httpClient(baseUrl))
         constructor(host: String, port: Int) : this(httpClient(host, port))
 
         override fun <T : Device<T>, V : DeviceConfig<T>> create(config: V): T {
