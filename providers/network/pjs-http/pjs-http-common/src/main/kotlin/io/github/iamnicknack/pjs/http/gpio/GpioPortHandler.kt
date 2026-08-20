@@ -1,12 +1,17 @@
 package io.github.iamnicknack.pjs.http.gpio
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.iamnicknack.pjs.device.gpio.GpioEventMode
 import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.http.config.ConfigHandler
+import io.github.iamnicknack.pjs.http.jackson.IntMaskDeserializer
+import io.github.iamnicknack.pjs.http.jackson.IntMaskSerializer
 import io.github.iamnicknack.pjs.model.event.GpioChangeEventType
+import tools.jackson.databind.annotation.JsonDeserialize
+import tools.jackson.databind.annotation.JsonSerialize
 
 /**
  * HTTP layer functionality for GPIO ports
@@ -38,8 +43,11 @@ interface GpioPortHandler : ConfigHandler<GpioPort> {
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
     class GpioPortConfigPayload(
+        @param:JsonSerialize(using = IntMaskSerializer::class)
+        @param:JsonDeserialize(using = IntMaskDeserializer::class)
+        @param:JsonProperty("mask")
         val pinNumber: IntArray,
-        val portMode: GpioPortMode,
+        val portMode: GpioPortMode = GpioPortMode.INPUT,
         val eventMode: GpioEventMode = GpioEventMode.NONE,
         val defaultValue: Int? = null,
         val debounceDelay: Int? = null

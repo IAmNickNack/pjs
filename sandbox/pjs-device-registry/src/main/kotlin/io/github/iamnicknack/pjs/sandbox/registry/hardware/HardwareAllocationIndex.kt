@@ -58,6 +58,14 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
         .findByAllocation(HardwareAllocation.fromOffsets(*offsets))
 
     /**
+     * Fetch the line allocation which can satisfy the specified mask
+     * @param mask the mask to match
+     * @return the line allocation for given mask
+     */
+    fun findByMask(mask: Long): Line? = this
+        .findByAllocation(HardwareAllocation(mask))
+
+    /**
      * Fetch all line allocations of the specified type
      * @param lineType the type of line to fetch
      * @return all line allocations of the specified type

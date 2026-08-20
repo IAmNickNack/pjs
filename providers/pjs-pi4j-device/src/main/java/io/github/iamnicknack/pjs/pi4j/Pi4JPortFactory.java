@@ -7,10 +7,10 @@ import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortFactory;
 import io.github.iamnicknack.pjs.model.device.DeviceConfig;
+import io.github.iamnicknack.pjs.device.gpio.GpioPinMask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class Pi4JPortFactory implements GpioPortFactory {
             case INPUT_PULLUP -> PullResistance.PULL_UP;
             default -> PullResistance.OFF;
         };
-        var devices = Arrays.stream(config.pinNumber())
+        var devices = GpioPinMask.stream(config.mask())
                 .mapToObj(pin -> DigitalInputConfig.newBuilder(pi4jContext)
                         .bcm(pin)
                         .pull(mode)
@@ -67,7 +67,7 @@ public class Pi4JPortFactory implements GpioPortFactory {
     }
 
     private List<DigitalOutput> createOutputs(GpioPortConfig config) {
-        var devices = Arrays.stream(config.pinNumber())
+        var devices = GpioPinMask.stream(config.mask())
                 .mapToObj(pin -> DigitalOutputConfig.newBuilder(pi4jContext)
                         .bcm(pin)
                         .initial(config.defaultValue() > 0 ? DigitalState.HIGH : DigitalState.LOW)

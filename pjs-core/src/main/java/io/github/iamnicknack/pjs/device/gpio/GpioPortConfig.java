@@ -3,20 +3,17 @@ package io.github.iamnicknack.pjs.device.gpio;
 import io.github.iamnicknack.pjs.model.device.DeviceConfig;
 import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Configuration for a GPIO port which can be used by a {@link GpioPortFactory} to construct a {@link GpioPort} instance.
- * @param pinNumber array of pin numbers
+ * @param mask the pin mask
  * @param portMode initial portMode of the port
  * @param debounceDelay debounce delay in microseconds
  * @param id unique identifier for the port
  */
 public record GpioPortConfig(
-        int[] pinNumber,
+        int mask,
         GpioPortMode portMode,
         GpioEventMode eventMode,
         int defaultValue,
@@ -28,30 +25,13 @@ public record GpioPortConfig(
         return new Builder();
     }
 
-    public int getPinMask() {
-        return Arrays.stream(pinNumber).reduce(0, (acc, pin) -> acc | (1 << pin));
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        GpioPortConfig that = (GpioPortConfig) obj;
-        return Arrays.equals(pinNumber, that.pinNumber)
-                && portMode == that.portMode
-                && eventMode == that.eventMode
-                && defaultValue == that.defaultValue
-                && debounceDelay == that.debounceDelay
-                && Objects.equals(id, that.id);
-    }
-
     @Override
     public String getId() {
         return id;
     }
 
     public static class Builder {
-        private final List<Integer> pinNumber = new ArrayList<>();
+        private int mask = 0;
         private GpioPortMode portMode = GpioPortMode.INPUT;
         private GpioEventMode eventMode = GpioEventMode.NONE;
         private int defaultValue = -1;
@@ -60,12 +40,12 @@ public record GpioPortConfig(
         private String id;
 
         public Builder pin(int... pinNumber) {
-            Arrays.stream(pinNumber).forEach(this.pinNumber::add);
+            Arrays.stream(pinNumber).forEach(pin -> this.mask |= 1 << pin);
             return this;
         }
 
         public Builder pin(int pinNumber) {
-            this.pinNumber.add(pinNumber);
+            this.mask |= 1 << pinNumber;
             return this;
         }
 
@@ -95,9 +75,8 @@ public record GpioPortConfig(
         }
 
         public GpioPortConfig build() {
-            int[] pinNumber = this.pinNumber.stream().mapToInt(Integer::intValue).toArray();
-            var id = (this.id != null) ? this.id : String.format("GPIO-%s-%s", this.portMode, Arrays.toString(pinNumber));
-            return new GpioPortConfig(pinNumber, portMode, eventMode, defaultValue, debounceDelay, id);
+            var id = (this.id != null) ? this.id : String.format("GPIO-%s-%s", this.portMode, Integer.toBinaryString(this.mask));
+            return new GpioPortConfig(mask, portMode, eventMode, defaultValue, debounceDelay, id);
         }
     }
 }

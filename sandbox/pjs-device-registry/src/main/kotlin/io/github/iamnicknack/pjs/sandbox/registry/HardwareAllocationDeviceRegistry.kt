@@ -111,7 +111,7 @@ class HardwareAllocationDeviceRegistry(
             val line = HardwareAllocationIndex.Line(
                 LineType.GPIO,
                 config.id,
-                HardwareAllocation.fromOffsets(*config.pinNumber)
+                HardwareAllocation(config.mask.toLong())
             )
 
             if (gpioIndex.findByAllocation(line.allocation) == null) {

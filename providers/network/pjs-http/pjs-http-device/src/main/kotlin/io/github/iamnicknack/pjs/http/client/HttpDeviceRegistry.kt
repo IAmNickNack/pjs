@@ -34,7 +34,7 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.sse.*
-import io.ktor.serialization.jackson.*
+import io.ktor.serialization.jackson3.*
 import kotlinx.coroutines.runBlocking
 
 sealed class HttpDeviceRegistry(client: HttpClient) : DefaultDeviceRegistry() {
@@ -56,8 +56,6 @@ sealed class HttpDeviceRegistry(client: HttpClient) : DefaultDeviceRegistry() {
             install(SSE)
         }
     )
-
-    constructor(host: String, port: Int) : this("http://$host:$port")
 
     init {
         registerFactory(HttpGpioPortFactory(this.portHandler), GpioPortConfig::class.java)
@@ -95,7 +93,6 @@ sealed class HttpDeviceRegistry(client: HttpClient) : DefaultDeviceRegistry() {
     @Suppress("UNCHECKED_CAST")
     class Proxy(httpClient: HttpClient) : HttpDeviceRegistry(httpClient) {
 
-        constructor(baseUrl: String) : this(httpClient(baseUrl))
         constructor(host: String, port: Int) : this(httpClient(host, port))
 
         override fun <T : Device<T>, V : DeviceConfig<T>> create(config: V): T {

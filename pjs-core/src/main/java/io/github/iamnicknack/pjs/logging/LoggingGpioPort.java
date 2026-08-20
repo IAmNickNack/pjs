@@ -6,7 +6,7 @@ import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
 import io.github.iamnicknack.pjs.model.device.DeviceConfig;
 import io.github.iamnicknack.pjs.model.device.WithDelegateDevice;
 import io.github.iamnicknack.pjs.model.event.GpioEventListener;
-import io.github.iamnicknack.pjs.util.GpioPinMask;
+import io.github.iamnicknack.pjs.device.gpio.GpioPinMask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +21,7 @@ public class LoggingGpioPort implements GpioPort, WithDelegateDevice<GpioPort> {
 
     public LoggingGpioPort(GpioPort delegate) {
         this.delegate = delegate;
-        this.pinsMask = new GpioPinMask(((GpioPortConfig)delegate.getConfig()).pinNumber());
+        this.pinsMask = GpioPinMask.fromMask(((GpioPortConfig)delegate.getConfig()).mask());
         this.logger = LoggerFactory.getLogger("device." + delegate.getClass().getSimpleName() + "." + delegate.getConfig().getId());
     }
 
