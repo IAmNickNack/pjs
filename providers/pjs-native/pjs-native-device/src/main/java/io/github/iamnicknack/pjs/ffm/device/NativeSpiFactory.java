@@ -3,13 +3,11 @@ package io.github.iamnicknack.pjs.ffm.device;
 import io.github.iamnicknack.pjs.device.spi.Spi;
 import io.github.iamnicknack.pjs.device.spi.SpiConfig;
 import io.github.iamnicknack.pjs.device.spi.SpiFactory;
-import io.github.iamnicknack.pjs.device.spi.SpiTransfer;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapper;
 import io.github.iamnicknack.pjs.ffm.device.context.FileOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.FileOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.spi.SpiConstants;
-import io.github.iamnicknack.pjs.logging.LoggingSpi;
 
 import java.lang.foreign.SegmentAllocator;
 
@@ -53,11 +51,5 @@ public class NativeSpiFactory implements SpiFactory {
                 segmentAllocator,
                 memorySegmentMapper
         );
-    }
-
-    @Override
-    public SpiTransfer createTransfer(Spi spi) {
-        var delegateSpi = (spi instanceof LoggingSpi loggingSpi) ? loggingSpi.getDelegate() : spi;
-        return ((NativeSpi)delegateSpi).new Transfer();
     }
 }

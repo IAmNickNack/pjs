@@ -5,7 +5,6 @@ import io.github.iamnicknack.pjs.sandbox.device.eeprom.PageFunction;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
 import io.github.iamnicknack.pjs.device.spi.SpiConfig;
-import io.github.iamnicknack.pjs.device.spi.SpiFactory;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +45,7 @@ public class EepromExample implements Runnable {
         var holdPin = registry.create(HOLD_PIN_CONFIG).pin();
 
         var spi = registry.create(SPI_CONFIG);
-        var spiTransfer = ((SpiFactory)registry.getFactory(SpiConfig.class)).createTransfer(spi);
+        var spiTransfer = spi.createTransfer();
         eeprom = new Microchip25LcEeprom(spiTransfer, holdPin, new PageFunction.DefaultPageFunction(PAGE_SIZE));
     }
 

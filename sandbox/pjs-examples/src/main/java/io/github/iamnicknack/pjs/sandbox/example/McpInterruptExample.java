@@ -2,7 +2,6 @@ package io.github.iamnicknack.pjs.sandbox.example;
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
-import io.github.iamnicknack.pjs.device.spi.SpiTransferFactory;
 import io.github.iamnicknack.pjs.sandbox.device.mcp.Mcp23x08;
 import io.github.iamnicknack.pjs.sandbox.device.mcp.register.McpSpiTransferRegister;
 import io.github.iamnicknack.pjs.device.spi.SpiConfig;
@@ -46,13 +45,9 @@ public class McpInterruptExample implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(McpInterruptExample.class);
     private final DeviceRegistry deviceRegistry;
-    private final SpiTransferFactory spiTransferFactory;
 
     public McpInterruptExample(DeviceRegistry deviceRegistry) {
         this.deviceRegistry = deviceRegistry;
-        this.spiTransferFactory = (SpiTransferFactory)deviceRegistry.getFactory(SpiConfig.class);
-
-        logger.info("SPI transfer factory: {}", spiTransferFactory.getClass().getSimpleName());
     }
 
     public void run() {
@@ -60,7 +55,7 @@ public class McpInterruptExample implements Runnable {
         var outputPin = new DefaultPinOperations(deviceRegistry.create(OUTPUT_PIN_CONFIG).pin());
         var interruptPort = deviceRegistry.create(INTERRUPT_PIN_CONFIG);
         var spi = deviceRegistry.create(SPI_CONFIG);
-        var spiTransfer = spiTransferFactory.createTransfer(spi);
+        var spiTransfer = spi.createTransfer();
 
         try(var mcp = new Mcp23x08(new McpSpiTransferRegister.Factory(spiTransfer), interruptPort)) {
             resetPin.pulse();

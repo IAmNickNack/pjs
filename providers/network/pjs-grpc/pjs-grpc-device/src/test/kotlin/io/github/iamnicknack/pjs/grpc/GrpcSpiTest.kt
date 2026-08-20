@@ -5,7 +5,6 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import io.github.iamnicknack.pjs.device.spi.Spi
 import io.github.iamnicknack.pjs.device.spi.SpiConfig
-import io.github.iamnicknack.pjs.device.spi.SpiFactory
 import io.github.iamnicknack.pjs.device.spi.SpiTransfer
 import io.github.iamnicknack.pjs.mock.MockSpi
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
@@ -54,9 +53,8 @@ class GrpcSpiTest {
         @PjsExtension.Remote remoteRegistry: DeviceRegistry
     ) {
         val localDevice = localRegistry.create(config)
-        val localFactory = localRegistry.getFactory(SpiConfig::class.java) as SpiFactory
 
-        val transfer = localFactory.createTransfer(localDevice)
+        val transfer = localDevice.createTransfer()
         assertThat(transfer).isNotNull()
 
         val remoteDevice = remoteRegistry.device<Spi>(config.id) as? MockSpi ?: fail("cannot find device")

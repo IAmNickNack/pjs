@@ -10,17 +10,17 @@ import io.github.iamnicknack.pjs.device.spi.Spi
 import io.github.iamnicknack.pjs.device.spi.SpiConfig
 import io.github.iamnicknack.pjs.http.client.gpio.GpioPortClientHandler
 import io.github.iamnicknack.pjs.http.client.gpio.HttpGpioPort
-import io.github.iamnicknack.pjs.http.client.gpio.HttpGpioPortHandler
 import io.github.iamnicknack.pjs.http.client.gpio.HttpGpioPortFactory
+import io.github.iamnicknack.pjs.http.client.gpio.HttpGpioPortHandler
 import io.github.iamnicknack.pjs.http.client.i2c.HttpI2C
-import io.github.iamnicknack.pjs.http.client.i2c.HttpI2CHandler
 import io.github.iamnicknack.pjs.http.client.i2c.HttpI2CFactory
+import io.github.iamnicknack.pjs.http.client.i2c.HttpI2CHandler
 import io.github.iamnicknack.pjs.http.client.pwm.HttpPwm
-import io.github.iamnicknack.pjs.http.client.pwm.HttpPwmHandler
 import io.github.iamnicknack.pjs.http.client.pwm.HttpPwmFactory
+import io.github.iamnicknack.pjs.http.client.pwm.HttpPwmHandler
 import io.github.iamnicknack.pjs.http.client.spi.HttpSpi
-import io.github.iamnicknack.pjs.http.client.spi.HttpSpiHandler
 import io.github.iamnicknack.pjs.http.client.spi.HttpSpiFactory
+import io.github.iamnicknack.pjs.http.client.spi.HttpSpiHandler
 import io.github.iamnicknack.pjs.http.client.spi.HttpSpiTransferHandler
 import io.github.iamnicknack.pjs.http.i2c.I2CHandler
 import io.github.iamnicknack.pjs.http.pwm.PwmHandler
@@ -79,7 +79,7 @@ sealed class HttpDeviceRegistry(client: HttpClient) : DefaultDeviceRegistry() {
             }
             Spi::class.java -> runBlocking {
                 val deviceConfig = spiHandler.getDevice(id) as SpiConfig
-                HttpSpi.Proxy(spiHandler, deviceConfig) as T
+                HttpSpi.Proxy(spiHandler, spiTransferHandler, deviceConfig) as T
             }
             Pwm::class.java -> runBlocking {
                 val deviceConfig = pwmHandler.getDevice(id) as PwmConfig

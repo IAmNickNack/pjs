@@ -1,8 +1,6 @@
 package io.github.iamnicknack.pjs.http.server.spi
 
 import io.github.iamnicknack.pjs.device.spi.Spi
-import io.github.iamnicknack.pjs.device.spi.SpiConfig
-import io.github.iamnicknack.pjs.device.spi.SpiFactory
 import io.github.iamnicknack.pjs.device.spi.SpiTransfer
 import io.github.iamnicknack.pjs.http.server.deviceOrThrow
 import io.github.iamnicknack.pjs.http.spi.SpiTransferHandler
@@ -12,13 +10,11 @@ class SpiTransferHandlerImpl(
     private val deviceRegistry: DeviceRegistry,
 ) : SpiTransferHandler {
 
-    private val spiFactory: SpiFactory = deviceRegistry.getFactory(SpiConfig::class.java) as SpiFactory
-
     override suspend fun transfer(
         deviceId: String,
         messageList: SpiTransferHandler.TransferMessageList
     ): SpiTransferHandler.TransferMessageList {
-        val transfer = spiFactory.createTransfer(deviceRegistry.deviceOrThrow<Spi>(deviceId))
+        val transfer = deviceRegistry.deviceOrThrow<Spi>(deviceId).createTransfer()
 
         val messagesToSend = messageList.messages
             .map {

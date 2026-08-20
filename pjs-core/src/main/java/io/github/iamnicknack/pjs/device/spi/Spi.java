@@ -1,5 +1,6 @@
 package io.github.iamnicknack.pjs.device.spi;
 
+import io.github.iamnicknack.pjs.device.spi.impl.DefaultSpiTransfer;
 import io.github.iamnicknack.pjs.model.device.Device;
 import io.github.iamnicknack.pjs.model.port.Port;
 import io.github.iamnicknack.pjs.model.port.SerialPort;
@@ -63,5 +64,13 @@ public interface Spi extends SerialPort, Port<Integer>, Device<Spi> {
         byte[] buffer = new byte[1];
         readBytes(buffer);
         return (int)buffer[0];
+    }
+
+    /**
+     * Create an {@link SpiTransfer} from this device
+     * @return a new {@link SpiTransfer}
+     */
+    default SpiTransfer createTransfer() {
+        return new DefaultSpiTransfer(this);
     }
 }
