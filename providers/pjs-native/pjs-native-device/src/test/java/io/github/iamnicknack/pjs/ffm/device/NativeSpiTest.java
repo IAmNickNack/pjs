@@ -2,7 +2,6 @@ package io.github.iamnicknack.pjs.ffm.device;
 
 import io.github.iamnicknack.pjs.device.spi.Spi;
 import io.github.iamnicknack.pjs.device.spi.SpiConfig;
-import io.github.iamnicknack.pjs.device.spi.SpiFactory;
 import io.github.iamnicknack.pjs.device.spi.SpiTransfer;
 import io.github.iamnicknack.pjs.ffm.context.segment.MemorySegmentMapperImpl;
 import io.github.iamnicknack.pjs.ffm.device.context.AbstractIoctlOperations;
@@ -11,7 +10,7 @@ import io.github.iamnicknack.pjs.ffm.device.context.spi.SpiConstants;
 import org.junit.jupiter.api.Test;
 
 import java.lang.foreign.Arena;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 import static io.github.iamnicknack.pjs.ffm.device.context.spi.SpiConstants.SPI_IOC_RD_BITS_PER_WORD;
@@ -38,8 +37,7 @@ class NativeSpiTest {
     void canTransfer() {
         performTest(
                 builder -> builder.addHandler(SpiConstants.SPI_IOC_MESSAGE(1)),
-                (spi, _) -> spi
-                        .transfer(new byte[0], 0, new byte[0], 0, 0)
+                spi -> spi.transfer(new byte[0], 0, new byte[0], 0, 0)
         );
     }
 
@@ -47,15 +45,13 @@ class NativeSpiTest {
     void canTransferMessage() {
         performTest(
                 builder -> builder.addHandler(SpiConstants.SPI_IOC_MESSAGE(1)),
-                (spi, factory) -> factory
-                        .createTransfer(spi)
-                        .transfer(SpiTransfer.Message.write(new byte[0], 0, 0))
+                spi -> spi.createTransfer().transfer(SpiTransfer.Message.write(new byte[0], 0, 0))
         );
     }
 
     private void performTest(
             UnaryOperator<AbstractIoctlOperations.Builder> ioctlHandlers,
-            BiConsumer<Spi, SpiFactory> verifier
+            Consumer<Spi> verifier
     ) {
         var fileOperations = new VirtualFileOperations();
         var ioctlOperations = AbstractIoctlOperations.builder()
@@ -68,7 +64,7 @@ class NativeSpiTest {
 
         try (var factory = new NativeSpiFactory(fileOperations, ioctlOperations, mapper, segmentAllocator);
              var spi = factory.create(config)) {
-            verifier.accept(spi, factory);
+            verifier.accept(spi);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -2,13 +2,16 @@ package io.github.iamnicknack.pjs.grpc
 
 import io.github.iamnicknack.pjs.device.spi.Spi
 import io.github.iamnicknack.pjs.device.spi.SpiConfig
+import io.github.iamnicknack.pjs.device.spi.SpiTransfer
 import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiConfigServiceGrpc
 import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiServiceGrpc
+import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiTransferServiceGrpc
 import io.github.iamnicknack.pjs.model.device.DeviceConfig
 
 class GrpcSpi(
     private val config: SpiConfig,
     private val stub : SpiServiceGrpc.SpiServiceBlockingStub,
+    private val transferStub: SpiTransferServiceGrpc.SpiTransferServiceBlockingStub,
     private val configStub: SpiConfigServiceGrpc.SpiConfigServiceBlockingStub,
 ) : Spi {
 
@@ -24,5 +27,9 @@ class GrpcSpi(
 
     override fun close() {
         configStub.remove(config.asDeviceRequest())
+    }
+
+    override fun createTransfer(): SpiTransfer {
+        return GrpcSpiTransfer(this.config, this.transferStub)
     }
 }

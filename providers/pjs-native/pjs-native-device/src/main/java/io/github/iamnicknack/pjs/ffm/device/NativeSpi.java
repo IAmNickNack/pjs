@@ -67,7 +67,12 @@ public class NativeSpi implements Spi, AutoCloseable {
         fileDescriptor.close();
     }
 
-    class Transfer implements io.github.iamnicknack.pjs.device.spi.SpiTransfer {
+    @Override
+    public io.github.iamnicknack.pjs.device.spi.SpiTransfer createTransfer() {
+        return new Transfer();
+    }
+
+    private class Transfer implements io.github.iamnicknack.pjs.device.spi.SpiTransfer {
 
         @Override
         public int transfer(Message... messages) {

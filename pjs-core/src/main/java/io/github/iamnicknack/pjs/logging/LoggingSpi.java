@@ -1,6 +1,7 @@
 package io.github.iamnicknack.pjs.logging;
 
 import io.github.iamnicknack.pjs.device.spi.Spi;
+import io.github.iamnicknack.pjs.device.spi.SpiTransfer;
 import io.github.iamnicknack.pjs.model.device.DeviceConfig;
 import io.github.iamnicknack.pjs.model.device.WithDelegateDevice;
 import org.slf4j.Logger;
@@ -43,5 +44,10 @@ public class LoggingSpi implements Spi, WithDelegateDevice<Spi> {
     @Override
     public void close() throws Exception {
         delegate.close();
+    }
+
+    @Override
+    public SpiTransfer createTransfer() {
+        return new LoggingSpiTransfer(delegate.createTransfer(), delegate.getConfig().getId());
     }
 }
