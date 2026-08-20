@@ -10,9 +10,4 @@ public class MockPwmFactory implements DeviceFactory<Pwm, PwmConfig> {
     public Pwm create(PwmConfig config) {
         return new MockPwm(config);
     }
-
-    @Override
-    public void close() {
-        // do nothing
-    }
 }

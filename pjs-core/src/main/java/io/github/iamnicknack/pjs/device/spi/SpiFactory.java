@@ -6,9 +6,4 @@ import io.github.iamnicknack.pjs.model.device.DeviceFactory;
  * Factory for SPI devices.
  */
 public interface SpiFactory extends DeviceFactory<Spi, SpiConfig> {
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    default void close() {}
 }

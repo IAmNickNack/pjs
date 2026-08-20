@@ -9,9 +9,4 @@ public class MockGpioPortFactory implements DeviceFactory<GpioPort, GpioPortConf
     public GpioPort create(GpioPortConfig config) {
         return new MockGpioPort(config);
     }
-
-    @Override
-    public void close() {
-        // do nothing
-    }
 }
