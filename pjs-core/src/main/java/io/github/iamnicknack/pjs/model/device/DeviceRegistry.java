@@ -12,27 +12,6 @@ import org.jspecify.annotations.Nullable;
 public interface DeviceRegistry extends GenericDeviceFactory, Iterable<Device<?>>, AutoCloseable {
 
     /**
-     * Register a device factory.
-     * @param factory the factory to register.
-     * @param configType the configuration type used by the factory.
-     * @return this instance for chaining.
-     * @param <T> the type of device created by the factory.
-     * @param <V> the type of configuration used by the factory.
-     */
-    <T extends Device<T>, V extends DeviceConfig<T>> DeviceRegistry registerFactory(
-            DeviceFactory<T, V> factory,
-            Class<V> configType
-    );
-
-    /**
-     * Get the factory associated with a given configuration type.
-     * @param configType the configuration type.
-     * @return the factory, or null if not found.
-     * @param <T> the type of device created by the factory.
-     */
-    <T extends Device<T>, V extends DeviceConfig<T>> DeviceFactory<T, V> getFactory(Class<V> configType);
-
-    /**
      * Create a device of type T, from a configuration of type V.
      * @param config the configuration to create the device from.
      * @return the created device.
