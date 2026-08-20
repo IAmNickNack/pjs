@@ -5,8 +5,6 @@ import io.github.iamnicknack.pjs.device.pwm.PwmBean;
 import io.github.iamnicknack.pjs.device.pwm.PwmConfig;
 import io.github.iamnicknack.pjs.ffm.device.context.SysfsOperations;
 
-import java.util.concurrent.TimeUnit;
-
 class NativePwm extends PwmBean implements Pwm, AutoCloseable {
 
     static final String ENABLE_PATH = "enable";

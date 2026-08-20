@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 /**
  * Configure a device registry from a map of properties.
  * Delegating construction of a registry to the loader allows the loading
+ * @param <T> the type of the registry configuration.
  */
 public interface DeviceRegistryLoader<T> {
 
