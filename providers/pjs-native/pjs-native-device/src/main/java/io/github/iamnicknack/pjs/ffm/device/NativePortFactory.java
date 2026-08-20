@@ -161,7 +161,7 @@ public class NativePortFactory implements GpioPortFactory {
                 && DebounceStrategy.fromProperty() == DebounceStrategy.HARDWARE) {
             logger.debug("Enabling hardware debounce filter for port {}", config.id());
             var debounceAttr = new LineAttribute(LineAttribute.Id.DEBOUNCE_PERIOD_US, config.debounceDelay());
-            var mask = GpioPinMask.packBits(config.pinNumber());
+            var mask = GpioPinMask.packOffsets(config.pinNumber());
             var debounceConfig = new LineConfigAttribute(debounceAttr, mask);
             attributes = new LineConfigAttribute[] { debounceConfig };
         } else {

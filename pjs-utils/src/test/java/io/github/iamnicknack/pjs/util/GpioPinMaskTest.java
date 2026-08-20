@@ -50,15 +50,15 @@ class GpioPinMaskTest {
     @Test
     void canCreateSimpleMask() {
         var pinMask = GpioPinMask.fromOffsets(2);
-        assertThat(pinMask.getUnpackedMask()).isEqualTo(4);
-        assertThat(GpioPinMask.gpioMaskFor(new int[] { 2 })).isEqualTo(4);
+        assertThat(pinMask.getMask()).isEqualTo(4);
+        assertThat(GpioPinMask.mask(new int[] { 2 })).isEqualTo(4);
     }
 
     @Test
     void canCreateMultiPinMask() {
         var pinMask = GpioPinMask.fromOffsets(2, 4);
-        assertThat(pinMask.getUnpackedMask()).isEqualTo(20);
-        assertThat(GpioPinMask.gpioMaskFor(2, 4)).isEqualTo(20);
+        assertThat(pinMask.getMask()).isEqualTo(20);
+        assertThat(GpioPinMask.mask(2, 4)).isEqualTo(20);
     }
 
     @Test
@@ -116,7 +116,7 @@ class GpioPinMaskTest {
 
     @Test
     void canPackValues() {
-        assertThat(GpioPinMask.packBits(new int[]{1, 2})).isEqualTo(0b11);
+        assertThat(GpioPinMask.packOffsets(1, 2)).isEqualTo(0b11);
     }
 
     @TestFactory
@@ -131,7 +131,7 @@ class GpioPinMaskTest {
                 new Expectation(new int[]{0, 2, 4}, 0b111)
         ).map(e -> DynamicTest.dynamicTest(
                 "pins " + Arrays.toString(e.pins) + " -> 0b" + Integer.toBinaryString(e.packed),
-                () -> assertThat(GpioPinMask.packBits(e.pins)).isEqualTo(e.packed)
+                () -> assertThat(GpioPinMask.packOffsets(e.pins)).isEqualTo(e.packed)
         ));
     }
 
@@ -147,7 +147,7 @@ class GpioPinMaskTest {
                 new Expectation(0b10101, 0b111)
         ).map(e -> DynamicTest.dynamicTest(
                 "pins 0b" + Integer.toBinaryString(e.pinsMask) + " -> 0b" + Integer.toBinaryString(e.packed),
-                () -> assertThat(GpioPinMask.packBits(e.pinsMask)).isEqualTo(e.packed)
+                () -> assertThat(GpioPinMask.packMask(e.pinsMask)).isEqualTo(e.packed)
         ));
     }
 }

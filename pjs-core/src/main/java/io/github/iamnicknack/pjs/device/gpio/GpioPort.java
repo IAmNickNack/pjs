@@ -25,7 +25,7 @@ public interface GpioPort extends Port<Integer>, GpioEventEmitter<GpioPort>, Dev
      */
     default Pin pin() {
         var config = (GpioPortConfig)getConfig();
-        var allPinsMask = GpioPinMask.packBits(config.pinNumber());
+        var allPinsMask = GpioPinMask.packOffsets(config.pinNumber());
         return new BooleanPin(this, i -> i != 0, i -> i ? allPinsMask : 0);
     }
 }

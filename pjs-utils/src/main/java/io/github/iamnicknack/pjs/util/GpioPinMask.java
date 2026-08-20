@@ -3,17 +3,21 @@ package io.github.iamnicknack.pjs.util;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.PrimitiveIterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.IntStream;
+import java.util.stream.StreamSupport;
 
 /**
  * Utility class to convert between pin numbers and GPIO bit masks.
  */
 public class GpioPinMask implements Iterable<Integer> {
+    private final int mask;
     private final int packedMask;
-    private final int unpackedMask;
 
-    private GpioPinMask(int packedMask, int unpackedMask) {
+    private GpioPinMask(int mask, int packedMask) {
+        this.mask = mask;
         this.packedMask = packedMask;
-        this.unpackedMask = unpackedMask;
     }
 
     /**
@@ -21,7 +25,7 @@ public class GpioPinMask implements Iterable<Integer> {
      * @param offsets the pin numbers to create a mask for.
      */
     public static GpioPinMask fromOffsets(int... offsets) {
-        return new GpioPinMask(packBits(offsets), gpioMaskFor(offsets));
+        return new GpioPinMask(mask(offsets), packOffsets(offsets));
     }
 
     /**
@@ -29,7 +33,7 @@ public class GpioPinMask implements Iterable<Integer> {
      * @param mask the pin mask to create a mask for.
      */
     public static GpioPinMask fromMask(int mask) {
-        return new GpioPinMask(packBits(mask), mask);
+        return new GpioPinMask(mask, packMask(mask));
     }
 
     /**
@@ -44,8 +48,16 @@ public class GpioPinMask implements Iterable<Integer> {
      * The mask as represented on GPIO pins.
      * @return the mask
      */
-    public int getUnpackedMask() {
-        return unpackedMask;
+    public int getMask() {
+        return mask;
+    }
+
+    /**
+     * The offsets of the GPIO pins represented by this mask.
+     * @return the offsets
+     */
+    public int[] offsets() {
+        return stream().toArray();
     }
 
     /**
@@ -54,7 +66,7 @@ public class GpioPinMask implements Iterable<Integer> {
      * @return the value as represented on GPIO pins
      */
     public int maskValue(int value) {
-        return unpackByMask(unpackedMask, value);
+        return unpackByMask(mask, value);
     }
 
     /**
@@ -63,7 +75,7 @@ public class GpioPinMask implements Iterable<Integer> {
      * @return the original value
      */
     public int unmaskValue(int value) {
-        return packByMask(unpackedMask, value);
+        return packByMask(mask, value);
     }
 
     /**
@@ -76,7 +88,7 @@ public class GpioPinMask implements Iterable<Integer> {
 
         var str = "--------------------------------".toCharArray();
 
-        int remaining = unpackedMask; // bits at absolute GPIO positions
+        int remaining = mask; // bits at absolute GPIO positions
         int packedIndex = 0;          // index in packed representation (LSB-first)
         int absPos = 0;               // current absolute bit position
 
@@ -98,7 +110,18 @@ public class GpioPinMask implements Iterable<Integer> {
 
     @Override
     public Iterator<Integer> iterator() {
-        return new OffsetsIterator(this.unpackedMask);
+        return new OffsetsIterator(this.mask);
+    }
+
+    /**
+     * Returns an {@link IntStream} of the offsets of the set bits in the mask.
+     * @return the stream of offsets
+     */
+    public IntStream stream() {
+        return StreamSupport.intStream(
+                Spliterators.spliterator(new OffsetsIterator(this.mask), Integer.bitCount(this.mask), Spliterator.ORDERED),
+                false
+        );
     }
 
     /**
@@ -106,20 +129,20 @@ public class GpioPinMask implements Iterable<Integer> {
      * @param pins the pin numbers to convert
      * @return the GPIO mask
      */
-    public static int gpioMaskFor(int... pins) {
+    public static int mask(int... pins) {
         return Arrays.stream(pins)
                 .reduce(0, (acc, pin) -> acc | (1 << pin));
     }
 
     /**
      * "pack" bits specified by the given mask. E.g. `1101` becomes `111`.
-     * @param value the value to pack
+     * @param mask the value to pack
      * @return the packed value
      */
-    public static int packBits(int value) {
+    public static int packMask(int mask) {
         int out = 0;
         int i = 0;
-        int v = value;
+        int v = mask;
         while (v != 0) {
             int tz = Integer.numberOfTrailingZeros(v);
             v >>>= tz;
@@ -136,8 +159,20 @@ public class GpioPinMask implements Iterable<Integer> {
      * @param values the values to pack
      * @return the packed values
      */
-    public static int packBits(int... values) {
-        return packBits(gpioMaskFor(values));
+    public static int packOffsets(int... values) {
+        return packMask(mask(values));
+    }
+
+    /**
+     * Returns an array of the offsets of the set bits in the mask.
+     * @param mask the mask to get offsets for
+     * @return the array of offsets
+     */
+    public static int[] offsets(int mask) {
+        return StreamSupport.intStream(
+                Spliterators.spliterator(new OffsetsIterator(mask), Integer.bitCount(mask), Spliterator.ORDERED),
+                false
+        ).toArray();
     }
 
     static int packByMask(int mask, int value) {
