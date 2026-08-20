@@ -30,6 +30,7 @@ public interface SerialPort extends SerialWriteOperation, SerialReadOperation, P
      * Enforce read-only access to the port
      * @return a read-only port
      */
+    @Override
     default SerialPort input() {
         return new SerialPort() {
             @Override
@@ -48,6 +49,7 @@ public interface SerialPort extends SerialWriteOperation, SerialReadOperation, P
      * Enforce write-only access to the port
      * @return a write-only port
      */
+    @Override
     default SerialPort output() {
         return new SerialPort() {
             @Override

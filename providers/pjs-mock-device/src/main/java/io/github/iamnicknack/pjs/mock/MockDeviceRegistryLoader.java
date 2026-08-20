@@ -12,7 +12,7 @@ public class MockDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRegi
     @Override
     public boolean isLoadable(Map<String, Object> properties) {
         return Optional.ofNullable(properties.get("pjs.mode"))
-                .filter(s -> s.equals("mock"))
+                .filter("mock"::equals)
                 .isPresent();
     }
 

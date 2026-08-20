@@ -52,10 +52,10 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
             }
             var device = factory.create(config);
             devices.put(config.getId(), device);
-            logger.info("Created {} device with id: {}", device.getClass().getSimpleName(), config.getId());
+            logger.atInfo().log("Created {} device with id: {}", device.getClass().getSimpleName(), config.getId());
             return device;
         } catch (Exception e) {
-            logger.error("Failed to create device with id: {}", config.getId(), e);
+            logger.atError().log("Failed to create device with id: {}", config.getId(), e);
             throw e;
         }
     }
@@ -75,7 +75,7 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
     public void remove(String id) {
         var device = devices.remove(id);
         if (device != null) {
-            logger.info("Removing device: {}, {}", id, device.getClass().getName());
+            logger.atInfo().log("Removing device: {}, {}", id, device.getClass().getName());
             try {
                 device.close();
             } catch (Exception e) {
@@ -120,23 +120,23 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
     public void close() {
         factories.values().forEach(deviceFactory -> {
             try {
-                logger.info("Closing factory: {}", deviceFactory.getClass().getName());
+                logger.atInfo().log("Closing factory: {}", deviceFactory.getClass().getName());
                 deviceFactory.close();
             } catch (Exception e) {
                 // don't rethrow, just log.
                 // we want to attempt to close all factories.
-                logger.error("Failed to close device factory: {}", deviceFactory, e);
+                logger.atError().log("Failed to close device factory: {}", deviceFactory, e);
             }
         });
 
         devices.values().forEach(device -> {
             try {
-                logger.info("Closing device: {}, {}", device.getConfig().getId(), device.getClass().getName());
+                logger.atInfo().log("Closing device: {}, {}", device.getConfig().getId(), device.getClass().getName());
                 device.close();
             } catch (Exception e) {
                 // don't rethrow, just log.
                 // we want to attempt to close all devices.
-                logger.error("Failed to close device: {}", device, e);
+                logger.atError().log("Failed to close device: {}", device, e);
             }
         });
     }

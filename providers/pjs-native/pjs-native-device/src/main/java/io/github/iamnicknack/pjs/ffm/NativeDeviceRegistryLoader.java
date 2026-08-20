@@ -25,7 +25,7 @@ public class NativeDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRe
     @Override
     public boolean isLoadable(Map<String, Object> properties) {
         return NativeContext.isAvailable() && Optional.ofNullable(properties.get("pjs.mode"))
-                .filter(s -> s.equals("ffm"))
+                .filter("ffm"::equals)
                 .isPresent();
     }
 
@@ -34,6 +34,7 @@ public class NativeDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRe
         return load(DeviceRegistryLoader.NoConfig.INSTANCE);
     }
 
+    @Override
     public DeviceRegistry load(Map<String, Object> ignored) {
         return load(DeviceRegistryLoader.NoConfig.INSTANCE);
     }

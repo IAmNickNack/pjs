@@ -48,6 +48,7 @@ public class LoggingI2C implements I2C, WithDelegateDevice<I2C> {
         return delegate.getConfig();
     }
 
+    @Override
     public I2C getDelegate() {
         return delegate;
     }

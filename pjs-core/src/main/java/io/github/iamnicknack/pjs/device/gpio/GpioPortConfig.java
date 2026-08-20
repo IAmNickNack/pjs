@@ -5,6 +5,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -50,7 +51,7 @@ public record GpioPortConfig(
     }
 
     public static class Builder {
-        private final ArrayList<Integer> pinNumber = new ArrayList<>();
+        private final List<Integer> pinNumber = new ArrayList<>();
         private GpioPortMode portMode = GpioPortMode.INPUT;
         private GpioEventMode eventMode = GpioEventMode.NONE;
         private int defaultValue = -1;

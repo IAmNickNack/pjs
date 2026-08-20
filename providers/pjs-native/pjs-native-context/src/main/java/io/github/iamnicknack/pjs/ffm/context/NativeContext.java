@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.lang.foreign.SegmentAllocator;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Container for components required to interact with native code.
@@ -24,7 +25,7 @@ public interface NativeContext {
             return false;
         }
 
-        try (var reader = new BufferedReader(new FileReader(cpuInfo))) {
+        try (var reader = new BufferedReader(new FileReader(cpuInfo, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 var lower = line.toLowerCase();
