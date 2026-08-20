@@ -13,4 +13,5 @@ dependencies {
     implementation(libs.kotlin.coroutines.core)
     implementation(project(":pjs-core"))
     implementation(project(":pjs-utils"))
+    testImplementation(libs.jackson.kotlin)
 }

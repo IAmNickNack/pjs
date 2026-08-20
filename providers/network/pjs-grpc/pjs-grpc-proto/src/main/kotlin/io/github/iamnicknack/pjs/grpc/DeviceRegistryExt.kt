@@ -14,6 +14,7 @@ import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PwmConfigPayload
 import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiConfigPayload
 import io.github.iamnicknack.pjs.model.device.Device
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
+import io.github.iamnicknack.pjs.device.gpio.GpioPinMask
 import io.grpc.Status
 
 inline fun <reified T : Device<T>> DeviceRegistry.deviceOrThrow(deviceId: String): T =
@@ -52,7 +53,7 @@ fun GpioPortConfig.asPortConfigPayload(): PortConfigPayload {
         .setPortMode(this.portMode.asPortMode())
         .setEventMode(this.eventMode.asEventMode())
         .setDefaultValue(this.defaultValue)
-        .addAllPinNumber(this.pinNumber.toList())
+        .addAllPinNumber(GpioPinMask.offsets(this.mask).toList())
         .setDebounceDelay(this.debounceDelay)
         .build()
 }

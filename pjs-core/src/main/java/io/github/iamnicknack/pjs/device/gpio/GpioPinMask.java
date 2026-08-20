@@ -1,4 +1,4 @@
-package io.github.iamnicknack.pjs.util;
+package io.github.iamnicknack.pjs.device.gpio;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -118,10 +118,7 @@ public class GpioPinMask implements Iterable<Integer> {
      * @return the stream of offsets
      */
     public IntStream stream() {
-        return StreamSupport.intStream(
-                Spliterators.spliterator(new OffsetsIterator(this.mask), Integer.bitCount(this.mask), Spliterator.ORDERED),
-                false
-        );
+        return stream(this.mask);
     }
 
     /**
@@ -169,10 +166,19 @@ public class GpioPinMask implements Iterable<Integer> {
      * @return the array of offsets
      */
     public static int[] offsets(int mask) {
+        return stream(mask).toArray();
+    }
+
+    /**
+     * Returns a stream of the offsets of the set bits in the mask.
+     * @param mask the mask to get offsets for
+     * @return the stream of offsets
+     */
+    public static IntStream stream(int mask) {
         return StreamSupport.intStream(
                 Spliterators.spliterator(new OffsetsIterator(mask), Integer.bitCount(mask), Spliterator.ORDERED),
                 false
-        ).toArray();
+        );
     }
 
     static int packByMask(int mask, int value) {

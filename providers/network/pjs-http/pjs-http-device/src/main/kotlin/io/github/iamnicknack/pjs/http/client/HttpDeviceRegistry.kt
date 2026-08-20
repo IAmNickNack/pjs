@@ -34,7 +34,7 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.sse.*
-import io.ktor.serialization.jackson.*
+import io.ktor.serialization.jackson3.*
 import kotlinx.coroutines.runBlocking
 
 sealed class HttpDeviceRegistry(client: HttpClient) : DefaultDeviceRegistry() {

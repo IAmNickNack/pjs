@@ -6,6 +6,7 @@ module pjs.pi4j {
     requires com.pi4j;
     requires org.slf4j;
     requires org.jspecify;
+    requires pjs.util;
 
     exports io.github.iamnicknack.pjs.pi4j;
 

@@ -1,4 +1,4 @@
-package io.github.iamnicknack.pjs.util;
+package io.github.iamnicknack.pjs.device.gpio;
 
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;

@@ -19,12 +19,10 @@ import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineRequest;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.PinFlag;
 import io.github.iamnicknack.pjs.ffm.event.DebounceStrategy;
 import io.github.iamnicknack.pjs.ffm.event.EventPoller;
-import io.github.iamnicknack.pjs.util.GpioPinMask;
+import io.github.iamnicknack.pjs.device.gpio.GpioPinMask;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
 
 /**
  * @see <a href="https://docs.kernel.org/userspace-api/gpio/gpio-v2-get-line-ioctl.html">gpio-v2-get-line-ioctl</a>
@@ -66,7 +64,7 @@ public class NativePortFactory implements GpioPortFactory {
 
             var lineConfigs = createLineConfigPair(config);
             var lineRequest = new LineRequest(
-                    config.pinNumber(),
+                    GpioPinMask.offsets(config.mask()),
                     config.id(),
                     (config.portMode().isSet(GpioPortMode.INPUT) ? lineConfigs.inputConfig() : lineConfigs.outputConfig()),
                     0,
@@ -111,7 +109,7 @@ public class NativePortFactory implements GpioPortFactory {
      * @param fileDescriptor the file descriptor for the GPIO port
      */
     private void checkLines(GpioPortConfig config, FileDescriptor fileDescriptor) {
-        Arrays.stream(config.pinNumber()).forEach(pinNumber -> {
+        GpioPinMask.stream(config.mask()).forEach(pinNumber -> {
             var lineInfoResult = ioctlOperations.ioctl(
                     fileDescriptor,
                     GpioConstants.GPIO_V2_GET_LINEINFO_IOCTL,
@@ -161,7 +159,7 @@ public class NativePortFactory implements GpioPortFactory {
                 && DebounceStrategy.fromProperty() == DebounceStrategy.HARDWARE) {
             logger.debug("Enabling hardware debounce filter for port {}", config.id());
             var debounceAttr = new LineAttribute(LineAttribute.Id.DEBOUNCE_PERIOD_US, config.debounceDelay());
-            var mask = GpioPinMask.packOffsets(config.pinNumber());
+            var mask = GpioPinMask.packMask(config.mask());
             var debounceConfig = new LineConfigAttribute(debounceAttr, mask);
             attributes = new LineConfigAttribute[] { debounceConfig };
         } else {

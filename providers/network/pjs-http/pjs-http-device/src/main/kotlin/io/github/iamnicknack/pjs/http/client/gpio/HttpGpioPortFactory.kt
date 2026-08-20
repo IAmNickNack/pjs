@@ -4,6 +4,7 @@ import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
 import io.github.iamnicknack.pjs.device.gpio.GpioPortFactory
 import io.github.iamnicknack.pjs.http.gpio.GpioPortHandler
+import io.github.iamnicknack.pjs.device.gpio.GpioPinMask
 import kotlinx.coroutines.runBlocking
 
 class HttpGpioPortFactory(
@@ -16,7 +17,7 @@ class HttpGpioPortFactory(
     }
 
     fun GpioPortConfig.asGpioPortConfigPayload() = GpioPortHandler.GpioPortConfigPayload(
-        this.pinNumber,
+        GpioPinMask.offsets(this.mask),
         this.portMode,
         this.eventMode,
         this.defaultValue,

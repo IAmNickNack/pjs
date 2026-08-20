@@ -39,6 +39,7 @@ assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assert
 gradle-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "gradle-versions" }
 gradle-test-retry = { module = "org.gradle.test-retry:org.gradle.test-retry.gradle.plugin", version.ref = "gradle-test-retry" }
 jackson-databind = { module = "tools.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-kotlin = { module = "tools.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 jimfs = { module = "com.google.jimfs:jimfs", version.ref = "jimfs" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }

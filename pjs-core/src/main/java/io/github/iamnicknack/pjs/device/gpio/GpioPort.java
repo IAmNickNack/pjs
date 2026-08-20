@@ -5,7 +5,6 @@ import io.github.iamnicknack.pjs.model.event.GpioEventEmitter;
 import io.github.iamnicknack.pjs.model.pin.BooleanPin;
 import io.github.iamnicknack.pjs.model.pin.Pin;
 import io.github.iamnicknack.pjs.model.port.Port;
-import io.github.iamnicknack.pjs.util.GpioPinMask;
 
 /**
  * A GPIO port maps a numeric value to one or many GPIO pins via the {@link Port} interface and can expose interrupt
@@ -25,7 +24,7 @@ public interface GpioPort extends Port<Integer>, GpioEventEmitter<GpioPort>, Dev
      */
     default Pin pin() {
         var config = (GpioPortConfig)getConfig();
-        var allPinsMask = GpioPinMask.packOffsets(config.pinNumber());
+        var allPinsMask = GpioPinMask.packMask(config.mask());
         return new BooleanPin(this, i -> i != 0, i -> i ? allPinsMask : 0);
     }
 }

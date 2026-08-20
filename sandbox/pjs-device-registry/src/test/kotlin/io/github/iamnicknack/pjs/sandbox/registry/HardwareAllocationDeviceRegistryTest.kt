@@ -62,7 +62,7 @@ class HardwareAllocationDeviceRegistryTest {
 
         registry.create(config2)
         assertThat(usedHardware.containsName(config2.id())).isTrue()
-        assertThat(usedHardware.findByOffsets(*config2.pinNumber)).isNotNull()
+        assertThat(usedHardware.findByMask(config2.mask.toLong())).isNotNull()
 
         val device = registry.create(config1)
         assertThat(device).isNotNull()
@@ -71,8 +71,8 @@ class HardwareAllocationDeviceRegistryTest {
         registry.remove(device)
         assertThat(registry.contains(device.config.id)).isFalse()
         assertThat(usedHardware.containsName(config1.id())).isFalse()
-        assertThat(usedHardware.findByOffsets(*config1.pinNumber)).isNull()
-        assertThat(usedHardware.findByOffsets(*config2.pinNumber)).isNotNull()
+        assertThat(usedHardware.findByMask(config1.mask.toLong())).isNull()
+        assertThat(usedHardware.findByMask(config2.mask.toLong())).isNotNull()
 
         val recreatedDevice = registry.create(config1)
         assertThat(recreatedDevice).isNotNull()

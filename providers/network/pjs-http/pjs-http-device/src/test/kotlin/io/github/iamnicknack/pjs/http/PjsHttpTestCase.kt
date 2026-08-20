@@ -7,7 +7,7 @@ import io.github.iamnicknack.pjs.mock.MockDeviceRegistry
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.sse.*
-import io.ktor.serialization.jackson.*
+import io.ktor.serialization.jackson3.*
 import io.ktor.server.testing.*
 import org.koin.dsl.bind
 import org.koin.ktor.plugin.Koin
