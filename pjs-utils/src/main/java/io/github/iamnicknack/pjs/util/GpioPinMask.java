@@ -1,33 +1,35 @@
 package io.github.iamnicknack.pjs.util;
 
 import java.util.Arrays;
-import java.util.stream.IntStream;
+import java.util.Iterator;
+import java.util.PrimitiveIterator;
 
 /**
  * Utility class to convert between pin numbers and GPIO bit masks.
  */
-public class GpioPinMask {
+public class GpioPinMask implements Iterable<Integer> {
     private final int packedMask;
     private final int unpackedMask;
 
+    private GpioPinMask(int packedMask, int unpackedMask) {
+        this.packedMask = packedMask;
+        this.unpackedMask = unpackedMask;
+    }
+
     /**
      * Create a mask from the given pin numbers.
-     * @param pins the pin numbers to create a mask for.
+     * @param offsets the pin numbers to create a mask for.
      */
-    public GpioPinMask(int... pins) {
-        packedMask = packBits(pins);
-        unpackedMask = gpioMaskFor(pins);
+    public static GpioPinMask fromOffsets(int... offsets) {
+        return new GpioPinMask(packBits(offsets), gpioMaskFor(offsets));
     }
 
     /**
      * Create a mask from the given pin mask.
-     * @param pinMask the pin mask to create a mask for.
+     * @param mask the pin mask to create a mask for.
      */
-    public GpioPinMask(int pinMask) {
-        this(IntStream.range(0, 32)
-                .filter(i -> (pinMask & (1 << i)) != 0)
-                .toArray()
-        );
+    public static GpioPinMask fromMask(int mask) {
+        return new GpioPinMask(packBits(mask), mask);
     }
 
     /**
@@ -92,6 +94,11 @@ public class GpioPinMask {
         }
 
         return new String(str);
+    }
+
+    @Override
+    public Iterator<Integer> iterator() {
+        return new OffsetsIterator(this.unpackedMask);
     }
 
     /**
@@ -168,5 +175,29 @@ public class GpioPinMask {
             i++;
         }
         return out;
+    }
+
+    /**
+     * Iterator for the offsets of the set bits in the mask.
+     */
+    private static class OffsetsIterator implements PrimitiveIterator.OfInt {
+
+        private long remaining;
+
+        public OffsetsIterator(long remaining) {
+            this.remaining = remaining;
+        }
+
+        @Override
+        public int nextInt() {
+            var index = Long.numberOfTrailingZeros(remaining);
+            remaining &= ~(1L << index);
+            return index;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return remaining != 0L;
+        }
     }
 }
