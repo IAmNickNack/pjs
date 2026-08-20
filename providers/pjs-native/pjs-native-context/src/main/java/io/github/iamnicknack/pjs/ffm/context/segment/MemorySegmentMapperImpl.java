@@ -22,24 +22,14 @@ public class MemorySegmentMapperImpl implements MemorySegmentMapper {
         this.registerDeserializer(MemorySegment.class, new MemorySegmentDeserializer.Noop());
     }
 
-    @SuppressWarnings("unused")
-    public MemorySegmentMapperImpl registerSerializer(Class<?> type, MemorySegmentSerializer<?> serializer) {
+    public final void registerSerializer(Class<?> type, MemorySegmentSerializer<?> serializer) {
         serializerMap.put(type, serializer);
         layoutMap.put(type, serializer.layout());
-        return this;
     }
 
-    @SuppressWarnings("unused")
-    public MemorySegmentMapperImpl registerDeserializer(Class<?> type, MemorySegmentDeserializer<?> deserializer) {
+    public final void registerDeserializer(Class<?> type, MemorySegmentDeserializer<?> deserializer) {
         deserializerMap.put(type, deserializer);
         layoutMap.put(type, deserializer.layout());
-        return this;
-    }
-
-    @SuppressWarnings("unused")
-    public MemorySegmentMapperImpl registerLayout(Class<?> type, MemoryLayout layout) {
-        layoutMap.put(type, layout);
-        return this;
     }
 
     @Override

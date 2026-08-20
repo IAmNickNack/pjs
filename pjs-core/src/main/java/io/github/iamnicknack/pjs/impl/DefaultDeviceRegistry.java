@@ -21,27 +21,19 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
     private final Map<String, Device<?>> devices = new HashMap<>();
 
     /**
-     * {@inheritDoc}
+     * Register a device factory.
+     * @param factory the factory to register.
+     * @param configType the configuration type used by the factory.
+     * @return this instance for chaining.
+     * @param <T> the type of device created by the factory.
+     * @param <V> the type of configuration used by the factory.
      */
-    @Override
-    public <T extends Device<T>, V extends DeviceConfig<T>> DeviceRegistry registerFactory(
+    public final <T extends Device<T>, V extends DeviceConfig<T>> DeviceRegistry registerFactory(
             DeviceFactory<T, V> factory,
             Class<V> configType
     ) {
         factories.put(configType, factory);
         return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends Device<T>, V extends DeviceConfig<T>> DeviceFactory<T, V> getFactory(Class<V> configType) {
-        if (factories.containsKey(configType)) {
-            return (DeviceFactory<T, V>) factories.get(configType);
-        }
-        throw new IllegalArgumentException("No factory registered for config type: " + configType);
     }
 
     /**
