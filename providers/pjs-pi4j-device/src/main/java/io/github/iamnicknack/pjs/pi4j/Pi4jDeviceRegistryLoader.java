@@ -32,7 +32,7 @@ public class Pi4jDeviceRegistryLoader implements DeviceRegistryLoader<Pi4jDevice
     @Override
     public boolean isLoadable(Map<String, Object> properties) {
         return Optional.ofNullable(properties.get("pjs.mode"))
-                .filter(s -> s.equals("pi4j"))
+                .filter("pi4j"::equals)
                 .isPresent();
     }
 

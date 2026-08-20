@@ -50,6 +50,7 @@ public class McpInterruptExample implements Runnable {
         this.deviceRegistry = deviceRegistry;
     }
 
+    @Override
     public void run() {
         var resetPin = new DefaultPinOperations(deviceRegistry.create(RESET_PIN_CONFIG).pin());
         var outputPin = new DefaultPinOperations(deviceRegistry.create(OUTPUT_PIN_CONFIG).pin());

@@ -14,7 +14,7 @@ public class GpioPinMask {
      * Create a mask from the given pin numbers.
      * @param pins the pin numbers to create a mask for.
      */
-    public GpioPinMask(int[] pins) {
+    public GpioPinMask(int... pins) {
         packedMask = packBits(pins);
         unpackedMask = gpioMaskFor(pins);
     }
@@ -99,7 +99,7 @@ public class GpioPinMask {
      * @param pins the pin numbers to convert
      * @return the GPIO mask
      */
-    public static int gpioMaskFor(int[] pins) {
+    public static int gpioMaskFor(int... pins) {
         return Arrays.stream(pins)
                 .reduce(0, (acc, pin) -> acc | (1 << pin));
     }
@@ -112,11 +112,12 @@ public class GpioPinMask {
     public static int packBits(int value) {
         int out = 0;
         int i = 0;
-        while (value != 0) {
-            int tz = Integer.numberOfTrailingZeros(value);
-            value >>>= tz;
-            out |= (value & 1) << i;
-            value >>>= 1;
+        int v = value;
+        while (v != 0) {
+            int tz = Integer.numberOfTrailingZeros(v);
+            v >>>= tz;
+            out |= (v & 1) << i;
+            v >>>= 1;
             i++;
         }
 
@@ -128,7 +129,7 @@ public class GpioPinMask {
      * @param values the values to pack
      * @return the packed values
      */
-    public static int packBits(int[] values) {
+    public static int packBits(int... values) {
         return packBits(gpioMaskFor(values));
     }
 
@@ -136,13 +137,14 @@ public class GpioPinMask {
         int out = 0;
         int i = 0; // absolute bit position in value
         int k = 0; // next bit position in packed output
-        while (mask != 0) {
-            int tz = Integer.numberOfTrailingZeros(mask); // skip mask zero bits
+        int m = mask;
+        while (m != 0) {
+            int tz = Integer.numberOfTrailingZeros(m); // skip mask zero bits
             i += tz;
-            mask >>>= tz;
+            m >>>= tz;
             // now mask LSB is 1 (guaranteed)
             if (((value >>> i) & 1) != 0) out |= (1 << k);
-            mask >>>= 1; // consumed this mask bit
+            m >>>= 1; // consumed this mask bit
             i++;         // move to next absolute bit position
             k++;         // advance packed output position
         }
@@ -153,14 +155,16 @@ public class GpioPinMask {
     static int unpackByMask(int mask, int value) {
         int out = 0;
         int i = 0; // bit position in result
-        while (mask != 0 && value != 0) {
-            int tz = Integer.numberOfTrailingZeros(mask); // skip mask zero bits
+        int m = mask;
+        int v = value;
+        while (m != 0 && v != 0) {
+            int tz = Integer.numberOfTrailingZeros(m); // skip mask zero bits
             i += tz;
-            mask >>>= tz;
+            m >>>= tz;
             // now mask LSB is 1 (guaranteed)
-            if ((value & 1) != 0) out |= (1 << i);
-            value >>>= 1;  // consume LSB of value
-            mask >>>= 1;   // consumed this mask bit
+            if ((v & 1) != 0) out |= (1 << i);
+            v >>>= 1;  // consume LSB of value
+            m >>>= 1;   // consumed this mask bit
             i++;
         }
         return out;

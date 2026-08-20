@@ -24,9 +24,7 @@ pmd {
     toolVersion = "7.26.0"
     isIgnoreFailures = true
     rulesMinimumPriority = 2
-    ruleSets = listOf(
-        "${rootDir.path}/config/pmd/ruleset.xml"
-    )
+    ruleSets = listOf("${rootDir.path}/config/pmd/ruleset.xml")
 }
 
 checkstyle {

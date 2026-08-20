@@ -64,12 +64,6 @@ public class DefaultDrawingOperations implements DrawingOperations {
         long high = mask ^ (mask << (y2 + 1));
         long value = low & high;
 
-        System.out.printf("%s, %s, %s%n",
-                Long.toBinaryString(low),
-                Long.toBinaryString(high),
-                Long.toBinaryString(value)
-        );
-
         for (int i = 0; i < 8 && value != 0; i++) {
             var pageValue = value & 0xff;
             if (pageValue != 0) {

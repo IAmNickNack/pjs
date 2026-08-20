@@ -114,8 +114,6 @@ public class SevenSegmentRotaryExample implements Runnable {
 
         rotaryButton.addListener(event -> {
             if (event.eventType() == GpioChangeEventType.FALLING) {
-                var value = event.port().read();
-                System.out.println(value);
                 display.off();
             } else {
                 display.on();

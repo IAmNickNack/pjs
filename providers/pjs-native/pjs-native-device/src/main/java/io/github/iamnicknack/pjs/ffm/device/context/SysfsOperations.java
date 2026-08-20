@@ -1,5 +1,6 @@
 package io.github.iamnicknack.pjs.ffm.device.context;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 /**
@@ -20,11 +21,11 @@ public interface SysfsOperations {
     boolean exists(String path);
 
     default void writeString(String path, String value) {
-        write(path, value.getBytes());
+        write(path, value.getBytes(StandardCharsets.UTF_8));
     }
 
     default String readString(String path) {
-        return new String(read(path));
+        return new String(read(path), StandardCharsets.UTF_8);
     }
 
     default void writeLong(String path, long value) {

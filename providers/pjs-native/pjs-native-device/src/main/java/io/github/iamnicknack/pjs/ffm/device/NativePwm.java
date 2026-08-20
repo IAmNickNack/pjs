@@ -4,6 +4,8 @@ import io.github.iamnicknack.pjs.device.pwm.Pwm;
 import io.github.iamnicknack.pjs.device.pwm.PwmBean;
 import io.github.iamnicknack.pjs.device.pwm.PwmConfig;
 import io.github.iamnicknack.pjs.ffm.device.context.SysfsOperations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class NativePwm extends PwmBean implements Pwm, AutoCloseable {
 
@@ -13,6 +15,8 @@ class NativePwm extends PwmBean implements Pwm, AutoCloseable {
     static final String POLARITY_PATH = "polarity";
 
     private final SysfsOperations channelOperations;
+
+    private final Logger logger = LoggerFactory.getLogger(NativePwm.class);
 
     public NativePwm(PwmConfig config, SysfsOperations channelOperations) {
         super(config);
@@ -72,8 +76,7 @@ class NativePwm extends PwmBean implements Pwm, AutoCloseable {
             channelOperations.writeInt(ENABLE_PATH, 1);
             super.on();
         } catch (Exception ex) {
-            System.err.println("Failed to enable PWM: " + ex);
-            ex.printStackTrace(System.err);
+            logger.error("Failed to enable PWM: {}", ex.getMessage(), ex);
             super.off();
         }
     }
@@ -83,8 +86,7 @@ class NativePwm extends PwmBean implements Pwm, AutoCloseable {
         try {
             channelOperations.writeInt(ENABLE_PATH, 0);
         } catch (Exception ex) {
-            System.err.println("Failed to disable PWM: " + ex);
-            ex.printStackTrace(System.err);
+            logger.error("Failed to disable PWM: {}", ex.getMessage(), ex);
         }
         super.off();
     }
@@ -132,8 +134,7 @@ class NativePwm extends PwmBean implements Pwm, AutoCloseable {
             }
         } catch (Exception ex) {
             // Minimal error handling; replace with a logger if available.
-            System.err.println("Failed to apply PWM settings: " + ex);
-            ex.printStackTrace(System.err);
+            logger.error("Failed to apply PWM settings: {}", ex.getMessage(), ex);
         }
     }
 }

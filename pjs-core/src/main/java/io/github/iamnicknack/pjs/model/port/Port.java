@@ -99,7 +99,7 @@ public interface Port<T> extends ReadOperation<T>, WriteOperation<T> {
 
             @Override
             public Boolean read() {
-                return Port.this.read() == high;
+                return Port.this.read().equals(high);
             }
 
             @Override

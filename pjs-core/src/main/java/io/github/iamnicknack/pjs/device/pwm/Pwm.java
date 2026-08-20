@@ -112,6 +112,7 @@ public interface Pwm extends Pin, Device<Pwm> {
     /**
      * Alias for {@link #on()}
      */
+    @Override
     default void high() {
         on();
     }
@@ -119,6 +120,7 @@ public interface Pwm extends Pin, Device<Pwm> {
     /**
      * Alias for {@link #off()}
      */
+    @Override
     default void low() {
         off();
     }
