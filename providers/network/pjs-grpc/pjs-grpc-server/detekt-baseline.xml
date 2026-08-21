@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>NewLineAtEndOfFile:DefaultGrpcServer.kt:io.github.iamnicknack.pjs.grpc.config.DefaultGrpcServer.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcDeviceConfigService.kt:io.github.iamnicknack.pjs.grpc.service.GrpcDeviceConfigService.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcI2CBusConfigService.kt:io.github.iamnicknack.pjs.grpc.service.GrpcI2CBusConfigService.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcPortConfigService.kt:io.github.iamnicknack.pjs.grpc.service.GrpcPortConfigService.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcPortService.kt:io.github.iamnicknack.pjs.grpc.service.GrpcPortService.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcPwmConfigService.kt:io.github.iamnicknack.pjs.grpc.service.GrpcPwmConfigService.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcPwmService.kt:io.github.iamnicknack.pjs.grpc.service.GrpcPwmService.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcServer.kt:io.github.iamnicknack.pjs.grpc.config.GrpcServer.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcSpiConfigService.kt:io.github.iamnicknack.pjs.grpc.service.GrpcSpiConfigService.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcSpiService.kt:io.github.iamnicknack.pjs.grpc.service.GrpcSpiService.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcSpiTransferService.kt:io.github.iamnicknack.pjs.grpc.service.GrpcSpiTransferService.kt</ID>
+  </CurrentIssues>
+</SmellBaseline>

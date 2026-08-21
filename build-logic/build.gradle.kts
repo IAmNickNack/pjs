@@ -24,6 +24,7 @@ dependencies {
             strictly(libs.versions.kotlin.asProvider().get())
         }
     }
+    implementation("dev.detekt:detekt-gradle-plugin:2.0.0-alpha.6")
 }
 
 kotlin {

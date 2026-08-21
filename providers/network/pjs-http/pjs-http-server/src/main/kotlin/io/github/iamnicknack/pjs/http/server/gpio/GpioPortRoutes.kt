@@ -13,6 +13,7 @@ import io.ktor.sse.*
 import io.ktor.util.date.*
 import org.koin.ktor.ext.inject
 
+@Suppress("ThrowsCount")
 fun Route.gpioPortRoutes() {
     val handler: GpioPortHandler by inject()
     val eventsHandler: GpioEventsHandler by inject()

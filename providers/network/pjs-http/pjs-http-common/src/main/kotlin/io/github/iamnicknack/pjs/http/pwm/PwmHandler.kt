@@ -38,7 +38,7 @@ interface PwmHandler : ConfigHandler<Pwm> {
             .id(deviceId ?: "PWM[${chip ?: 0}.${channel ?: 0}]")
             .chip(chip ?: 0)
             .channel(channel ?: 0)
-            .period(period ?: 1000) // TODO: set this to 440hz
+            .period(period ?: 1000)
             .polarity(polarity ?: Pwm.Polarity.NORMAL)
             .dutyCycle(dutyCycle ?: 50)
             .build()

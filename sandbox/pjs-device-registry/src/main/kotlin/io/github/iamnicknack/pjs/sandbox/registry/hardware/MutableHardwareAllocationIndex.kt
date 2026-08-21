@@ -1,10 +1,13 @@
 package io.github.iamnicknack.pjs.sandbox.registry.hardware
 
+import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.Line
+import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.LineType
+
 /**
  * Mutable implementation of [HardwareAllocationIndex] which allows lines to be added at runtime
  */
 class MutableHardwareAllocationIndex<K>(
-    private val keySelector: (HardwareAllocationIndex.Line) -> K
+    private val keySelector: (Line) -> K
 ) : HardwareAllocationIndex.Mutable, HardwareAllocationIndex.Keyed<K> {
 
     /**
@@ -21,7 +24,7 @@ class MutableHardwareAllocationIndex<K>(
      * Adds a new line to the index
      * @param line the line to add
      */
-    override fun add(line: HardwareAllocationIndex.Line): MutableHardwareAllocationIndex<K> {
+    override fun add(line: Line): MutableHardwareAllocationIndex<K> {
         val key = keySelector(line)
         val current = indexByKey[key] ?: Node.EMPTY
 
@@ -38,7 +41,7 @@ class MutableHardwareAllocationIndex<K>(
      * Remove a line from the index
      * @param line the line to remove
      */
-    override fun remove(line: HardwareAllocationIndex.Line): MutableHardwareAllocationIndex<K> {
+    override fun remove(line: Line): MutableHardwareAllocationIndex<K> {
         val key = keySelector(line)
         val current = indexByKey[key] ?: Node.EMPTY
 
@@ -52,13 +55,13 @@ class MutableHardwareAllocationIndex<K>(
         return this
     }
 
-    override operator fun get(key: K): Set<HardwareAllocationIndex.Line> = indexByKey[key]?.lines ?: emptySet()
+    override operator fun get(key: K): Set<Line> = indexByKey[key]?.lines ?: emptySet()
 
-    override fun iterator(): Iterator<HardwareAllocationIndex.Line> = indexByKey.values.flatMap { it.lines }.iterator()
+    override fun iterator(): Iterator<Line> = indexByKey.values.flatMap { it.lines }.iterator()
 
     private data class Node(
         val allocation: HardwareAllocation,
-        val lines: Set<HardwareAllocationIndex.Line>
+        val lines: Set<Line>
     ) {
         companion object {
             @JvmStatic
@@ -68,7 +71,7 @@ class MutableHardwareAllocationIndex<K>(
 
     companion object {
         @JvmStatic
-        fun byLineType(vararg lines: HardwareAllocationIndex.Line): MutableHardwareAllocationIndex<HardwareAllocationIndex.LineType> {
+        fun byLineType(vararg lines: Line): MutableHardwareAllocationIndex<LineType> {
             return MutableHardwareAllocationIndex {
                 it.lineType
             }.apply {

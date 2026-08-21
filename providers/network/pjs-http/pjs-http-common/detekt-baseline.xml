@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>NewLineAtEndOfFile:ConfigHandler.kt:io.github.iamnicknack.pjs.http.config.ConfigHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:EventBroadcaster.kt:io.github.iamnicknack.pjs.http.event.EventBroadcaster.kt</ID>
+    <ID>NewLineAtEndOfFile:GpioPortHandler.kt:io.github.iamnicknack.pjs.http.gpio.GpioPortHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:I2CHandler.kt:io.github.iamnicknack.pjs.http.i2c.I2CHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:IntMaskDeserializer.kt:io.github.iamnicknack.pjs.http.jackson.IntMaskDeserializer.kt</ID>
+    <ID>NewLineAtEndOfFile:IntMaskSerializer.kt:io.github.iamnicknack.pjs.http.jackson.IntMaskSerializer.kt</ID>
+    <ID>NewLineAtEndOfFile:PwmHandler.kt:io.github.iamnicknack.pjs.http.pwm.PwmHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:SpiHandler.kt:io.github.iamnicknack.pjs.http.spi.SpiHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:SpiTransferHandler.kt:io.github.iamnicknack.pjs.http.spi.SpiTransferHandler.kt</ID>
+  </CurrentIssues>
+</SmellBaseline>

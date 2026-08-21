@@ -35,4 +35,14 @@ checkstyle {
 tasks.withType<Checkstyle>().configureEach {
     exclude("**/module-info.java")
     exclude("**/generated/**")
+
+    reports {
+        sarif.required = true
+    }
+}
+
+tasks.withType<Pmd>().configureEach {
+    reports {
+        sarif.required = true
+    }
 }

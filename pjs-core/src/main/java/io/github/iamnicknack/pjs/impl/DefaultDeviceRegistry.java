@@ -117,6 +117,7 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public void close() {
         factories.values().forEach(deviceFactory -> {
             try {

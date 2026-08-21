@@ -39,7 +39,11 @@ sealed class HttpSpi(
     /**
      * Proxy implementation used when the device is not managed by the local registry
      */
-    class Proxy(spiHandler: SpiHandler, spiTransferHandler: SpiTransferHandler, config: SpiConfig) : HttpSpi(spiHandler, spiTransferHandler, config) {
+    class Proxy(
+        spiHandler: SpiHandler,
+        spiTransferHandler: SpiTransferHandler,
+        config: SpiConfig
+    ) : HttpSpi(spiHandler, spiTransferHandler, config) {
         /**
          * Do nothing as the device is not managed by the local registry
          */
@@ -51,5 +55,9 @@ sealed class HttpSpi(
     /**
      * Default implementation used when the device is managed by the local registry
      */
-    class Default(spiHandler: SpiHandler, spiTransferHandler: SpiTransferHandler, config: SpiConfig) : HttpSpi(spiHandler, spiTransferHandler, config)
+    class Default(
+        spiHandler: SpiHandler,
+        spiTransferHandler: SpiTransferHandler,
+        config: SpiConfig
+    ) : HttpSpi(spiHandler, spiTransferHandler, config)
 }

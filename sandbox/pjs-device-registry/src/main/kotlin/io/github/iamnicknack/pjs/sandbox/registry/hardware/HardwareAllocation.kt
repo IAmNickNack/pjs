@@ -68,6 +68,7 @@ data class HardwareAllocation(
         }
 
         override fun next(): Int {
+            if (!hasNext()) throw NoSuchElementException()
             val index = java.lang.Long.numberOfTrailingZeros(remaining)
             remaining = remaining and (1L shl index).inv()
             return index

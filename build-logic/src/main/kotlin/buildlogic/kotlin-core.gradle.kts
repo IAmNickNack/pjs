@@ -3,6 +3,7 @@ package buildlogic
 plugins {
     kotlin("jvm")
     id("buildlogic.java-core")
+    id("buildlogic.detekt")
 }
 
 kotlin {

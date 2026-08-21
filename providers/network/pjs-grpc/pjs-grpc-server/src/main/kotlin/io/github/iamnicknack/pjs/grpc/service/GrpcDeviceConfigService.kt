@@ -23,7 +23,7 @@ class GrpcDeviceConfigService(
 
         try {
             deviceRegistry.remove(request.deviceId)
-        } catch (e: Exception) {
+        } catch (e: DeviceRegistry.RegistryException) {
             logger.error("Failed to remove device: {}", request.deviceId, e)
             throw Status.INTERNAL
                 .withDescription("Failed to remove device with id ${request.deviceId}")

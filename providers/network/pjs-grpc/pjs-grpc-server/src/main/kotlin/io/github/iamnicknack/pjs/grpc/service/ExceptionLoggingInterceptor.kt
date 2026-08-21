@@ -20,13 +20,14 @@ class ExceptionLoggingInterceptor : ServerInterceptor {
 
         val safeCall = object : ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(call) {
             override fun sendMessage(message: RespT) {
-                try {
-                    super.sendMessage(message)
-                } catch (t: Throwable) {
+                val result = runCatching { super.sendMessage(message) }
+
+                if (result.isFailure) {
+                    val t = result.exceptionOrNull()
                     logger.error("Unhandled exception making gRPC call", t)
-                    val cause = t.cause?.cause ?: t.cause ?: t
+                    val cause = t?.cause?.cause ?: t?.cause ?: t
                     call.close(
-                        Status.INTERNAL.withDescription(cause.message).withCause(cause),
+                        Status.INTERNAL.withDescription(cause?.message).withCause(cause),
                         Metadata()
                     )
                 }

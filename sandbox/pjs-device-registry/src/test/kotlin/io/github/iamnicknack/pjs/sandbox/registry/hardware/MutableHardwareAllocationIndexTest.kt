@@ -1,5 +1,7 @@
 package io.github.iamnicknack.pjs.sandbox.registry.hardware
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.Line
 import org.junit.jupiter.api.Test
 
@@ -12,9 +14,6 @@ class MutableHardwareAllocationIndexTest {
         val lineToAdd = Line(HardwareAllocationIndex.LineType.GPIO, "GPIO-0-1", HardwareAllocation.fromOffsets(0, 1))
         index.add(lineToAdd)
 
-        val line = index.findByPin(0)
-        println(line)
-
+        assertThat(index.findByPin(0)).isEqualTo(lineToAdd)
     }
-
 }
