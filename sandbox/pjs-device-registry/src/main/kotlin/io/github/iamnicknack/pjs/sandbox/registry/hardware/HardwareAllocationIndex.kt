@@ -93,6 +93,14 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
 
 
     /**
+     * Create a mutable copy of this index.
+     *
+     * Operations performed on the mutable index will not affect this index.
+     * @return a mutable copy of this index
+     */
+    fun mutable(): Mutable = MutableHardwareAllocationIndex(this.toMutableSet())
+
+    /**
      * Represents a line allocation in the hardware allocation index.
      * @param lineType the IO type of line
      * @param name the name of the line
@@ -133,6 +141,14 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
          * @return the updated mutable hardware allocation index
          */
         fun remove(line: Line): Mutable
+
+        /**
+         * Create a new, immutable hardware allocation index from this mutable index
+         * @return the immutable hardware allocation index
+         */
+        fun immutable(): HardwareAllocationIndex {
+            return ReadonlyHardwareAllocationIndex(this.toSet())
+        }
     }
 
     /**

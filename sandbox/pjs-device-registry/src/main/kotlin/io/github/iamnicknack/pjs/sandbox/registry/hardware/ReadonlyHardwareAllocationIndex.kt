@@ -9,6 +9,9 @@ import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationInd
  * @param lines the set of lines to read from
  */
 open class ReadonlyHardwareAllocationIndex(lines: Set<Line>) : HardwareAllocationIndex {
+
+    constructor(vararg lines: Line) : this(lines.toSet())
+
     private val linesByName = lines
         .associateBy { it.name }
     private val linesByPin = lines

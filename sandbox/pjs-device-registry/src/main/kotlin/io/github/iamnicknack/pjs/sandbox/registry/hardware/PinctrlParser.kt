@@ -5,7 +5,7 @@ import java.io.InputStream
 import java.io.Reader
 import java.nio.charset.StandardCharsets
 
-class PinctrlParser {
+class PinctrlParser(private val maxPins: Int = 64) {
     fun readLines(inputStream: InputStream): Set<HardwareAllocationIndex.Line> =
         inputStream.bufferedReader(StandardCharsets.UTF_8).use { readLines(it) }
 
@@ -36,7 +36,7 @@ class PinctrlParser {
     private fun parseLine(line: String): Pair<Int, LineKey>? {
         val match = linePattern.matchEntire(line) ?: return null
         val offset = match.groupValues[1].toIntOrNull() ?: return null
-        if (offset !in 0..63) {
+        if (offset !in 0..maxPins) {
             return null
         }
 

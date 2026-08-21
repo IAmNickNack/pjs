@@ -23,6 +23,18 @@ fun interface LineSupplier {
         }
     }
 
+    /**
+     * Filters the lines to only include those that are allocated in the given [hardwareAllocation].
+     * @param hardwareAllocation the hardware allocation to filter by
+     * @return a new [LineSupplier] that only includes lines allocated in the given [hardwareAllocation]
+     */
+    fun forHardwareAllocation(hardwareAllocation: HardwareAllocation) = LineSupplier {
+        this@LineSupplier.lines()
+            .map { it.copy(allocation = it.allocation and hardwareAllocation) }
+            .filter { it != HardwareAllocations.EMPTY }
+            .toSet()
+    }
+
     companion object {
         /**
          * Reads output from `pinctrl`.

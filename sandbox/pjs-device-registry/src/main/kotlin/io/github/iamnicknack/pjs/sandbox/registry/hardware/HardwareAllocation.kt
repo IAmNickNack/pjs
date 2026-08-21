@@ -1,5 +1,7 @@
 package io.github.iamnicknack.pjs.sandbox.registry.hardware
 
+import java.util.stream.IntStream
+
 /**
  * Represents a hardware allocation of pin offsets and bitmasks.
  * @param mask the bitmask of offsets
@@ -48,15 +50,16 @@ data class HardwareAllocation(
     override fun iterator(): Iterator<Int> = OffsetsIterator(mask)
 
     companion object {
-        @JvmStatic
-        val EMPTY = HardwareAllocation(0L)
-
         /**
          * Creates a HardwareAllocation from a list of offsets / pins.
          * @param offsets the offsets / pins
          */
         @JvmStatic
         fun fromOffsets(vararg offsets: Int) = HardwareAllocation(offsets.toList())
+
+        @JvmStatic
+        @Suppress("SpreadOperator")
+        fun fromBitCount(bitCount: Int) = fromOffsets(*IntStream.range(0, bitCount).toArray())
     }
 
     /**

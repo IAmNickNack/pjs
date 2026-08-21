@@ -2,6 +2,7 @@ package io.github.iamnicknack.pjs.sandbox.registry
 
 import assertk.assertThat
 import assertk.assertions.containsExactly
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
@@ -17,7 +18,10 @@ import io.github.iamnicknack.pjs.sandbox.registry.HardwareAllocationDeviceRegist
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocation
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.Line
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.LineType
+import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocations
+import io.github.iamnicknack.pjs.sandbox.registry.hardware.LineSupplier
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.MutableHardwareAllocationIndex
+import io.github.iamnicknack.pjs.sandbox.registry.hardware.ReadonlyHardwareAllocationIndex
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
@@ -27,7 +31,7 @@ class HardwareAllocationDeviceRegistryTest {
 
     @Test
     fun `can create gpio`() {
-        val availableHardware = MutableHardwareAllocationIndex.byLineType(
+        val availableHardware = MutableHardwareAllocationIndex(
             Line(LineType.GPIO, "available-gpio", HardwareAllocation.fromOffsets(2, 3))
         )
 
@@ -43,11 +47,11 @@ class HardwareAllocationDeviceRegistryTest {
 
     @Test
     fun `can remove gpio`() {
-        val availableHardware = MutableHardwareAllocationIndex.byLineType(
+        val availableHardware = MutableHardwareAllocationIndex(
             Line(LineType.GPIO, "available-gpio", HardwareAllocation.fromOffsets(2, 3, 4, 5))
         )
 
-        val usedHardware = MutableHardwareAllocationIndex.byLineType()
+        val usedHardware = MutableHardwareAllocationIndex()
 
         val registry = HardwareAllocationDeviceRegistry(MockDeviceRegistry(), availableHardware, usedHardware)
         val config1 = GpioPortConfig.builder()
@@ -81,7 +85,7 @@ class HardwareAllocationDeviceRegistryTest {
 
     @Test
     fun `cannot create with invalid gpios`() {
-        val availableHardware = MutableHardwareAllocationIndex.byLineType(
+        val availableHardware = MutableHardwareAllocationIndex(
             Line(LineType.GPIO, "gpio1", HardwareAllocation.fromOffsets(2)),
             Line(LineType.GPIO, "gpio2", HardwareAllocation.fromOffsets(4))
         )
@@ -101,7 +105,7 @@ class HardwareAllocationDeviceRegistryTest {
 
     @Test
     fun `cannot create conflicting gpio`() {
-        val availableHardware = MutableHardwareAllocationIndex.byLineType(
+        val availableHardware = MutableHardwareAllocationIndex(
             Line(LineType.GPIO, "available-gpio", HardwareAllocation.fromOffsets(2, 3, 4))
         )
 
@@ -148,7 +152,7 @@ class HardwareAllocationDeviceRegistryTest {
             ) { registry: DeviceRegistry -> registry.create(PwmConfig.builder().id("pwm1").chip(1).build()) }
         ).map { expectation ->
             DynamicTest.dynamicTest("can create ${expectation.line.lineType} device") {
-                val availableHardware = MutableHardwareAllocationIndex.byLineType(expectation.line)
+                val availableHardware = MutableHardwareAllocationIndex(expectation.line)
                 val registry = HardwareAllocationDeviceRegistry(MockDeviceRegistry(), availableHardware)
                 val result = expectation.factory(registry)
                 assertThat(result).isNotNull()
@@ -175,7 +179,7 @@ class HardwareAllocationDeviceRegistryTest {
             ) { registry: DeviceRegistry -> registry.create(PwmConfig.builder().id("pwm1").chip(1).build()) }
         ).map { expectation ->
             DynamicTest.dynamicTest("can create ${expectation.line.lineType} device when already in use") {
-                val availableHardware = MutableHardwareAllocationIndex.byLineType(expectation.line)
+                val availableHardware = MutableHardwareAllocationIndex(expectation.line)
                 val registry = HardwareAllocationDeviceRegistry(MockDeviceRegistry(), availableHardware)
                 val result = expectation.factory(registry)
                 assertThat(result).isNotNull()
@@ -208,7 +212,7 @@ class HardwareAllocationDeviceRegistryTest {
             ) { registry: DeviceRegistry -> registry.create(PwmConfig.builder().chip(0).build()) }
         ).map { expectation ->
             DynamicTest.dynamicTest("cannot create ${expectation.line.lineType} device with invalid bus") {
-                val availableHardware = MutableHardwareAllocationIndex.byLineType(expectation.line)
+                val availableHardware = MutableHardwareAllocationIndex(expectation.line)
                 val registry = HardwareAllocationDeviceRegistry(MockDeviceRegistry(), availableHardware)
                 val error = assertFailsWith(HardwareAllocationException.BusNotConfigured::class) {
                     expectation.factory(registry)
@@ -217,5 +221,17 @@ class HardwareAllocationDeviceRegistryTest {
                 assertThat(error.lineType).isEqualTo(expectation.line.lineType)
             }
         }
+    }
+
+    @Test
+    fun `log pinctrl example`() {
+        val lineSupplier = LineSupplier
+            .fromPinctrlResource("/pinctrl-output.txt")
+            .forHardwareAllocation(HardwareAllocations.RASPBERRY_PI)
+        val index = ReadonlyHardwareAllocationIndex(lineSupplier.lines())
+        HardwareAllocationDeviceRegistry(MockDeviceRegistry(), index)
+
+        val invalidAllocation = HardwareAllocation.fromOffsets(27, 28, 29, 30, 31)
+        assertThat(index.findAllIntersectingByAllocation(invalidAllocation)).isEmpty()
     }
 }

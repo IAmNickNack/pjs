@@ -1,5 +1,6 @@
 package io.github.iamnicknack.pjs.sandbox.registry
 
+import io.github.iamnicknack.pjs.device.gpio.GpioPinMask
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
 import io.github.iamnicknack.pjs.device.i2c.I2CConfig
 import io.github.iamnicknack.pjs.device.pwm.PwmConfig
@@ -11,7 +12,9 @@ import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocation
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.LineType
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.MutableHardwareAllocationIndex
-import java.util.Spliterator
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.util.*
 import java.util.function.Consumer
 
 /**
@@ -29,9 +32,22 @@ class HardwareAllocationDeviceRegistry(
     constructor(
         delegate: DeviceRegistry,
         availableHardware: HardwareAllocationIndex
-    ) : this(delegate, availableHardware, MutableHardwareAllocationIndex {
-        it.lineType
-    })
+    ) : this(delegate, availableHardware, MutableHardwareAllocationIndex())
+
+    private val logger: Logger = LoggerFactory.getLogger(HardwareAllocationDeviceRegistry::class.java)
+
+    init {
+        logger.info("Initializing HardwareAllocationDeviceRegistry")
+        availableHardware.forEach { line ->
+            val pinMask = GpioPinMask.fromMask(line.allocation.mask and 0xFFFFFFFFL)
+
+            logger.info("> {} - {}: {}",
+                pinMask.maskString,
+                line.lineType.toString().padEnd(5, ' '),
+                pinMask.offsets().joinToString(", ") { "%02d".format(it) }
+            )
+        }
+    }
 
     /**
      * Factory for validating [GpioPortConfig] prior to constructing a port.
