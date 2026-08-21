@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>NewLineAtEndOfFile:GpioPortClientHandler.kt:io.github.iamnicknack.pjs.http.client.gpio.GpioPortClientHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpConfigHandler.kt:io.github.iamnicknack.pjs.http.client.config.HttpConfigHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpDeviceRegistry.kt:io.github.iamnicknack.pjs.http.client.HttpDeviceRegistry.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpDeviceRegistryTest.kt:io.github.iamnicknack.pjs.http.client.HttpDeviceRegistryTest.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpGpioPort.kt:io.github.iamnicknack.pjs.http.client.gpio.HttpGpioPort.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpGpioPortEventsTest.kt:io.github.iamnicknack.pjs.http.gpio.HttpGpioPortEventsTest.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpGpioPortFactory.kt:io.github.iamnicknack.pjs.http.client.gpio.HttpGpioPortFactory.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpGpioPortHandler.kt:io.github.iamnicknack.pjs.http.client.gpio.HttpGpioPortHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpI2C.kt:io.github.iamnicknack.pjs.http.client.i2c.HttpI2C.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpI2CFactory.kt:io.github.iamnicknack.pjs.http.client.i2c.HttpI2CFactory.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpI2CHandler.kt:io.github.iamnicknack.pjs.http.client.i2c.HttpI2CHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpPwm.kt:io.github.iamnicknack.pjs.http.client.pwm.HttpPwm.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpPwmFactory.kt:io.github.iamnicknack.pjs.http.client.pwm.HttpPwmFactory.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpPwmHandler.kt:io.github.iamnicknack.pjs.http.client.pwm.HttpPwmHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpSpiFactory.kt:io.github.iamnicknack.pjs.http.client.spi.HttpSpiFactory.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpSpiHandler.kt:io.github.iamnicknack.pjs.http.client.spi.HttpSpiHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpSpiTransfer.kt:io.github.iamnicknack.pjs.http.client.spi.HttpSpiTransfer.kt</ID>
+    <ID>NewLineAtEndOfFile:HttpSpiTransferHandler.kt:io.github.iamnicknack.pjs.http.client.spi.HttpSpiTransferHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:PjsHttpTestCase.kt:io.github.iamnicknack.pjs.http.PjsHttpTestCase.kt</ID>
+    <ID>NewLineAtEndOfFile:RemoteDeviceException.kt:io.github.iamnicknack.pjs.http.client.RemoteDeviceException.kt</ID>
+    <ID>TooManyFunctions:HttpPwm.kt:HttpPwm : Pwm</ID>
+  </CurrentIssues>
+</SmellBaseline>

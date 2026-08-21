@@ -10,7 +10,8 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 
 /**
- * A [io.github.iamnicknack.pjs.http.config.ConfigHandler] implementation that uses HTTP to communicate with the device factory.
+ * A [io.github.iamnicknack.pjs.http.config.ConfigHandler] implementation that uses HTTP to communicate with the
+ * device factory.
  * @param httpClient the HTTP client to use for communication
  * @param deviceTypeUrlComponent the URL component to use for device types
  */

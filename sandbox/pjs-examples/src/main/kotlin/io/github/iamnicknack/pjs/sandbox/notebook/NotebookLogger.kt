@@ -31,6 +31,7 @@ object NotebookLogger {
      *
      * This allows application log messages to be written to the notebook console.
      */
+    @Suppress("TooGenericExceptionCaught")
     fun reconfigureSlf4j(
         loader: ClassLoader = this.javaClass.classLoader,
         providerClass: String = "ch.qos.logback.classic.spi.LogbackServiceProvider",
@@ -65,7 +66,6 @@ object NotebookLogger {
             println("FORCE-LOADED SLF4J Provider: " + provider.requestedApiVersion)
         } catch (e: Exception) {
             println("Could not force-load provider: $e")
-            e.printStackTrace(System.err)
         }
     }
 }

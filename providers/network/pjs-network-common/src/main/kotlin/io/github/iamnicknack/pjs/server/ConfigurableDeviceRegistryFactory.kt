@@ -36,7 +36,8 @@ class ConfigurableDeviceRegistryFactory(
      * Registries are loaded using the [io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader] service loader.
      */
     override fun createDeviceRegistry(): DeviceRegistry {
-        val registry = ServiceLoader.load(DeviceRegistryLoader::class.java, DeviceRegistryLoader::class.java.classLoader)
+        val registry = ServiceLoader
+            .load(DeviceRegistryLoader::class.java, DeviceRegistryLoader::class.java.classLoader)
             .firstOrNull { loader ->
                 loader.isLoadable(propertyMap)
                     .also { logger.debug("Loader {}: isLoadable={}", loader.javaClass.simpleName, it) }
@@ -55,6 +56,11 @@ class ConfigurableDeviceRegistryFactory(
     }
 
     override fun toString(): String {
-        return "ConfigurableDeviceRegistry(logging=$logging, proxyPort=$proxyPort, proxyHost=$proxyHost, preferredMode='$preferredMode')"
+        return "ConfigurableDeviceRegistry(" +
+                "logging=$logging, " +
+                "proxyPort=$proxyPort, " +
+                "proxyHost=$proxyHost, " +
+                "preferredMode='$preferredMode'" +
+                ")"
     }
 }

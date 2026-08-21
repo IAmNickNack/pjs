@@ -1,0 +1,35 @@
+config:
+  warningsAsErrors: false
+  validation: true
+
+style:
+  WildcardImport:
+    excludeImports:
+      - io.github.iamnicknack.pjs.grpc.service.*
+      - io.ktor.client.*
+      - io.ktor.client.engine.cio.*
+      - io.ktor.client.plugins.*
+      - io.ktor.client.plugins.contentnegotiation.*
+      - io.ktor.client.plugins.sse.*
+      - io.ktor.serialization.jackson3.*
+      - io.ktor.http.*
+      - io.ktor.serialization.jackson3.*
+      - io.ktor.server.application.*
+      - io.ktor.server.engine.*
+      - io.ktor.server.netty.*
+      - io.ktor.server.plugins.contentnegotiation.*
+      - io.ktor.server.plugins.statuspages.*
+      - io.ktor.server.plugins.swagger.*
+      - io.ktor.server.request.*
+      - io.ktor.server.response.*
+      - io.ktor.server.routing.*
+      - io.ktor.server.sse.*
+      - io.ktor.server.testing.*
+      - io.ktor.sse.*
+      - io.ktor.util.date.*
+
+      - java.util.*
+      - kotlin.*
+
+  MagicNumber:
+    active: false

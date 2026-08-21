@@ -12,6 +12,7 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 import java.util.Arrays;
+import java.util.Objects;
 
 import static java.lang.foreign.MemoryLayout.PathElement.groupElement;
 
@@ -43,6 +44,11 @@ public record LineConfig(
             return flags == config.flags && Arrays.equals(attributes, config.attributes);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(flags, Arrays.hashCode(attributes));
     }
 
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(

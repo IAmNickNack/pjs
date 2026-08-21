@@ -32,6 +32,7 @@ class PinctrlParser {
             }
     }
 
+    @Suppress("MagicNumber", "ReturnCount")
     private fun parseLine(line: String): Pair<Int, LineKey>? {
         val match = linePattern.matchEntire(line) ?: return null
         val offset = match.groupValues[1].toIntOrNull() ?: return null
@@ -45,6 +46,7 @@ class PinctrlParser {
         return offset to lineKey
     }
 
+    @Suppress("ReturnCount")
     private fun classifyLineKey(token: String, currentValue: String): LineKey? {
         val normalized = token.uppercase()
 

@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>NewLineAtEndOfFile:GrpcDeviceRegistryLoader.kt:io.github.iamnicknack.pjs.grpc.GrpcDeviceRegistryLoader.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcGpioPort.kt:io.github.iamnicknack.pjs.grpc.GrpcGpioPort.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcI2C.kt:io.github.iamnicknack.pjs.grpc.GrpcI2C.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcI2CFactory.kt:io.github.iamnicknack.pjs.grpc.GrpcI2CFactory.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcI2CTest.kt:io.github.iamnicknack.pjs.grpc.GrpcI2CTest.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcPwm.kt:io.github.iamnicknack.pjs.grpc.GrpcPwm.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcPwmFactory.kt:io.github.iamnicknack.pjs.grpc.GrpcPwmFactory.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcPwmTest.kt:io.github.iamnicknack.pjs.grpc.GrpcPwmTest.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcSpi.kt:io.github.iamnicknack.pjs.grpc.GrpcSpi.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcSpiFactory.kt:io.github.iamnicknack.pjs.grpc.GrpcSpiFactory.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcSpiTest.kt:io.github.iamnicknack.pjs.grpc.GrpcSpiTest.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcSpiTransfer.kt:io.github.iamnicknack.pjs.grpc.GrpcSpiTransfer.kt</ID>
+    <ID>NewLineAtEndOfFile:PjsExtension.kt:io.github.iamnicknack.pjs.grpc.PjsExtension.kt</ID>
+  </CurrentIssues>
+</SmellBaseline>

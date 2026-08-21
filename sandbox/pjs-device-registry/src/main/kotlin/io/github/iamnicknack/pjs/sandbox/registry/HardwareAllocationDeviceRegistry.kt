@@ -11,7 +11,7 @@ import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocation
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.LineType
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.MutableHardwareAllocationIndex
-import java.util.*
+import java.util.Spliterator
 import java.util.function.Consumer
 
 /**
@@ -242,8 +242,9 @@ class HardwareAllocationDeviceRegistry(
         class PinsNotAvailable(
             val requested: HardwareAllocationIndex.Line,
             val unavailable: HardwareAllocation
-        ) : HardwareAllocationException("Pins not available: ${requested.name}, unavailable: ${unavailable.joinToString(", ")}")
-
+        ) : HardwareAllocationException(
+            "Pins not available: ${requested.name}, unavailable: ${unavailable.joinToString(", ")}"
+        )
         /**
          * Exception thrown when attempting to allocate hardware that is already in use.
          *
@@ -253,8 +254,9 @@ class HardwareAllocationDeviceRegistry(
         class PinsInUse(
             val requested: HardwareAllocationIndex.Line,
             conflicts: Iterable<HardwareAllocationIndex.Line>
-        ) : HardwareAllocationException("Pins in use: ${requested.name}, conflicts: ${conflicts.joinToString(", ") { it.name }}") {
-
+        ) : HardwareAllocationException(
+            "Pins in use: ${requested.name}, conflicts: ${conflicts.joinToString(", ") { it.name }}")
+        {
             val conflicts: List<HardwareAllocationIndex.Line> = conflicts
                 .map { HardwareAllocationIndex.Line(it.lineType, it.name, it.allocation and requested.allocation) }
         }
@@ -267,7 +269,9 @@ class HardwareAllocationDeviceRegistry(
         class BusInUse(
             val requested: HardwareAllocationIndex.Line,
             val current: HardwareAllocationIndex.Line
-        ) : HardwareAllocationException("Bus ${requested.bus} is already in use for ${requested.lineType} by ${current.name}")
+        ) : HardwareAllocationException(
+            "Bus ${requested.bus} is already in use for ${requested.lineType} by ${current.name}"
+        )
 
         /**
          * Exception thrown when attempting to allocate hardware on a bus that is not configured.

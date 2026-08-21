@@ -1,8 +1,9 @@
 package io.github.iamnicknack.pjs.http.server.config
 
+import io.github.iamnicknack.pjs.http.config.ConfigHandler
+import io.github.iamnicknack.pjs.http.config.ConfigHandler.DeviceConfigPayload
 import io.github.iamnicknack.pjs.http.server.DeviceNotFoundException
 import io.github.iamnicknack.pjs.http.server.cannotContain
-import io.github.iamnicknack.pjs.http.config.ConfigHandler
 import io.github.iamnicknack.pjs.model.device.Device
 import io.github.iamnicknack.pjs.model.device.DeviceConfig
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
@@ -12,7 +13,7 @@ class ConfigHandlerImpl<T : Device<T>>(
     val deviceClass: Class<T>,
 ) : ConfigHandler<T> {
 
-    override suspend  fun createDevice(deviceId: String, config: ConfigHandler.DeviceConfigPayload<T>): DeviceConfig<T> {
+    override suspend  fun createDevice(deviceId: String, config: DeviceConfigPayload<T>): DeviceConfig<T> {
         deviceRegistry.cannotContain(deviceId)
         val device = deviceRegistry.create(config.asDeviceConfig(deviceId))
         return device.config as DeviceConfig<T>

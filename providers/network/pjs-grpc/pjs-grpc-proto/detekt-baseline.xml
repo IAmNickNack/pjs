@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>NewLineAtEndOfFile:DeviceRegistryExt.kt:io.github.iamnicknack.pjs.grpc.DeviceRegistryExt.kt</ID>
+    <ID>TooManyFunctions:DeviceRegistryExt.kt:io.github.iamnicknack.pjs.grpc.DeviceRegistryExt.kt</ID>
+  </CurrentIssues>
+</SmellBaseline>

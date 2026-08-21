@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions")
+
 package io.github.iamnicknack.pjs.grpc
 
 import com.google.protobuf.ByteString

@@ -34,3 +34,18 @@ application {
         "--enable-native-access=ALL-UNNAMED"
     )
 }
+
+//detekt {
+//    config.setFrom(files("$rootDir/config/detekt/disabled.yml"))
+//    buildUponDefaultConfig = false
+//}
+//
+//tasks.withType<Detekt>().configureEach {
+//    reports {
+//        checkstyle.required = false
+//        html.required = false
+//        markdown.required = true
+//        sarif.required = true
+//    }
+//}
+

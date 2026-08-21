@@ -84,8 +84,9 @@ class HttpGpioPortHandler(
                                     return@collect
                                 }
 
-                                listener.onEvent(GpioChangeEvent(port, sseEventType.gpioEvent))
-                                    .also { logger.debug("Forwarded GPIO event for port {}: {}", port.config.id, sseEventType) }
+                                listener.onEvent(GpioChangeEvent(port, sseEventType.gpioEvent)).also {
+                                    logger.debug("Forwarded GPIO event for port {}: {}", port.config.id, sseEventType)
+                                }
                             }
                     }
             }

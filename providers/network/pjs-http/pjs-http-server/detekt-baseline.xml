@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>NewLineAtEndOfFile:ConfigHandlerImpl.kt:io.github.iamnicknack.pjs.http.server.config.ConfigHandlerImpl.kt</ID>
+    <ID>NewLineAtEndOfFile:ConfigRoutes.kt:io.github.iamnicknack.pjs.http.server.config.ConfigRoutes.kt</ID>
+    <ID>NewLineAtEndOfFile:DeviceRegistryExt.kt:io.github.iamnicknack.pjs.http.server.DeviceRegistryExt.kt</ID>
+    <ID>NewLineAtEndOfFile:DeviceStatusPages.kt:io.github.iamnicknack.pjs.http.server.DeviceStatusPages.kt</ID>
+    <ID>NewLineAtEndOfFile:GpioEventsHandler.kt:io.github.iamnicknack.pjs.http.server.gpio.GpioEventsHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:GpioPortHandlerImpl.kt:io.github.iamnicknack.pjs.http.server.gpio.GpioPortHandlerImpl.kt</ID>
+    <ID>NewLineAtEndOfFile:GpioPortRoutes.kt:io.github.iamnicknack.pjs.http.server.gpio.GpioPortRoutes.kt</ID>
+    <ID>NewLineAtEndOfFile:I2CHandlerImpl.kt:io.github.iamnicknack.pjs.http.server.i2c.I2CHandlerImpl.kt</ID>
+    <ID>NewLineAtEndOfFile:I2CRoutes.kt:io.github.iamnicknack.pjs.http.server.i2c.I2CRoutes.kt</ID>
+    <ID>NewLineAtEndOfFile:KtorExt.kt:io.github.iamnicknack.pjs.http.server.KtorExt.kt</ID>
+    <ID>NewLineAtEndOfFile:PwmHandlerImpl.kt:io.github.iamnicknack.pjs.http.server.pwm.PwmHandlerImpl.kt</ID>
+    <ID>NewLineAtEndOfFile:PwmRoutes.kt:io.github.iamnicknack.pjs.http.server.pwm.PwmRoutes.kt</ID>
+    <ID>NewLineAtEndOfFile:SpiHandlerImpl.kt:io.github.iamnicknack.pjs.http.server.spi.SpiHandlerImpl.kt</ID>
+    <ID>NewLineAtEndOfFile:SpiRoutes.kt:io.github.iamnicknack.pjs.http.server.spi.SpiRoutes.kt</ID>
+    <ID>NewLineAtEndOfFile:SpiTransferHandlerImpl.kt:io.github.iamnicknack.pjs.http.server.spi.SpiTransferHandlerImpl.kt</ID>
+  </CurrentIssues>
+</SmellBaseline>
