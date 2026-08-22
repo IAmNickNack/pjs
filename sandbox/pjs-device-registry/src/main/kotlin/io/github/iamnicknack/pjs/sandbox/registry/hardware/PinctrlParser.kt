@@ -5,7 +5,7 @@ import java.io.InputStream
 import java.io.Reader
 import java.nio.charset.StandardCharsets
 
-class PinctrlParser(private val maxPins: Int = 64) {
+class PinctrlParser {
     fun readLines(inputStream: InputStream): Set<HardwareAllocationIndex.Line> =
         inputStream.bufferedReader(StandardCharsets.UTF_8).use { readLines(it) }
 
@@ -36,22 +36,21 @@ class PinctrlParser(private val maxPins: Int = 64) {
     private fun parseLine(line: String): Pair<Int, LineKey>? {
         val match = linePattern.matchEntire(line) ?: return null
         val offset = match.groupValues[1].toIntOrNull() ?: return null
-        if (offset !in 0..maxPins) {
+        if (offset !in 0..63) {
             return null
         }
 
-        val currentValue = match.groupValues[2]
         val token = match.groupValues[3]
-        val lineKey = classifyLineKey(token = token, currentValue = currentValue) ?: return null
+        val lineKey = classifyLineKey(token = token) ?: return null
         return offset to lineKey
     }
 
     @Suppress("ReturnCount")
-    private fun classifyLineKey(token: String, currentValue: String): LineKey? {
+    private fun classifyLineKey(token: String): LineKey? {
         val normalized = token.uppercase()
 
         if (normalized == "INPUT" || normalized == "OUTPUT" || normalized == "NONE") {
-            return if (currentValue == "--") LineKey(HardwareAllocationIndex.LineType.GPIO, "GPIO") else null
+            return LineKey(HardwareAllocationIndex.LineType.GPIO, "GPIO")
         }
 
         spiPattern.find(normalized)?.groupValues?.get(1)?.let {

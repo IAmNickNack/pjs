@@ -32,23 +32,26 @@ class ReadonlyHardwareAllocationIndexTest {
     }
 
     @Test
-    fun gpioOnlyIncludesEntriesWithDashedCurrentValue() {
+    fun gpioIncludesEntriesRegardlessOfCurrentValue() {
         val index = ReadonlyHardwareAllocationIndex(lineSupplier.lines())
         val gpio = assertNotNull(index.findByName("GPIO"))
         val offsets = gpio.allocation.toList()
-        assertFalse(offsets.contains(7))
-        assertFalse(offsets.contains(8))
-        assertFalse(offsets.contains(28))
-        assertFalse(offsets.contains(29))
-        assertFalse(offsets.contains(32))
-        assertFalse(offsets.contains(33))
-        assertFalse(offsets.contains(34))
-        assertFalse(offsets.contains(35))
+        assertTrue(offsets.contains(7))
+        assertTrue(offsets.contains(8))
+        assertTrue(offsets.contains(28))
+        assertTrue(offsets.contains(29))
+        assertTrue(offsets.contains(32))
+        assertTrue(offsets.contains(33))
+        assertTrue(offsets.contains(34))
+        assertTrue(offsets.contains(35))
     }
 
     private fun assertExpectedLines(index: ReadonlyHardwareAllocationIndex) {
         val expectedGpios =
-            listOf(2, 3, 4, 5, 6, 12, 13, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 30, 31, 50, 51, 52)
+            listOf(
+                2, 3, 4, 5, 6, 7, 8, 12, 13, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27,
+                28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 46, 47, 48, 49, 50, 51, 52, 53
+            )
 
         assertTrue(index.containsName("GPIO"))
         assertTrue(index.containsName("SPI0"))
