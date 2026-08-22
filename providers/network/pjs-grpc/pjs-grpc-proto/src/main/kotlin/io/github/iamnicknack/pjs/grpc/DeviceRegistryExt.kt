@@ -1,6 +1,7 @@
 package io.github.iamnicknack.pjs.grpc
 
 import io.github.iamnicknack.pjs.device.gpio.GpioEventMode
+import io.github.iamnicknack.pjs.device.gpio.GpioPinMask
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.device.i2c.I2CConfig
@@ -14,7 +15,6 @@ import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PwmConfigPayload
 import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiConfigPayload
 import io.github.iamnicknack.pjs.model.device.Device
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
-import io.github.iamnicknack.pjs.device.gpio.GpioPinMask
 import io.grpc.Status
 
 inline fun <reified T : Device<T>> DeviceRegistry.deviceOrThrow(deviceId: String): T =
@@ -36,6 +36,7 @@ fun DeviceRegistry.cannotContain(deviceId: String) {
     }
 }
 
+@Suppress("SpreadOperator")
 fun PortConfigPayload.asGpioPortConfig(): GpioPortConfig {
     return GpioPortConfig.builder()
         .id(this.deviceId)
