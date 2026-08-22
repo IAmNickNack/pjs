@@ -43,7 +43,7 @@ class HardwareAllocationDeviceRegistry(
 
             logger.info("> {} - {}: {}",
                 pinMask.maskString,
-                line.lineType.toString().padEnd(5, ' '),
+                "${line.lineType}${line.bus ?: ""}".padEnd(5, ' '),
                 pinMask.offsets().joinToString(", ") { "%02d".format(it) }
             )
         }

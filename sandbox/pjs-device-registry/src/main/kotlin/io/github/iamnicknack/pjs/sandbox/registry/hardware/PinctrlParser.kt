@@ -5,7 +5,7 @@ import java.io.InputStream
 import java.io.Reader
 import java.nio.charset.StandardCharsets
 
-class PinctrlParser {
+internal object PinctrlParser {
     fun readLines(inputStream: InputStream): Set<HardwareAllocationIndex.Line> =
         inputStream.bufferedReader(StandardCharsets.UTF_8).use { readLines(it) }
 
@@ -78,12 +78,10 @@ class PinctrlParser {
         val bus: Int? = null
     )
 
-    companion object {
-        private val linePattern = Regex("""^\s*(\d+):\s+.*?\|\s*(\S+)\s*//.*?=\s*(\S+)\s*$""")
-        private val spiPattern = Regex("""SPI_?(\d+)""")
-        private val pwmPattern = Regex("""PWM_?(\d+)""")
-        private val i2cSdaSclPattern = Regex("""(?:SDA|SCL)_?(\d+)""")
-        private val i2cBscPattern = Regex("""BSC(?:_M)?_?(\d+)""")
-        private val uartPattern = Regex("""(?:UART(?:_[A-Z]+)?_|TXD|RXD|CTS|RTS)_?(\d+)""")
-    }
+    private val linePattern = Regex("""^\s*(\d+):\s+.*?\|\s*(\S+)\s*//.*?=\s*(\S+)\s*$""")
+    private val spiPattern = Regex("""SPI_?(\d+)""")
+    private val pwmPattern = Regex("""PWM_?(\d+)""")
+    private val i2cSdaSclPattern = Regex("""(?:SDA|SCL)_?(\d+)""")
+    private val i2cBscPattern = Regex("""BSC(?:_M)?_?(\d+)""")
+    private val uartPattern = Regex("""(?:UART(?:_[A-Z]+)?_|TXD|RXD|CTS|RTS)_?(\d+)""")
 }

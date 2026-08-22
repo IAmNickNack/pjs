@@ -17,7 +17,7 @@ class HttpGpioPortFactory(
     }
 
     fun GpioPortConfig.asGpioPortConfigPayload() = GpioPortHandler.GpioPortConfigPayload(
-        GpioPinMask.offsets(this.mask),
+        GpioPinMask.offsets(this.mask.toLong() and 0xFFFFFFFF),
         this.portMode,
         this.eventMode,
         this.defaultValue,

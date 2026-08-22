@@ -9,4 +9,7 @@ object HardwareAllocations {
 
     @JvmStatic
     val RASPBERRY_PI = HardwareAllocation.fromBitCount(27)
+
+    @JvmStatic
+    val RASPBERRY_PI_I2C0 = HardwareAllocation(0b11L)
 }
