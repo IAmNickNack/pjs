@@ -2,6 +2,7 @@ package io.github.iamnicknack.pjs.sandbox.registry.hardware
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.Line
 import org.junit.jupiter.api.Test
@@ -12,12 +13,11 @@ class MutableHardwareAllocationIndexTest {
     fun `can add line`() {
         val index = MutableHardwareAllocationIndex()
 
-        val lineToAdd = Line(HardwareAllocationIndex.LineType.GPIO, "GPIO-0-1", HardwareAllocation.fromOffsets(0, 1))
-        index.add(lineToAdd)
+        val line = Line(HardwareAllocationIndex.LineType.GPIO, "GPIO-0-1", HardwareAllocation.fromOffsets(0, 1))
+        index.add(line)
 
-        assertThat(index.findByPin(0)).isEqualTo(lineToAdd)
-        assertThat(index.findByPin(1)).isEqualTo(lineToAdd)
-        assertThat(index.findByName(lineToAdd.name)).isEqualTo(lineToAdd)
+        assertThat(index.findByAllocation(line.allocation)).isNotNull()
+        assertThat(index.findByName(line.name)).isEqualTo(line)
     }
 
     @Test
@@ -27,8 +27,7 @@ class MutableHardwareAllocationIndexTest {
 
         index.remove(line)
 
-        assertThat(index.findByPin(0)).isNull()
-        assertThat(index.findByPin(1)).isNull()
+        assertThat(index.findByAllocation(line.allocation)).isNull()
         assertThat(index.findByName(line.name)).isNull()
     }
 }

@@ -1,9 +1,10 @@
 package io.github.iamnicknack.pjs.sandbox.registry.hardware
 
+import assertk.assertThat
+import assertk.assertions.isNotNull
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.LineType
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -48,7 +49,7 @@ class ReadonlyHardwareAllocationIndexTest {
 
     private fun assertExpectedLines(index: ReadonlyHardwareAllocationIndex) {
         val expectedGpios =
-            listOf(
+            HardwareAllocation.fromOffsets(
                 2, 3, 4, 5, 6, 7, 8, 12, 13, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27,
                 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 46, 47, 48, 49, 50, 51, 52, 53
             )
@@ -59,7 +60,7 @@ class ReadonlyHardwareAllocationIndexTest {
         assertTrue(index.containsName("PWM1"))
         assertTrue(index.containsName("I2C3"))
         assertTrue(index.containsName("UART1"))
-        expectedGpios.forEach { assertTrue(index.containsPin(it)) }
+        assertThat(index.findByAllocation(expectedGpios)).isNotNull()
 
         val gpio = assertNotNull(index.findByName("GPIO"))
         val spi0 = assertNotNull(index.findByName("SPI0"))
@@ -74,7 +75,7 @@ class ReadonlyHardwareAllocationIndexTest {
         assertEquals(LineType.I2C, i2c3.lineType)
         assertEquals(LineType.UART, uart1.lineType)
 
-        assertEquals(expectedGpios, gpio.allocation.toList())
+        assertEquals(expectedGpios, gpio.allocation)
 
         assertEquals(listOf(9, 10, 11), spi0.allocation.toList())
         assertEquals(listOf(18), pwm0.allocation.toList())

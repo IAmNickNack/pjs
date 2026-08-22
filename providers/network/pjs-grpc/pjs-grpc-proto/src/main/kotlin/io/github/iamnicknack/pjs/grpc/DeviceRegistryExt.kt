@@ -54,7 +54,7 @@ fun GpioPortConfig.asPortConfigPayload(): PortConfigPayload {
         .setPortMode(this.portMode.asPortMode())
         .setEventMode(this.eventMode.asEventMode())
         .setDefaultValue(this.defaultValue)
-        .addAllPinNumber(GpioPinMask.offsets(this.mask.toLong() and 0xFFFFFFFF).toList())
+        .addAllPinNumber(GpioPinMask.offsets(this.mask).toList())
         .setDebounceDelay(this.debounceDelay)
         .build()
 }

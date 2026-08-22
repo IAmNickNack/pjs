@@ -17,20 +17,20 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
      */
     fun containsName(name: String): Boolean = findByName(name) != null
 
-    /**
-     * Fetch the line allocation for a given pin
-     * @param pin the pin number
-     * @return the line allocation for a given pin
-     */
-    fun findByPin(pin: Int): Line? = this
-        .firstOrNull { it.allocation.contains(pin) }
-
-    /**
-     * Check if the index contains a line with the specified pin
-     * @param pin the pin number
-     * @return true if the index contains a line with the specified pin, false otherwise
-     */
-    fun containsPin(pin: Int): Boolean = findByPin(pin) != null
+//    /**
+//     * Fetch the line allocation for a given pin
+//     * @param pin the pin number
+//     * @return the line allocation for a given pin
+//     */
+//    fun findByPin(pin: Int): Line? = this
+//        .firstOrNull { it.allocation.contains(pin) }
+//
+//    /**
+//     * Check if the index contains a line with the specified pin
+//     * @param pin the pin number
+//     * @return true if the index contains a line with the specified pin, false otherwise
+//     */
+//    fun containsPin(pin: Int): Boolean = findByPin(pin) != null
 
     /**
      * Fetch the line allocation which can satisfy the specified allocation
@@ -49,13 +49,13 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
         .filter { it.allocation intersects allocation }
         .toSet()
 
-    /**
-     * Fetch the line allocation which can satisfy the specified offsets
-     * @param offsets the offsets to match
-     * @return the line allocation for given offsets
-     */
-    fun findByOffsets(vararg offsets: Int): Line? = this
-        .findByAllocation(HardwareAllocation.fromOffsets(*offsets))
+//    /**
+//     * Fetch the line allocation which can satisfy the specified offsets
+//     * @param offsets the offsets to match
+//     * @return the line allocation for given offsets
+//     */
+//    fun findByOffsets(vararg offsets: Int): Line? = this
+//        .findByAllocation(HardwareAllocation.fromOffsets(*offsets))
 
     /**
      * Fetch the line allocation which can satisfy the specified mask
