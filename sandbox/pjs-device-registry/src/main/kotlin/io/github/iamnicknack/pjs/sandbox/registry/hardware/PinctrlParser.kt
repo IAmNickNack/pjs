@@ -5,7 +5,7 @@ import java.io.InputStream
 import java.io.Reader
 import java.nio.charset.StandardCharsets
 
-class PinctrlParser {
+internal object PinctrlParser {
     fun readLines(inputStream: InputStream): Set<HardwareAllocationIndex.Line> =
         inputStream.bufferedReader(StandardCharsets.UTF_8).use { readLines(it) }
 
@@ -40,18 +40,17 @@ class PinctrlParser {
             return null
         }
 
-        val currentValue = match.groupValues[2]
         val token = match.groupValues[3]
-        val lineKey = classifyLineKey(token = token, currentValue = currentValue) ?: return null
+        val lineKey = classifyLineKey(token = token) ?: return null
         return offset to lineKey
     }
 
     @Suppress("ReturnCount")
-    private fun classifyLineKey(token: String, currentValue: String): LineKey? {
+    private fun classifyLineKey(token: String): LineKey? {
         val normalized = token.uppercase()
 
         if (normalized == "INPUT" || normalized == "OUTPUT" || normalized == "NONE") {
-            return if (currentValue == "--") LineKey(HardwareAllocationIndex.LineType.GPIO, "GPIO") else null
+            return LineKey(HardwareAllocationIndex.LineType.GPIO, "GPIO")
         }
 
         spiPattern.find(normalized)?.groupValues?.get(1)?.let {
@@ -79,12 +78,10 @@ class PinctrlParser {
         val bus: Int? = null
     )
 
-    companion object {
-        private val linePattern = Regex("""^\s*(\d+):\s+.*?\|\s*(\S+)\s*//.*?=\s*(\S+)\s*$""")
-        private val spiPattern = Regex("""SPI_?(\d+)""")
-        private val pwmPattern = Regex("""PWM_?(\d+)""")
-        private val i2cSdaSclPattern = Regex("""(?:SDA|SCL)_?(\d+)""")
-        private val i2cBscPattern = Regex("""BSC(?:_M)?_?(\d+)""")
-        private val uartPattern = Regex("""(?:UART(?:_[A-Z]+)?_|TXD|RXD|CTS|RTS)_?(\d+)""")
-    }
+    private val linePattern = Regex("""^\s*(\d+):\s+.*?\|\s*(\S+)\s*//.*?=\s*(\S+)\s*$""")
+    private val spiPattern = Regex("""SPI_?(\d+)""")
+    private val pwmPattern = Regex("""PWM_?(\d+)""")
+    private val i2cSdaSclPattern = Regex("""(?:SDA|SCL)_?(\d+)""")
+    private val i2cBscPattern = Regex("""BSC(?:_M)?_?(\d+)""")
+    private val uartPattern = Regex("""(?:UART(?:_[A-Z]+)?_|TXD|RXD|CTS|RTS)_?(\d+)""")
 }

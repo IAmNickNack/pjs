@@ -34,7 +34,7 @@ public interface NativeContext {
                 }
             }
         } catch (Exception e) {
-            // do nothing
+            return false;
         }
 
         return false;

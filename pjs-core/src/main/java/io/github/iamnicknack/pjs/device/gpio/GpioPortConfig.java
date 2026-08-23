@@ -13,7 +13,7 @@ import java.util.Arrays;
  * @param id unique identifier for the port
  */
 public record GpioPortConfig(
-        int mask,
+        long mask,
         GpioPortMode portMode,
         GpioEventMode eventMode,
         int defaultValue,
@@ -31,7 +31,7 @@ public record GpioPortConfig(
     }
 
     public static class Builder {
-        private int mask = 0;
+        private long mask = 0;
         private GpioPortMode portMode = GpioPortMode.INPUT;
         private GpioEventMode eventMode = GpioEventMode.NONE;
         private int defaultValue = -1;
@@ -40,12 +40,12 @@ public record GpioPortConfig(
         private String id;
 
         public Builder pin(int... pinNumber) {
-            Arrays.stream(pinNumber).forEach(pin -> this.mask |= 1 << pin);
+            Arrays.stream(pinNumber).forEach(pin -> this.mask |= 1L << pin);
             return this;
         }
 
         public Builder pin(int pinNumber) {
-            this.mask |= 1 << pinNumber;
+            this.mask |= 1L << pinNumber;
             return this;
         }
 
@@ -75,7 +75,7 @@ public record GpioPortConfig(
         }
 
         public GpioPortConfig build() {
-            var id = (this.id != null) ? this.id : String.format("GPIO-%s-%s", this.portMode, Integer.toBinaryString(this.mask));
+            var id = (this.id != null) ? this.id : String.format("GPIO-%s-%s", this.portMode, Long.toBinaryString(this.mask));
             return new GpioPortConfig(mask, portMode, eventMode, defaultValue, debounceDelay, id);
         }
     }

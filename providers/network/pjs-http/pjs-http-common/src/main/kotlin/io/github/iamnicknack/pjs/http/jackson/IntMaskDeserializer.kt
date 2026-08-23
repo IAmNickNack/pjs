@@ -15,6 +15,6 @@ class IntMaskDeserializer : ValueDeserializer<IntArray>() {
         p: JsonParser,
         ctxt: DeserializationContext
     ): IntArray {
-        return GpioPinMask.offsets(p.intValue)
+        return GpioPinMask.offsets(p.longValue)
     }
 }

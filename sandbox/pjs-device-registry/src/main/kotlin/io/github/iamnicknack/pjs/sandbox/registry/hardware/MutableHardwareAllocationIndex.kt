@@ -1,82 +1,44 @@
 package io.github.iamnicknack.pjs.sandbox.registry.hardware
 
-import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.Line
-import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.LineType
-
 /**
  * Mutable implementation of [HardwareAllocationIndex] which allows lines to be added at runtime
  */
-class MutableHardwareAllocationIndex<K>(
-    private val keySelector: (Line) -> K
-) : HardwareAllocationIndex.Mutable, HardwareAllocationIndex.Keyed<K> {
+class MutableHardwareAllocationIndex(
+    private val lines: MutableSet<HardwareAllocationIndex.Line> = mutableSetOf(),
+) : HardwareAllocationIndex.Mutable {
 
     /**
-     * [HardwareAllocation] indicating current allocation of all device types
+     * Tracker for in-use hardware allocations
      */
-    private var hardwareAllocation: HardwareAllocation = HardwareAllocation.EMPTY
+    private var inUse: HardwareAllocation = lines
+        .map { it.allocation }
+        .fold(HardwareAllocations.EMPTY) { acc, allocation -> acc or allocation }
 
     /**
-     * The index of allocations keyed by the result of [keySelector]
+     * Public accessor to the in-use hardware allocations tracker
      */
-    private val indexByKey: MutableMap<K, Node> = mutableMapOf()
+    val inUseAllocation: HardwareAllocation
+        get() = inUse
 
-    /**
-     * Adds a new line to the index
-     * @param line the line to add
-     */
-    override fun add(line: Line): MutableHardwareAllocationIndex<K> {
-        val key = keySelector(line)
-        val current = indexByKey[key] ?: Node.EMPTY
+    constructor(vararg lines: HardwareAllocationIndex.Line) : this(lines.toSet().toMutableSet())
 
-        (current.allocation and line.allocation).takeIf { it != HardwareAllocation.EMPTY }
-            ?.also { throw IllegalArgumentException("Allocation for $key already exists: $it") }
-
-        hardwareAllocation = hardwareAllocation or line.allocation
-        indexByKey[key] = Node(current.allocation or line.allocation, current.lines + line)
-
+    override fun add(line: HardwareAllocationIndex.Line): HardwareAllocationIndex.Mutable {
+        require(inUse and line.allocation == HardwareAllocations.EMPTY) {
+            "Line intersects with existing lines"
+        }
+        lines.add(line)
+        inUse = inUse or line.allocation
         return this
     }
 
-    /**
-     * Remove a line from the index
-     * @param line the line to remove
-     */
-    override fun remove(line: Line): MutableHardwareAllocationIndex<K> {
-        val key = keySelector(line)
-        val current = indexByKey[key] ?: Node.EMPTY
-
-        if (!current.lines.contains(line)) {
-            return this
+    override fun remove(line: HardwareAllocationIndex.Line): HardwareAllocationIndex.Mutable {
+        require(lines.contains(line)) {
+            "Line does not exist"
         }
-
-        hardwareAllocation = hardwareAllocation not line.allocation
-        indexByKey[key] = Node(current.allocation not line.allocation, current.lines - line)
-
+        lines.remove(line)
+        inUse = inUse not line.allocation
         return this
     }
 
-    override operator fun get(key: K): Set<Line> = indexByKey[key]?.lines ?: emptySet()
-
-    override fun iterator(): Iterator<Line> = indexByKey.values.flatMap { it.lines }.iterator()
-
-    private data class Node(
-        val allocation: HardwareAllocation,
-        val lines: Set<Line>
-    ) {
-        companion object {
-            @JvmStatic
-            val EMPTY = Node(HardwareAllocation.EMPTY, emptySet())
-        }
-    }
-
-    companion object {
-        @JvmStatic
-        fun byLineType(vararg lines: Line): MutableHardwareAllocationIndex<LineType> {
-            return MutableHardwareAllocationIndex {
-                it.lineType
-            }.apply {
-                lines.forEach { add(it) }
-            }
-        }
-    }
+    override fun iterator(): Iterator<HardwareAllocationIndex.Line> = lines.iterator()
 }
