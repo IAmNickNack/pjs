@@ -3,6 +3,7 @@ package io.github.iamnicknack.pjs.sandbox.registry.hardware
 import assertk.assertThat
 import assertk.assertions.isNotNull
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.LineType
+import io.github.iamnicknack.pjs.sandbox.registry.line.PinctrlLineSupplier
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -10,7 +11,7 @@ import kotlin.test.assertTrue
 
 class ReadonlyHardwareAllocationIndexTest {
 
-    private val lineSupplier = LineSupplier.fromPinctrlResource("/pinctrl-output.txt")
+    private val lineSupplier = PinctrlLineSupplier.from("/pinctrl-output.txt")
 
     @Test
     fun showAllLines() {

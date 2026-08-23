@@ -10,4 +10,7 @@ plugins {
 dependencies {
     api(project(":pjs-core"))
     implementation(project(":providers:pjs-mock-device"))
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.yaml)
+    implementation(libs.jackson.kotlin)
 }

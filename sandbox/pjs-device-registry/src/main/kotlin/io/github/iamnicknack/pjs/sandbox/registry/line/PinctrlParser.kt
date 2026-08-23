@@ -1,5 +1,7 @@
-package io.github.iamnicknack.pjs.sandbox.registry.hardware
+package io.github.iamnicknack.pjs.sandbox.registry.line
 
+import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocation
+import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.Reader
