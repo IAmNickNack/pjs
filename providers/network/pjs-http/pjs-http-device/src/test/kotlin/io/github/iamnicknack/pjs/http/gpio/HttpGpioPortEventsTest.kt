@@ -3,7 +3,6 @@ package io.github.iamnicknack.pjs.http.gpio
 import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
-import io.github.iamnicknack.pjs.http.client.gpio.HttpGpioPort
 import io.github.iamnicknack.pjs.http.pjsHttpTestCase
 import io.github.iamnicknack.pjs.http.server.deviceOrThrow
 import io.github.iamnicknack.pjs.mock.MockGpioPort
@@ -22,7 +21,7 @@ class HttpGpioPortEventsTest {
             .portMode(GpioPortMode.INPUT)
             .pin(1)
             .build()
-        val httpPort = httpDeviceRegistry.create(config) as HttpGpioPort
+        val httpPort = httpDeviceRegistry.create(config) as GpioPort
         val mockPort = mockDeviceRegistry.deviceOrThrow<GpioPort>("test-port") as MockGpioPort
 
         val latch = CountDownLatch(1)
