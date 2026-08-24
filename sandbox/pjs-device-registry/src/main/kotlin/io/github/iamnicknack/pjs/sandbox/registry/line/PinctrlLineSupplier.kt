@@ -48,7 +48,7 @@ class PinctrlLineSupplier : LineSupplier {
                     throw FileNotFoundException("pinctrl not found")
                 }
 
-                proc.inputStream.bufferedReader().readText()
+                proc.inputStream.bufferedReader().readText().trim()
             }
 
             return path
