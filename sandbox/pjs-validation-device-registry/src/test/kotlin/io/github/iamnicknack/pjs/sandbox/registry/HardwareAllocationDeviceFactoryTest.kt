@@ -151,8 +151,8 @@ class HardwareAllocationDeviceFactoryTest {
                 Line(LineType.I2C, "i2c3", HardwareAllocation.fromOffsets(14, 15), 3)
             ) { registry: DeviceRegistry -> registry.create(I2CConfig.builder().id("i2c3").bus(3).build()) },
             Expectation(
-                Line(LineType.PWM, "pwm0", HardwareAllocation.fromOffsets(16), 1)
-            ) { registry: DeviceRegistry -> registry.create(PwmConfig.builder().id("pwm1").chip(1).build()) }
+                Line(LineType.PWM, "pwm0", HardwareAllocation.fromOffsets(16), 1, 1)
+            ) { registry: DeviceRegistry -> registry.create(PwmConfig.builder().id("pwm1").chip(1).channel(1).build()) }
         ).map { expectation ->
             DynamicTest.dynamicTest("can create ${expectation.line.lineType} device") {
                 val availableHardware = MutableHardwareAllocationIndex(expectation.line)
@@ -179,7 +179,7 @@ class HardwareAllocationDeviceFactoryTest {
                 Line(LineType.I2C, "i2c3", HardwareAllocation.fromOffsets(14, 15), 3)
             ) { registry: DeviceRegistry -> registry.create(I2CConfig.builder().id("i2c3").bus(3).build()) },
             Expectation(
-                Line(LineType.PWM, "pwm1", HardwareAllocation.fromOffsets(16), 1)
+                Line(LineType.PWM, "pwm1", HardwareAllocation.fromOffsets(16), 1, 0)
             ) { registry: DeviceRegistry -> registry.create(PwmConfig.builder().id("pwm1").chip(1).build()) }
         ).map { expectation ->
             DynamicTest.dynamicTest("can create ${expectation.line.lineType} device when already in use") {
@@ -213,7 +213,7 @@ class HardwareAllocationDeviceFactoryTest {
                 Line(LineType.I2C, "i2c3", HardwareAllocation.fromOffsets(14, 15), 3)
             ) { registry: DeviceRegistry -> registry.create(I2CConfig.builder().bus(0).build()) },
             Expectation(
-                Line(LineType.PWM, "pwm0", HardwareAllocation.fromOffsets(16), 1)
+                Line(LineType.PWM, "pwm0", HardwareAllocation.fromOffsets(16), 1, channel = 0)
             ) { registry: DeviceRegistry -> registry.create(PwmConfig.builder().chip(0).build()) }
         ).map { expectation ->
             DynamicTest.dynamicTest("cannot create ${expectation.line.lineType} device with invalid bus") {
