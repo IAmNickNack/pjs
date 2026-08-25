@@ -3,14 +3,9 @@ package io.github.iamnicknack.pjs.sandbox.registry.line
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocation
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex
 import java.io.BufferedReader
-import java.io.InputStream
 import java.io.Reader
-import java.nio.charset.StandardCharsets
 
 internal object PinctrlParser {
-    fun readLines(inputStream: InputStream): Set<HardwareAllocationIndex.Line> =
-        inputStream.bufferedReader(StandardCharsets.UTF_8).use { readLines(it) }
-
     fun readLines(reader: Reader): Set<HardwareAllocationIndex.Line> {
         val allocations = mutableMapOf<LineKey, MutableSet<Int>>()
         val bufferedReader = reader as? BufferedReader ?: reader.buffered()
@@ -29,7 +24,8 @@ internal object PinctrlParser {
                     lineType = key.lineType,
                     name = key.name,
                     allocation = HardwareAllocation(offsets.toList().sorted()),
-                    bus = key.bus
+                    bus = key.bus,
+                    channel = key.channel
                 )
             }
     }
@@ -59,7 +55,8 @@ internal object PinctrlParser {
             return LineKey(HardwareAllocationIndex.LineType.SPI, "SPI$it", it.toIntOrNull())
         }
         pwmPattern.find(normalized)?.groupValues?.get(1)?.let {
-            return LineKey(HardwareAllocationIndex.LineType.PWM, "PWM$it", it.toIntOrNull())
+            val channel = pwmChannelPattern.find(normalized)?.groupValues[1]?.toIntOrNull()
+            return LineKey(HardwareAllocationIndex.LineType.PWM, "PWM$it", it.toIntOrNull(), channel)
         }
         i2cSdaSclPattern.find(normalized)?.groupValues?.get(1)?.let {
             return LineKey(HardwareAllocationIndex.LineType.I2C, "I2C$it", it.toIntOrNull())
@@ -77,12 +74,14 @@ internal object PinctrlParser {
     private data class LineKey(
         val lineType: HardwareAllocationIndex.LineType,
         val name: String,
-        val bus: Int? = null
+        val bus: Int? = null,
+        val channel: Int? = null,
     )
 
     private val linePattern = Regex("""^\s*(\d+):\s+.*?\|\s*(\S+)\s*//.*?=\s*(\S+)\s*$""")
     private val spiPattern = Regex("""SPI_?(\d+)""")
     private val pwmPattern = Regex("""PWM_?(\d+)""")
+    private val pwmChannelPattern = Regex("""_?(\d+)$""")
     private val i2cSdaSclPattern = Regex("""(?:SDA|SCL)_?(\d+)""")
     private val i2cBscPattern = Regex("""BSC(?:_M)?_?(\d+)""")
     private val uartPattern = Regex("""(?:UART(?:_[A-Z]+)?_|TXD|RXD|CTS|RTS)_?(\d+)""")

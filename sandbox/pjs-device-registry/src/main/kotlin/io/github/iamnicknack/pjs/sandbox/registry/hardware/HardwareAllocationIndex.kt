@@ -83,12 +83,14 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
      * @param name the name of the line
      * @param allocation the hardware allocation of the line
      * @param bus the device bus number the line is connected to
+     * @param channel for PWM, the channel number the line is connected to
      */
     data class Line(
         val lineType: LineType,
         val name: String,
         val allocation: HardwareAllocation,
         val bus: Int? = null,
+        val channel: Int? = null
     )
 
     /**
@@ -126,13 +128,5 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
         fun immutable(): HardwareAllocationIndex {
             return ReadonlyHardwareAllocationIndex(this.toSet())
         }
-    }
-
-    /**
-     * Hardware allocation index which allows for retrieving line allocations a specific key type
-     * @param K the key type
-     */
-    interface Keyed<K> : HardwareAllocationIndex {
-        operator fun get(key: K): Set<Line>
     }
 }

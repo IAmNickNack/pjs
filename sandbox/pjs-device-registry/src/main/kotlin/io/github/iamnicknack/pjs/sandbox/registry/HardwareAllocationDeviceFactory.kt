@@ -228,17 +228,22 @@ class HardwareAllocationDeviceFactory(
         private val pwmIndex = availableHardware.indexForType(LineType.PWM)
 
         override fun createLine(config: PwmConfig): HardwareAllocationIndex.Line {
-            val configured = pwmIndex.firstOrNull { it.bus == config.chip }
-
-            if (configured == null) {
+            var found = pwmIndex.filter { it.bus == config.chip }
+            if (found.isEmpty()) {
                 throw HardwareAllocationException.BusNotConfigured(config.chip, LineType.PWM)
+            }
+
+            found = found.filter { it.channel == config.channel }
+            if (found.isEmpty()) {
+                throw HardwareAllocationException.ChannelNotConfigured(config.chip, config.channel, LineType.PWM)
             }
 
             return HardwareAllocationIndex.Line(
                 LineType.PWM,
                 config.id,
-                configured.allocation,
-                config.chip
+                found.first().allocation,
+                config.chip,
+                channel = config.channel
             )
         }
 
@@ -299,6 +304,18 @@ class HardwareAllocationDeviceFactory(
          */
         class BusNotConfigured(val bus: Int, val lineType: LineType) :
             HardwareAllocationException("Bus $bus is not configured for $lineType")
+
+        /**
+         * Exception thrown when attempting to allocate hardware on a channel that is not configured.
+         * @param bus the bus the channel is on
+         * @param channel the channel that is not configured
+         * @param lineType the type of line the channel is for
+         */
+        class ChannelNotConfigured(
+            val bus: Int,
+            val channel: Int,
+            val lineType: LineType
+        ) : HardwareAllocationException("Channel $channel on bus $bus is not configured for $lineType")
     }
 
     private inner class GpioPortDelegate(

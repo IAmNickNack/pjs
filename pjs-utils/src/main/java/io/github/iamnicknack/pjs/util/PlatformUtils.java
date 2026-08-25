@@ -13,6 +13,7 @@ public class PlatformUtils {
         return System.getProperty("os.name").toLowerCase().startsWith("linux");
     }
 
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public static boolean isRaspberryPi() {
         if (!isLinux()) {
             return false;
