@@ -4,12 +4,9 @@ plugins {
     id("buildlogic.kotlin-core")
     id("buildlogic.logging")
     id("buildlogic.test.test-kotlin")
-    id("buildlogic.kotlin-java-module-system")
     id("buildlogic.java-library")
     id("buildlogic.maven-publish")
 }
-
-javaModuleSystem.moduleName = "pjs.grpc"
 
 dependencies {
     api(project(":pjs-core"))
