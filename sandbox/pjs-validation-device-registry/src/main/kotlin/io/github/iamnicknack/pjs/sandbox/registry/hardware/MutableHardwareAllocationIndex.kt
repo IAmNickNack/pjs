@@ -5,6 +5,7 @@ package io.github.iamnicknack.pjs.sandbox.registry.hardware
  */
 class MutableHardwareAllocationIndex(
     private val lines: MutableSet<HardwareAllocationIndex.Line> = mutableSetOf(),
+    private val initialAllocation: HardwareAllocation = HardwareAllocation(Long.MAX_VALUE)
 ) : HardwareAllocationIndex.Mutable {
 
     /**
@@ -17,9 +18,14 @@ class MutableHardwareAllocationIndex(
     constructor(vararg lines: HardwareAllocationIndex.Line) : this(lines.toSet().toMutableSet())
 
     override fun add(line: HardwareAllocationIndex.Line): HardwareAllocationIndex.Mutable {
-        require(inUse and line.allocation == HardwareAllocations.EMPTY) {
-            "Line intersects with existing lines"
+        this.findAllIntersectingByAllocation(line.allocation)
+            .takeIf { it.isNotEmpty() }
+            ?.also { throw HardwareAllocationException.PinsInUse(line, it) }
+
+        require(initialAllocation.contains(line.allocation)) {
+            "Line allocation is not within initial allocation"
         }
+
         lines.add(line)
         inUse = inUse or line.allocation
         return this
@@ -29,6 +35,7 @@ class MutableHardwareAllocationIndex(
         require(lines.contains(line)) {
             "Line does not exist"
         }
+
         lines.remove(line)
         inUse = inUse not line.allocation
         return this

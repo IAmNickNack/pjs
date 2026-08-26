@@ -5,9 +5,9 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
+import assertk.assertions.matchesPredicate
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.Line
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class MutableHardwareAllocationIndexTest {
 
@@ -40,7 +40,10 @@ class MutableHardwareAllocationIndexTest {
         val line = Line(HardwareAllocationIndex.LineType.GPIO, "GPIO-0-1", HardwareAllocation.fromOffsets(0, 1))
         val index = MutableHardwareAllocationIndex(line)
 
-        assertThrows<IllegalArgumentException> { index.add(line) }
+        val result = runCatching { index.add(line) }
+        assertThat(result.exceptionOrNull()).matchesPredicate {
+                (it as? HardwareAllocationException.PinsInUse)?.conflicts?.contains(line) ?: false
+        }
     }
 
     @Test
