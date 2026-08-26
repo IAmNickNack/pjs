@@ -20,7 +20,7 @@ class MutableHardwareAllocationIndexTest {
 
         assertThat(index.findByAllocation(line.allocation)).isNotNull()
         assertThat(index.findByName(line.name)).isEqualTo(line)
-        assertThat(index.inUseAllocation).isNotEqualTo(HardwareAllocations.EMPTY)
+        assertThat(index.mask()).isNotEqualTo(0L)
     }
 
     @Test
@@ -32,7 +32,7 @@ class MutableHardwareAllocationIndexTest {
 
         assertThat(index.findByAllocation(line.allocation)).isNull()
         assertThat(index.findByName(line.name)).isNull()
-        assertThat(index.inUseAllocation).isEqualTo(HardwareAllocations.EMPTY)
+        assertThat(index.mask()).isEqualTo(0L)
     }
 
     @Test
@@ -49,12 +49,12 @@ class MutableHardwareAllocationIndexTest {
         val index = MutableHardwareAllocationIndex(line)
 
         index.remove(line)
-        assertThat(index.inUseAllocation).isEqualTo(HardwareAllocations.EMPTY)
+        assertThat(index.mask()).isEqualTo(0L)
 
         index.add(line)
         assertThat(index.findByAllocation(line.allocation)).isNotNull()
         assertThat(index.findByName(line.name)).isEqualTo(line)
-        assertThat(index.inUseAllocation).isNotEqualTo(HardwareAllocations.EMPTY)
+        assertThat(index.mask()).isNotEqualTo(0L)
     }
 
 }

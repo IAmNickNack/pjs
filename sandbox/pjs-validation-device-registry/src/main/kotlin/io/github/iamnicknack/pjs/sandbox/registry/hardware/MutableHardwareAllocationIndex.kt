@@ -14,12 +14,6 @@ class MutableHardwareAllocationIndex(
         .map { it.allocation }
         .fold(HardwareAllocations.EMPTY) { acc, allocation -> acc or allocation }
 
-    /**
-     * Public accessor to the in-use hardware allocations tracker
-     */
-    val inUseAllocation: HardwareAllocation
-        get() = inUse
-
     constructor(vararg lines: HardwareAllocationIndex.Line) : this(lines.toSet().toMutableSet())
 
     override fun add(line: HardwareAllocationIndex.Line): HardwareAllocationIndex.Mutable {
@@ -38,6 +32,10 @@ class MutableHardwareAllocationIndex(
         lines.remove(line)
         inUse = inUse not line.allocation
         return this
+    }
+
+    override fun mask(): Long {
+        return inUse.mask
     }
 
     override fun iterator(): Iterator<HardwareAllocationIndex.Line> = lines.iterator()

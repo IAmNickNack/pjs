@@ -68,6 +68,12 @@ interface HardwareAllocationIndex : Iterable<HardwareAllocationIndex.Line> {
     fun remainder(allocation: HardwareAllocation): HardwareAllocation = this
         .fold(HardwareAllocation(allocation.mask)) { acc, m -> acc not m.allocation }
 
+    /**
+     * Calculate the mask of all allocations in the index
+     * @return the mask of all allocations
+     */
+    fun mask(): Long = this
+        .fold(0L) { acc, m -> acc or m.allocation.mask }
 
     /**
      * Create a mutable copy of this index.
