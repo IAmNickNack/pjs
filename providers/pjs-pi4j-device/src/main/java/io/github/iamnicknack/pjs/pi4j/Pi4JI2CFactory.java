@@ -60,11 +60,12 @@ public class Pi4JI2CFactory implements I2CFactory {
     }
 
     /**
-     * Dispose of all Pi4J I2C devices, removing them from the Pi4J registry.
+     * Remove the Pi4J I2C devices for the given configuration.
+     * @param config the PJs configuration for this device.
      */
-    @Override
-    public void close() {
+    void removeI2C(I2CConfig config) {
         i2cMap.keySet().stream()
+                .filter(key -> key.pjsDeviceId().equals(config.getId()))
                 .map(DeviceCacheKey::toString)
                 .forEach(pi4jContext.registry()::remove);
     }

@@ -23,8 +23,8 @@ class NativePwmProviderTest {
         SysfsOperationsFactory sysfsFactory = devicePath -> new FakePwmSysfsOperations(fileOperations, devicePath);
         createChipSysfsFilesystem(fileOperations, "/sys/class/pwm/pwmchip0", 1);
 
-        try (var factory = new NativePwmFactory(sysfsFactory);
-             var device = factory.create(PwmConfig.builder().chip(0).channel(0).build())) {
+        var factory = new NativePwmFactory(sysfsFactory);
+        try(var device = factory.create(PwmConfig.builder().chip(0).channel(0).build())) {
             device.setFrequency(440.0);
             device.setDutyRatio(0.50);
             device.setPolarity(Pwm.Polarity.NORMAL);

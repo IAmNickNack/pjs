@@ -6,7 +6,7 @@ package io.github.iamnicknack.pjs.model.device;
  * @param <V> the type of configuration used to create the device.
  */
 @FunctionalInterface
-public interface DeviceFactory<T extends Device<T>, V extends DeviceConfig<T>> extends AutoCloseable {
+public interface DeviceFactory<T extends Device<T>, V extends DeviceConfig<T>> {
 
     /**
      * Create a device of type T, from a configuration of type V.
@@ -14,9 +14,4 @@ public interface DeviceFactory<T extends Device<T>, V extends DeviceConfig<T>> e
      * @return the created device.
      */
     T create(V config);
-
-    @Override
-    default void close() {
-        // do nothing by default
-    }
 }

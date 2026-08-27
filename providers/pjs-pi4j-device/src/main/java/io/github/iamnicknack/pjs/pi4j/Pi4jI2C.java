@@ -51,6 +51,11 @@ public class Pi4jI2C implements I2C {
         }
     }
 
+    @Override
+    public void close() throws Exception {
+        factory.removeI2C(this.config);
+    }
+
     /**
      * {@inheritDoc}
      */

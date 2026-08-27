@@ -16,7 +16,7 @@ class NativeI2CFactoryTest {
 
     @Test
     void canCreateI2C() {
-        try (var factory = new NativeI2CFactory(
+        var factory = new NativeI2CFactory(
                 new AbstractFileOperations() {
                     @Override
                     public FileDescriptor openFd(String pathname, int flags) {
@@ -34,16 +34,15 @@ class NativeI2CFactoryTest {
                         return I2C_FUNC_I2C;
                     }
                 }
-        )) {
-            var i2c = factory.create(I2CConfig.builder().build());
-            assertThat(i2c).isNotNull();
-        }
+        );
+        var i2c = factory.create(I2CConfig.builder().build());
+        assertThat(i2c).isNotNull();
     }
 
     @Test
     void doesNotCreateI2CWhenRDWRNotSupported() {
         var closeInvoked = new AtomicBoolean(false);
-        try (var factory = new NativeI2CFactory(
+        var factory = new NativeI2CFactory(
                 new AbstractFileOperations() {
                     @Override
                     public FileDescriptor openFd(String pathname, int flags) {
@@ -62,11 +61,10 @@ class NativeI2CFactoryTest {
                         return 0;
                     }
                 }
-        )) {
-            Assertions.assertThrows(IllegalStateException.class, () ->
-                    factory.create(I2CConfig.builder().build())
-            );
-            assertThat(closeInvoked.get()).isTrue();
-        }
+        );
+        Assertions.assertThrows(IllegalStateException.class, () ->
+                factory.create(I2CConfig.builder().build())
+        );
+        assertThat(closeInvoked.get()).isTrue();
     }
 }

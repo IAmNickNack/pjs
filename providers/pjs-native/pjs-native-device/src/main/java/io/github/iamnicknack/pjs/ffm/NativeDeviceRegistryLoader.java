@@ -14,6 +14,8 @@ import io.github.iamnicknack.pjs.ffm.device.context.PollingOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.event.EventPollerFactoryImpl;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Map;
@@ -21,6 +23,8 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 
 public class NativeDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRegistryLoader.NoConfig> {
+
+    private final Logger logger = LoggerFactory.getLogger(NativeDeviceRegistryLoader.class);
 
     @Override
     public boolean isLoadable(Map<String, Object> properties) {
@@ -58,6 +62,11 @@ public class NativeDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRe
                 fileOperations,
                 4
         );
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            logger.info("Shutting down native device registry");
+            eventPollerFactory.close();
+        }));
 
         var i2cFactory = new NativeI2CFactory(fileOperations, ioctlOperations);
         var portFactory = new NativePortFactory(
