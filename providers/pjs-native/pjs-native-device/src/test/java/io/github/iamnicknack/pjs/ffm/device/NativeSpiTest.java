@@ -62,8 +62,8 @@ class NativeSpiTest {
         var mapper = new MemorySegmentMapperImpl(segmentAllocator);
         var config = SpiConfig.builder().chipSelect(0).bus(0).build();
 
-        try (var factory = new NativeSpiFactory(fileOperations, ioctlOperations, mapper, segmentAllocator);
-             var spi = factory.create(config)) {
+        var factory = new NativeSpiFactory(fileOperations, ioctlOperations, mapper, segmentAllocator);
+        try(var spi = factory.create(config)) {
             verifier.accept(spi);
         } catch (Exception e) {
             throw new RuntimeException(e);

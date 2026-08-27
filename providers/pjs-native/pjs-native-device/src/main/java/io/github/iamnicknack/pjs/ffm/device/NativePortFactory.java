@@ -50,11 +50,6 @@ public class NativePortFactory implements GpioPortFactory {
     }
 
     @Override
-    public void close() {
-        eventPollerFactory.close();
-    }
-
-    @Override
     public GpioPort create(GpioPortConfig config) {
         try(var fileDescriptor = fileOperations.openFd(
                 chipInfo.getPath(),

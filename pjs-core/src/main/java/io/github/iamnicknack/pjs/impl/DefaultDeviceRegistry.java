@@ -129,17 +129,6 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
     @Override
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public void close() {
-        factories.values().forEach(deviceFactory -> {
-            try {
-                logger.atInfo().log("Closing factory: {}", deviceFactory.getClass().getName());
-                deviceFactory.close();
-            } catch (Exception e) {
-                // don't rethrow, just log.
-                // we want to attempt to close all factories.
-                logger.atError().log("Failed to close device factory: {}", deviceFactory, e);
-            }
-        });
-
         // remove devices which have not been closed by the user
         devices.values().forEach(device -> {
             try {
