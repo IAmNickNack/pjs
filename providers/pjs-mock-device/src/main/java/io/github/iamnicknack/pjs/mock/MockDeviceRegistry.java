@@ -9,6 +9,7 @@ import io.github.iamnicknack.pjs.impl.DefaultDeviceRegistry;
 /**
  * A {@link DefaultDeviceRegistry} with mock factories registered
  */
+@Deprecated
 public class MockDeviceRegistry extends DefaultDeviceRegistry {
     public MockDeviceRegistry() {
         this.registerFactory(new MockGpioPortFactory(), GpioPortConfig.class);

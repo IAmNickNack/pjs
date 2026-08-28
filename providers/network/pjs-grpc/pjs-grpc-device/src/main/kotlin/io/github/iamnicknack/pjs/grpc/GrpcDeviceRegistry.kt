@@ -13,6 +13,7 @@ import io.grpc.ManagedChannelBuilder
  * A registry of devices that is backed by gRPC.
  * @param channel the gRPC channel to use for communication with the device service.
  */
+@Deprecated(message = "Use the GrpcDeviceFactory instead")
 class GrpcDeviceRegistry(
     channel: Channel
 ) : DefaultDeviceRegistry() {
@@ -29,7 +30,7 @@ class GrpcDeviceRegistry(
         registerFactory(GrpcI2CFactory(channel), I2CConfig::class.java)
     }
 
-    override fun iterator(): MutableIterator<Device<*>?> {
+    override fun iterator(): MutableIterator<Device<*>> {
         return super.iterator()
     }
 }

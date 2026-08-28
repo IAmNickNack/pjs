@@ -5,10 +5,10 @@ import com.pi4j.plugin.ffm.FFMPlugin;
 import com.pi4j.plugin.mock.MockPlugin;
 import io.github.iamnicknack.pi4j.grpc.client.GrpcPlugin;
 import io.github.iamnicknack.pjs.ffm.NativeDeviceRegistryLoader;
-import io.github.iamnicknack.pjs.grpc.GrpcDeviceRegistry;
+import io.github.iamnicknack.pjs.grpc.GrpcDeviceFactory;
 import io.github.iamnicknack.pjs.http.client.HttpDeviceRegistry;
 import io.github.iamnicknack.pjs.logging.LoggingDeviceRegistry;
-import io.github.iamnicknack.pjs.mock.MockDeviceRegistry;
+import io.github.iamnicknack.pjs.mock.MockDeviceFactory;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
 import io.github.iamnicknack.pjs.pi4j.Pi4jDeviceRegistryLoader;
 import io.github.iamnicknack.pjs.sandbox.example.*;
@@ -130,7 +130,7 @@ public class Main {
                         InsecureChannelCredentials.create()
                 ).build();
 
-                yield new GrpcDeviceRegistry(channel);
+                yield new GrpcDeviceFactory(channel).asDeviceRegistry();
             }
             case "http" -> new HttpDeviceRegistry.Default(
                     commandLineArgs.getOptionValue("grpc-host"),
@@ -147,7 +147,7 @@ public class Main {
                 var loader = new Pi4jDeviceRegistryLoader(pluginClass);
                 yield loader.load(optionsAsSystemProperties(commandLineArgs));
             }
-            default -> new MockDeviceRegistry();
+            default -> new MockDeviceFactory().asDeviceRegistry();
         }) {
             var registryDelegate = (commandLineArgs.hasOption("logging"))
                     ? new LoggingDeviceRegistry(registry)

@@ -83,11 +83,11 @@ public class NativeDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRe
                 context.getSegmentAllocator()
         );
 
-        return new NativeDeviceRegistry(
+        return new NativeDeviceFactory(
                 portFactory,
                 spiFactory,
                 pwmFactory,
                 i2cFactory
-        );
+        ).asDeviceRegistry();
     }
 }

@@ -2,18 +2,19 @@ package io.github.iamnicknack.pjs.impl;
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
-import io.github.iamnicknack.pjs.mock.MockGpioPortFactory;
+import io.github.iamnicknack.pjs.mock.MockDeviceRegistry;
+import io.github.iamnicknack.pjs.model.device.GenericDeviceFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
 class DeviceRegistryTest {
 
+    private final GenericDeviceFactory factory = new MockDeviceRegistry();
+
     @Test
     void canCreateDevice() {
-        try (var registry = new DefaultDeviceRegistry()
-                .registerFactory(new MockGpioPortFactory(), GpioPortConfig.class)
-        ) {
+        try (var registry = factory.asDeviceRegistry()) {
             var config = GpioPortConfig.builder().pin(1).build();
             var device = registry.create(config);
 
@@ -23,14 +24,12 @@ class DeviceRegistryTest {
     }
 
     @Test
-    void canRemoveDevice() {
-        try (var registry = new DefaultDeviceRegistry()
-                .registerFactory(new MockGpioPortFactory(), GpioPortConfig.class)
-        ) {
+    void canRemoveDevice() throws Exception {
+        try (var registry = factory.asDeviceRegistry()) {
             var config = GpioPortConfig.builder().pin(1).build();
             var device = registry.create(config);
 
-            registry.remove(device);
+            device.close();
 
             assertThat(registry.device(config.id(), GpioPort.class)).isNull();
         }
@@ -38,7 +37,7 @@ class DeviceRegistryTest {
 
     @Test
     void missingProviderThrowsException() {
-        try (var registry = new DefaultDeviceRegistry()) {
+        try (var registry = GenericDeviceFactory.builder().build().asDeviceRegistry()) {
             var config = GpioPortConfig.builder().pin(1).build();
             assertThatExceptionOfType(DefaultDeviceRegistry.RegistryException.class)
                     .isThrownBy(() -> registry.create(config))

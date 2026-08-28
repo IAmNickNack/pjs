@@ -17,7 +17,7 @@ class GrpcDeviceRegistryLoader : DeviceRegistryLoader<GrpcDeviceRegistryLoader.C
             .usePlaintext()
             .build()
 
-        return GrpcDeviceRegistry(channel)
+        return GrpcDeviceFactory(channel).asDeviceRegistry()
     }
 
     private fun loadConfig(properties: Map<String, Any>): Config? {

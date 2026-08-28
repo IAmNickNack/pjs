@@ -23,13 +23,16 @@ class ConfigurableDeviceRegistryFactory(
 
     private val logger = LoggerFactory.getLogger(ConfigurableDeviceRegistryFactory::class.java)
 
-    private val propertyMap: Map<String, Any?> = mapOf(
+    private val propertyMap: Map<String, Any> = mapOf(
         "pjs.mode" to preferredMode,
         "pjs.proxy.host" to proxyHost,
         "pjs.proxy.port" to proxyPort,
         "pi4j.grpc.host" to proxyHost,
         "pi4j.grpc.port" to proxyPort,
     )
+        .filter { it.value != null } // assert the map does not contain null values
+        .map { it.key to it.value!! }
+        .toMap()
 
     /**
      * The device registry used to manage the devices.
@@ -50,6 +53,7 @@ class ConfigurableDeviceRegistryFactory(
         if (logging) {
             logger.info("Using logging devices")
             return LoggingDeviceRegistry(registry)
+//            return ExtensionByDelegation.delegate(registry, LoggingDeviceFactory(registry))
         } else {
             return registry
         }

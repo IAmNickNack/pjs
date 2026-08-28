@@ -18,7 +18,7 @@ public class MockDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRegi
 
     @Override
     public DeviceRegistry load(NoConfig ignored) {
-        return new MockDeviceRegistry();
+        return new MockDeviceFactory().asDeviceRegistry();
     }
 
     @Override

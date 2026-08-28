@@ -21,7 +21,7 @@ class HttpGpioPortEventsTest {
             .portMode(GpioPortMode.INPUT)
             .pin(1)
             .build()
-        val httpPort = httpDeviceRegistry.create(config) as GpioPort
+        val httpPort = httpDeviceRegistry.create(config)
         val mockPort = mockDeviceRegistry.deviceOrThrow<GpioPort>("test-port") as MockGpioPort
 
         val latch = CountDownLatch(1)

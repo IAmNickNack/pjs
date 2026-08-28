@@ -3,7 +3,7 @@ package io.github.iamnicknack.pjs.http
 import io.github.iamnicknack.pjs.http.client.HttpDeviceRegistry
 import io.github.iamnicknack.pjs.http.server.handlerModule
 import io.github.iamnicknack.pjs.http.server.ktorModule
-import io.github.iamnicknack.pjs.mock.MockDeviceRegistry
+import io.github.iamnicknack.pjs.mock.MockDeviceFactory
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.sse.*
@@ -18,14 +18,14 @@ import org.koin.ktor.plugin.Koin
  * @param httpDeviceRegistry local device registry
  */
 class PjsHttpTestCase(
-    val mockDeviceRegistry: MockDeviceRegistry,
+    val mockDeviceRegistry: DeviceRegistry,
     val httpDeviceRegistry: HttpDeviceRegistry.Default,
     val httpProxyDeviceRegistry: HttpDeviceRegistry.Proxy
 )
 
 fun pjsHttpTestCase(block: suspend PjsHttpTestCase.() -> Unit) = testApplication {
 
-    val mockDeviceRegistry = MockDeviceRegistry()
+    val mockDeviceRegistry = MockDeviceFactory().asDeviceRegistry()
 
     install(Koin) {
         modules(

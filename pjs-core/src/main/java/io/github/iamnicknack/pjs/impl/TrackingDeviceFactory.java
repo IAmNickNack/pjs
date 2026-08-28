@@ -6,8 +6,8 @@ import io.github.iamnicknack.pjs.device.pwm.Pwm;
 import io.github.iamnicknack.pjs.device.spi.Spi;
 import io.github.iamnicknack.pjs.model.device.Device;
 import io.github.iamnicknack.pjs.model.device.DeviceConfig;
-import io.github.iamnicknack.pjs.model.device.DeviceFactory;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
+import io.github.iamnicknack.pjs.model.device.GenericDeviceFactory;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,142 +20,55 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * Registry to help manage the lifecycle of factories and devices
- */
-@Deprecated
-public class DefaultDeviceRegistry implements DeviceRegistry {
-
+public class TrackingDeviceFactory implements DeviceRegistry {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final GenericDeviceFactory delegate;
     private final Map<String, Device<?>> devices = new HashMap<>();
-    private final Map<Class<?>, DeviceFactory<?, ?>> factories = new HashMap<>();
 
-    /**
-     * Register a device factory.
-     * @param factory the factory to register.
-     * @param configType the configuration type used by the factory.
-     * @return this instance for chaining.
-     * @param <T> the type of device created by the factory.
-     * @param <V> the type of configuration used by the factory.
-     */
-    public final <T extends Device<T>, V extends DeviceConfig<T>> DeviceRegistry registerFactory(
-            DeviceFactory<T, V> factory,
-            Class<V> configType
-    ) {
-        factories.put(configType, factory);
-        return this;
+    public TrackingDeviceFactory(GenericDeviceFactory delegate) {
+        this.delegate = delegate;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends Device<T>, V extends DeviceConfig<T>> T create(V config) {
-        try {
-            var factory = (DeviceFactory<T, DeviceConfig<T>>) factories.get(config.getClass());
-            if (factory == null) {
-                throw new RegistryException(
-                        "No factory registered for config type: " + config.getClass(),
-                        new IllegalArgumentException()
-                );
-            }
-            var device = factory.create(config);
-            devices.put(config.getId(), device);
-            logger.atInfo().log("Created {} device with id: {}", device.getClass().getSimpleName(), config.getId());
-
-            // provide the user with a proxy that hooks into the close method to keep the registry up to date
-            return interceptClose(device);
-        } catch (Exception e) {
-            logger.atError().log("Failed to create device with id: {}", config.getId(), e);
-            throw e;
-        }
+        var device = delegate.create(config);
+        devices.put(config.getId(), device);
+        logger.atInfo().log("Created {} device with id: {}", device.getClass().getSimpleName(), config.getId());
+        return interceptClose(device);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void remove(Device<?> device) {
-        remove(device.getConfig().getId());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void remove(String id) {
-        var device = devices.remove(id);
-        if (device != null) {
-            logger.atInfo().log("Removing device: {}, {}", id, device.getClass().getName());
-            try {
-                device.close();
-            } catch (Exception e) {
-                throw new RegistryException("Failed to remove device " + id, e);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
     @Override
-    @Nullable
-    public <T extends Device<T>> T device(String id, Class<T> deviceType) {
-        var device = devices.get(id);
-        if (device != null && deviceType.isAssignableFrom(device.getClass())) {
-            return (T)device;
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean contains(String id) {
-        return devices.containsKey(id);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterator<Device<?>> iterator() {
-        return devices.values().iterator();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public void close() {
-        // remove devices which have not been closed by the user
         devices.values().forEach(device -> {
             try {
                 logger.atInfo().log("Closing device: {}, {}", device.getConfig().getId(), device.getClass().getName());
                 device.close();
             } catch (Exception e) {
-                // don't rethrow, just log.
-                // we want to attempt to close all devices.
                 logger.atError().log("Failed to close device: {}", device, e);
             }
         });
     }
 
-    /**
-     * Append a device to the registry. Used by descendent classes to append devices which could be lazily created.
-     * <p>
-     * E.g. A remote device factory could eagerly create a device which gets added to the registry as normal, but
-     * not created via the client-side registry.
-     * <p>
-     * The intention here is to allow the client-side registry to know about devices which are managed by remote factories.
-     * @param device the device to append
-     */
-    protected void appendDevice(Device<?> device) {
-        if (!devices.containsKey(device.getConfig().getId())) {
-            devices.put(device.getConfig().getId(), device);
+    @Override
+    public Iterator<Device<?>> iterator() {
+        return devices.values().iterator();
+    }
+
+    @Override
+    public @Nullable <T extends Device<T>> T device(String id, Class<T> deviceType) {
+        var device = devices.get(id);
+        if (device == null) {
+            return null;
         }
+        if (deviceType.isInstance(device)) {
+            return deviceType.cast(device);
+        }
+        throw new IllegalArgumentException("Device with id " + id + " is not of type " + deviceType.getName());
+    }
+
+    @Override
+    public boolean contains(String id) {
+        return devices.containsKey(id);
     }
 
     /**
@@ -192,7 +105,7 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
         return (T) Proxy.newProxyInstance(
                 Thread.currentThread().getContextClassLoader(),
                 new Class<?>[] { type, AutoCloseable.class },
-                new CloseableInvocationHandler<>(instance)
+                new TrackingDeviceFactory.CloseableInvocationHandler<>(instance)
         );
     }
 
@@ -214,7 +127,14 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if (DEVICE_CLOSE_METHOD.equals(method)) {
                 // remove (and close) the device
-                DefaultDeviceRegistry.this.remove((Device<?>) instance);
+                var device = TrackingDeviceFactory.this.devices.remove(((Device<?>) instance).getConfig().getId());
+                if (device != null) {
+                    try {
+                        device.close();
+                    } catch (Exception e) {
+                        logger.atError().log("Failed to close device: {}", device, e);
+                    }
+                }
                 return null;
             } else {
                 try {

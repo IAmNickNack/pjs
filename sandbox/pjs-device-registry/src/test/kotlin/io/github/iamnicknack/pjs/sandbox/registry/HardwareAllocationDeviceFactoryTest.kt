@@ -12,9 +12,9 @@ import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
 import io.github.iamnicknack.pjs.device.i2c.I2CConfig
 import io.github.iamnicknack.pjs.device.pwm.PwmConfig
 import io.github.iamnicknack.pjs.device.spi.SpiConfig
-import io.github.iamnicknack.pjs.mock.MockDeviceRegistry
+import io.github.iamnicknack.pjs.mock.MockDeviceFactory
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
-import io.github.iamnicknack.pjs.sandbox.registry.HardwareAllocationDeviceRegistry.HardwareAllocationException
+import io.github.iamnicknack.pjs.sandbox.registry.HardwareAllocationDeviceFactory.HardwareAllocationException
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocation
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.Line
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.LineType
@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 import kotlin.test.assertFailsWith
 
-class HardwareAllocationDeviceRegistryTest {
+class HardwareAllocationDeviceFactoryTest {
 
     @Test
     fun `can create gpio`() {
@@ -35,7 +35,7 @@ class HardwareAllocationDeviceRegistryTest {
             Line(LineType.GPIO, "available-gpio", HardwareAllocation.fromOffsets(2, 3))
         )
 
-        val registry = HardwareAllocationDeviceRegistry(MockDeviceRegistry(), availableHardware)
+        val registry = HardwareAllocationDeviceFactory(MockDeviceFactory(), availableHardware)
         val config = GpioPortConfig.builder()
             .id("test-gpio")
             .pin(2, 3)
@@ -53,7 +53,9 @@ class HardwareAllocationDeviceRegistryTest {
 
         val usedHardware = MutableHardwareAllocationIndex()
 
-        val registry = HardwareAllocationDeviceRegistry(MockDeviceRegistry(), availableHardware, usedHardware)
+        val registry = HardwareAllocationDeviceFactory(MockDeviceFactory(), availableHardware, usedHardware)
+            .asDeviceRegistry()
+
         val config1 = GpioPortConfig.builder()
             .id("test-gpio")
             .pin(2, 4)
@@ -72,7 +74,7 @@ class HardwareAllocationDeviceRegistryTest {
         assertThat(device).isNotNull()
         assertThat(usedHardware.containsName(config1.id())).isTrue()
 
-        registry.remove(device)
+        device.close()
         assertThat(registry.contains(device.config.id)).isFalse()
         assertThat(usedHardware.containsName(config1.id())).isFalse()
         assertThat(usedHardware.findByMask(config1.mask)).isNull()
@@ -90,7 +92,8 @@ class HardwareAllocationDeviceRegistryTest {
             Line(LineType.GPIO, "gpio2", HardwareAllocation.fromOffsets(4))
         )
 
-        val registry = HardwareAllocationDeviceRegistry(MockDeviceRegistry(), availableHardware)
+        val registry = HardwareAllocationDeviceFactory(MockDeviceFactory(), availableHardware)
+
         val config = GpioPortConfig.builder()
             .id("test-gpio")
             .pin(2, 3, 4, 5)
@@ -109,7 +112,7 @@ class HardwareAllocationDeviceRegistryTest {
             Line(LineType.GPIO, "available-gpio", HardwareAllocation.fromOffsets(2, 3, 4))
         )
 
-        val registry = HardwareAllocationDeviceRegistry(MockDeviceRegistry(), availableHardware)
+        val registry = HardwareAllocationDeviceFactory(MockDeviceFactory(), availableHardware)
         val config1 = GpioPortConfig.builder()
             .id("valid-gpio")
             .pin(2, 3)
@@ -153,7 +156,8 @@ class HardwareAllocationDeviceRegistryTest {
         ).map { expectation ->
             DynamicTest.dynamicTest("can create ${expectation.line.lineType} device") {
                 val availableHardware = MutableHardwareAllocationIndex(expectation.line)
-                val registry = HardwareAllocationDeviceRegistry(MockDeviceRegistry(), availableHardware)
+                val registry = HardwareAllocationDeviceFactory(MockDeviceFactory(), availableHardware)
+                    .asDeviceRegistry()
                 val result = expectation.factory(registry)
                 assertThat(result).isNotNull()
             }
@@ -180,7 +184,8 @@ class HardwareAllocationDeviceRegistryTest {
         ).map { expectation ->
             DynamicTest.dynamicTest("can create ${expectation.line.lineType} device when already in use") {
                 val availableHardware = MutableHardwareAllocationIndex(expectation.line)
-                val registry = HardwareAllocationDeviceRegistry(MockDeviceRegistry(), availableHardware)
+                val registry = HardwareAllocationDeviceFactory(MockDeviceFactory(), availableHardware)
+                    .asDeviceRegistry()
                 val result = expectation.factory(registry)
                 assertThat(result).isNotNull()
 
@@ -213,7 +218,8 @@ class HardwareAllocationDeviceRegistryTest {
         ).map { expectation ->
             DynamicTest.dynamicTest("cannot create ${expectation.line.lineType} device with invalid bus") {
                 val availableHardware = MutableHardwareAllocationIndex(expectation.line)
-                val registry = HardwareAllocationDeviceRegistry(MockDeviceRegistry(), availableHardware)
+                val registry = HardwareAllocationDeviceFactory(MockDeviceFactory(), availableHardware)
+                    .asDeviceRegistry()
                 val error = assertFailsWith(HardwareAllocationException.BusNotConfigured::class) {
                     expectation.factory(registry)
                 }
@@ -229,7 +235,7 @@ class HardwareAllocationDeviceRegistryTest {
             .fromPinctrlResource("/pinctrl-output.txt")
             .forHardwareAllocation(HardwareAllocations.RASPBERRY_PI)
         val index = ReadonlyHardwareAllocationIndex(lineSupplier.lines())
-        HardwareAllocationDeviceRegistry(MockDeviceRegistry(), index)
+        HardwareAllocationDeviceFactory(MockDeviceFactory(), index)
 
         val invalidAllocation = HardwareAllocation.fromOffsets(27, 28, 29, 30, 31)
         assertThat(index.findAllIntersectingByAllocation(invalidAllocation)).isEmpty()

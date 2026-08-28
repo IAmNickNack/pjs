@@ -12,18 +12,6 @@ import org.jspecify.annotations.Nullable;
 public interface DeviceRegistry extends GenericDeviceFactory, Iterable<Device<?>>, AutoCloseable {
 
     /**
-     * Remove a device instance from the registry.
-     * @param device the device to remove.
-     */
-    void remove(Device<?> device);
-
-    /**
-     * Remove a device instance from the registry.
-     * @param id the id of the device to remove.
-     */
-    void remove(String id);
-
-    /**
      * Get a device instance by id.
      * @param id the id of the device to retrieve.
      * @param deviceType the type of device to retrieve.
@@ -41,10 +29,10 @@ public interface DeviceRegistry extends GenericDeviceFactory, Iterable<Device<?>
     boolean contains(String id);
 
     /**
-     * Close the registry and release any resources.
+     * TODO: Maybe remove this
      */
     @Override
-    void close();
+    default void close() {}
 
     /**
      * Wrapper exception for registry errors.

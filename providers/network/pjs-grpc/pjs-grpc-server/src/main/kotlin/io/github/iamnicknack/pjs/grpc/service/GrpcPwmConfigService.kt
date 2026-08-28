@@ -39,7 +39,7 @@ class GrpcPwmConfigService(
 
     override suspend fun remove(request: DeviceRequest): Empty {
         val device = deviceRegistry.deviceOrThrow<Pwm>(request.deviceId)
-        deviceRegistry.remove(device)
+        device.close()
         return Empty.getDefaultInstance()
     }
 }

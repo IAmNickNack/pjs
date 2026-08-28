@@ -49,13 +49,13 @@ public class Pi4jDeviceRegistryLoader implements DeviceRegistryLoader<Pi4jDevice
             var contextBuilder = Pi4J.newContextBuilder().properties(javaProperties);
             var plugin = pluginInstance(preferredPlugin);
             plugin.initialize(new CustomPluginService(contextBuilder, javaProperties));
-            return new Pi4jDeviceRegistry(contextBuilder.build());
+            return new Pi4jDeviceFactory(contextBuilder.build()).asDeviceRegistry();
         } else {
-            return new Pi4jDeviceRegistry(Pi4J.newContextBuilder()
+            return new Pi4jDeviceFactory(Pi4J.newContextBuilder()
                     .properties(javaProperties)
                     .autoDetect()
                     .build()
-            );
+            ).asDeviceRegistry();
         }
     }
 

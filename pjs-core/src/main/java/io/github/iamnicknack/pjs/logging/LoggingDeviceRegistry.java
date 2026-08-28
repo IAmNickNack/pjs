@@ -10,6 +10,7 @@ import io.github.iamnicknack.pjs.device.spi.SpiConfig;
 import io.github.iamnicknack.pjs.impl.DefaultDeviceRegistry;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
 
+@Deprecated
 public class LoggingDeviceRegistry extends DefaultDeviceRegistry {
     private final DeviceRegistry delegate;
 
