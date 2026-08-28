@@ -10,9 +10,9 @@ val Spi.mockDelegate: MockSpi
         ?.delegate as? MockSpi
         ?: error("LoggingSpi is not the delegate for this Spi")
 
-val I2C.mockDelegate: MockI2CImpl
+val I2C.mockDelegate: MockI2C
     get() = (this as? LoggingI2C)
-        ?.delegate as? MockI2CImpl
+        ?.delegate as? MockI2C
         ?: error("LoggingI2C is not the delegate for this I2C")
 
 /**
