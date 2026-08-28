@@ -17,7 +17,7 @@ class MockI2CTest {
 
     @Test
     void canWrite() {
-        var device = new MockI2C(config, 256);
+        var device = new MockI2CImpl(config, 256);
         var message = new I2C.Message(0x20, new byte[] { 1, 2, 3 }, 0, 3, I2C.Message.Type.WRITE);
         device.transfer(new I2C.Message[] { message });
 
@@ -29,7 +29,7 @@ class MockI2CTest {
 
     @Test
     void canWriteReadDevice() {
-        var bus = new MockI2C(config, 256);
+        var bus = new MockI2CImpl(config, 256);
         var device = new I2CSerialPort(0x20, bus);
 
         device.writeBytes(new byte[] { 1, 2, 3 });
@@ -46,7 +46,7 @@ class MockI2CTest {
 
     @Test
     void canWriteReadRegister() {
-        var bus = new MockI2C(config, 256);
+        var bus = new MockI2CImpl(config, 256);
         var device = new I2CRegister(0x20, 1, bus);
 
         device.writeBytes(new byte[] { 1, 2, 3 });

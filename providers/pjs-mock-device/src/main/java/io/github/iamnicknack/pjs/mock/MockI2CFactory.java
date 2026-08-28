@@ -18,6 +18,6 @@ public class MockI2CFactory implements I2CFactory {
 
     @Override
     public I2C create(I2CConfig config) {
-        return new MockI2C(config, maxBufferSize);
+        return new MockI2CImpl(config, maxBufferSize);
     }
 }

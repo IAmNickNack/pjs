@@ -6,6 +6,7 @@ import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.http.pjsHttpTestCase
 import io.github.iamnicknack.pjs.http.server.deviceOrThrow
 import io.github.iamnicknack.pjs.mock.MockGpioPort
+import io.github.iamnicknack.pjs.mock.MockGpioPortImpl
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit

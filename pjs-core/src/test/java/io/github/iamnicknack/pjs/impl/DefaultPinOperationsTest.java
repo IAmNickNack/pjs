@@ -1,7 +1,7 @@
 package io.github.iamnicknack.pjs.impl;
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
-import io.github.iamnicknack.pjs.mock.MockGpioPort;
+import io.github.iamnicknack.pjs.mock.MockGpioPortImpl;
 import io.github.iamnicknack.pjs.mock.impl.RecordingPort;
 import io.github.iamnicknack.pjs.model.pin.Pin;
 import io.github.iamnicknack.pjs.model.pin.PinOperations;
@@ -12,7 +12,7 @@ class DefaultPinOperationsTest {
 
     @Test
     void canReadValuesFromPort() {
-        MockGpioPort port = new MockGpioPort(GpioPortConfig.builder().pin(1).build());
+        MockGpioPortImpl port = new MockGpioPortImpl(GpioPortConfig.builder().pin(1).build());
         RecordingPort<Integer> recordingPort = new RecordingPort<>(port);
         Pin pin = recordingPort.pin(1, 0);
 
@@ -22,7 +22,7 @@ class DefaultPinOperationsTest {
 
     @Test
     void canPulsePin() {
-        MockGpioPort port = new MockGpioPort(GpioPortConfig.builder().pin(1).build());
+        MockGpioPortImpl port = new MockGpioPortImpl(GpioPortConfig.builder().pin(1).build());
         RecordingPort<Integer> recordingPort = new RecordingPort<>(port);
         Pin pin = recordingPort.pin(1, 0);
         PinOperations operations = new DefaultPinOperations(pin);

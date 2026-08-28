@@ -13,22 +13,15 @@ class ConfigHandlerImpl<T : Device<T>>(
     val deviceClass: Class<T>,
 ) : ConfigHandler<T> {
 
-    /**
-     * The handler currently needs access to the user-visible close handler to ensure [Device.close] removes
-     * the device from the registry.
-     */
-    private val localDeviceCache: MutableMap<String, Device<T>> = mutableMapOf()
-
     override suspend  fun createDevice(deviceId: String, config: DeviceConfigPayload<T>): DeviceConfig<T> {
         deviceRegistry.cannotContain(deviceId)
         val device = deviceRegistry.create(config.asDeviceConfig(deviceId))
-        localDeviceCache[deviceId] = device
         return device.config
     }
 
     override suspend  fun removeDevice(deviceId: String) {
-        localDeviceCache[deviceId]
-            ?.also { it.close() }
+        deviceRegistry.device(deviceId, deviceClass)
+            ?.also(AutoCloseable::close)
             ?: throw DeviceNotFoundException(deviceId)
     }
 

@@ -16,9 +16,12 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class TrackingDeviceFactory implements DeviceRegistry {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -31,15 +34,15 @@ public class TrackingDeviceFactory implements DeviceRegistry {
 
     @Override
     public <T extends Device<T>, V extends DeviceConfig<T>> T create(V config) {
-        var device = delegate.create(config);
+        var device = interceptClose(delegate.create(config));
         devices.put(config.getId(), device);
         logger.atInfo().log("Created {} device with id: {}", device.getClass().getSimpleName(), config.getId());
-        return interceptClose(device);
+        return device;
     }
 
     @Override
     public void close() {
-        devices.values().forEach(device -> {
+        new ArrayList<>(this.devices.values()).forEach(device -> {
             try {
                 logger.atInfo().log("Closing device: {}, {}", device.getConfig().getId(), device.getClass().getName());
                 device.close();
@@ -91,7 +94,7 @@ public class TrackingDeviceFactory implements DeviceRegistry {
      * @param <T> the type of the instance
      */
     @SuppressWarnings("unchecked")
-    private <T extends AutoCloseable> T interceptClose(T instance) {
+    private <T extends Device<?>> T interceptClose(T instance) {
         // the interface to be represented by the proxy
         var type = switch (instance) {
             case GpioPort _ -> GpioPort.class;
@@ -101,10 +104,15 @@ public class TrackingDeviceFactory implements DeviceRegistry {
             default -> throw new IllegalArgumentException("Unsupported type: " + instance.getClass().getName());
         };
 
+        var interfaces = Stream.concat(
+                Stream.of(type),
+                Arrays.stream(instance.getClass().getInterfaces())
+        ).distinct().toArray(Class<?>[]::new);
+
         // a new proxy which explicitly implements the determined interface and AutoCloseable
         return (T) Proxy.newProxyInstance(
                 Thread.currentThread().getContextClassLoader(),
-                new Class<?>[] { type, AutoCloseable.class },
+                interfaces,
                 new TrackingDeviceFactory.CloseableInvocationHandler<>(instance)
         );
     }
@@ -113,7 +121,7 @@ public class TrackingDeviceFactory implements DeviceRegistry {
      * Invocation handler to intercept the close method of a device instance.
      * @param <T> the device type
      */
-    private class CloseableInvocationHandler<T extends AutoCloseable> implements InvocationHandler {
+    private class CloseableInvocationHandler<T extends Device<?>> implements InvocationHandler {
 
         private static final Method DEVICE_CLOSE_METHOD = initCloseMethod();
 
@@ -124,13 +132,15 @@ public class TrackingDeviceFactory implements DeviceRegistry {
         }
 
         @Override
+        @Nullable
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if (DEVICE_CLOSE_METHOD.equals(method)) {
-                // remove (and close) the device
-                var device = TrackingDeviceFactory.this.devices.remove(((Device<?>) instance).getConfig().getId());
+                // remove the device from tracking
+                var device = TrackingDeviceFactory.this.devices.remove(instance.getConfig().getId());
+                logger.info("{}, Method: {}", delegate.getClass(), method);
                 if (device != null) {
                     try {
-                        device.close();
+                        instance.close();
                     } catch (Exception e) {
                         logger.atError().log("Failed to close device: {}", device, e);
                     }

@@ -8,6 +8,6 @@ public class MockSpiFactory implements SpiFactory {
 
     @Override
     public Spi create(SpiConfig config) {
-        return new MockSpi(config);
+        return new MockSpiImpl(config);
     }
 }

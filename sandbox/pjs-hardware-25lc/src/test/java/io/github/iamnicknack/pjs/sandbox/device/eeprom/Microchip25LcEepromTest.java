@@ -5,8 +5,9 @@ import io.github.iamnicknack.pjs.device.spi.SpiConfig;
 import io.github.iamnicknack.pjs.device.spi.SpiTransfer;
 import io.github.iamnicknack.pjs.device.spi.impl.DefaultSpiTransfer;
 import io.github.iamnicknack.pjs.logging.LoggingSpiTransfer;
-import io.github.iamnicknack.pjs.mock.MockGpioPort;
+import io.github.iamnicknack.pjs.mock.MockGpioPortImpl;
 import io.github.iamnicknack.pjs.mock.MockSpi;
+import io.github.iamnicknack.pjs.mock.MockSpiImpl;
 import io.github.iamnicknack.pjs.model.pin.Pin;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -21,9 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class Microchip25LcEepromTest {
 
-    private final MockSpi spi = new MockSpi(SpiConfig.builder().id("test-spi").build(), 256);
+    private final MockSpi spi = new MockSpiImpl(SpiConfig.builder().id("test-spi").build(), 256);
     private final SpiTransfer spiTransfer = new DefaultSpiTransfer(spi);
-    private final Pin hold = new MockGpioPort(GpioPortConfig.builder().id("test-port").pin(0).build()).pin();
+    private final Pin hold = new MockGpioPortImpl(GpioPortConfig.builder().id("test-port").pin(0).build()).pin();
 
     @Test
     void writesSpiData() {

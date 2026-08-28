@@ -10,9 +10,9 @@ val Spi.mockDelegate: MockSpi
         ?.delegate as? MockSpi
         ?: error("LoggingSpi is not the delegate for this Spi")
 
-val I2C.mockDelegate: MockI2C
+val I2C.mockDelegate: MockI2CImpl
     get() = (this as? LoggingI2C)
-        ?.delegate as? MockI2C
+        ?.delegate as? MockI2CImpl
         ?: error("LoggingI2C is not the delegate for this I2C")
 
 /**
@@ -52,7 +52,7 @@ fun Spi.writeToInputBuffer(vararg data: ByteArray) = with (mockDelegate) {
 }
 
 /**
- * Allow the [MockI2C.deviceBuffer] position to be reset on [I2C]
+ * Allow the [MockI2CImpl.deviceBuffer] position to be reset on [I2C]
  */
 fun I2C.rewindBuffer() {
     mockDelegate.deviceBuffer.position(0)

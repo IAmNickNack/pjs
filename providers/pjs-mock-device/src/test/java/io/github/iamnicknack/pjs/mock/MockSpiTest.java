@@ -14,7 +14,7 @@ class MockSpiTest {
 
     @Test
     void canWriteReadByte() {
-        var mock = new MockSpi(config);
+        var mock = new MockSpiImpl(config);
         mock.write(42);
         mock.swapBuffers();
         assertThat(mock.read()).isEqualTo(42);
@@ -22,7 +22,7 @@ class MockSpiTest {
 
     @Test
     void canWriteReadArray() {
-        var mock = new MockSpi(config);
+        var mock = new MockSpiImpl(config);
         var bytesOut = new byte[] { 1, 2, 3 };
         mock.writeBytes(bytesOut);
         mock.swapBuffers();
