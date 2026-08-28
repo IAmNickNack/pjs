@@ -1,11 +1,11 @@
 package io.github.iamnicknack.pjs.http.client
 
-import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader
+import io.github.iamnicknack.pjs.model.device.DeviceFactoryLoader
 
 /**
- * [DeviceRegistryLoader] for [HttpDeviceRegistry]
+ * [io.github.iamnicknack.pjs.model.device.DeviceFactoryLoader] for [HttpDeviceRegistry]
  */
-class HttpDeviceRegistryLoader : DeviceRegistryLoader<HttpDeviceRegistryConfig> {
+class HttpDeviceFactoryLoader : DeviceFactoryLoader<HttpDeviceRegistryConfig> {
 
     override fun isLoadable(properties: Map<String, Any>) = config(properties)
         ?.let { properties["pjs.mode"]?.toString() == "http" }

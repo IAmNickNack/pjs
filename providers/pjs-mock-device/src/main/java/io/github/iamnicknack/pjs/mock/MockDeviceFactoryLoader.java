@@ -1,13 +1,13 @@
 package io.github.iamnicknack.pjs.mock;
 
-import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
-import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader;
+import io.github.iamnicknack.pjs.model.device.DeviceFactoryLoader;
+import io.github.iamnicknack.pjs.model.device.GenericDeviceFactory;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
 
-public class MockDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRegistryLoader.NoConfig> {
+public class MockDeviceFactoryLoader implements DeviceFactoryLoader<DeviceFactoryLoader.NoConfig> {
 
     @Override
     public boolean isLoadable(Map<String, Object> properties) {
@@ -17,12 +17,12 @@ public class MockDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRegi
     }
 
     @Override
-    public DeviceRegistry load(NoConfig ignored) {
-        return new MockDeviceFactory().asDeviceRegistry();
+    public GenericDeviceFactory load(NoConfig ignored) {
+        return new MockDeviceFactory();
     }
 
     @Override
-    public @Nullable DeviceRegistry load(Map<String, Object> properties) {
+    public @Nullable GenericDeviceFactory load(Map<String, Object> properties) {
         return load(NoConfig.INSTANCE);
     }
 }

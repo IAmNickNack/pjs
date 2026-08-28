@@ -1,10 +1,10 @@
 package io.github.iamnicknack.pjs.grpc
 
-import io.github.iamnicknack.pjs.model.device.DeviceRegistry
-import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader
+import io.github.iamnicknack.pjs.model.device.DeviceFactoryLoader
+import io.github.iamnicknack.pjs.model.device.GenericDeviceFactory
 import io.grpc.ManagedChannelBuilder
 
-class GrpcDeviceRegistryLoader : DeviceRegistryLoader<GrpcDeviceRegistryLoader.Config> {
+class GrpcDeviceFactoryLoader : DeviceFactoryLoader<GrpcDeviceFactoryLoader.Config> {
 
     override fun isLoadable(properties: Map<String, Any>): Boolean {
         return properties["pjs.mode"] == "grpc" && load(properties) != null
@@ -12,12 +12,12 @@ class GrpcDeviceRegistryLoader : DeviceRegistryLoader<GrpcDeviceRegistryLoader.C
 
     override fun load(properties: Map<String, Any>) = loadConfig(properties)?.let(this::load)
 
-    override fun load(registryConfig: Config): DeviceRegistry {
+    override fun load(registryConfig: Config): GenericDeviceFactory {
         val channel = ManagedChannelBuilder.forAddress(registryConfig.proxyHost, registryConfig.proxyPort)
             .usePlaintext()
             .build()
 
-        return GrpcDeviceFactory(channel).asDeviceRegistry()
+        return GrpcDeviceFactory(channel)
     }
 
     private fun loadConfig(properties: Map<String, Any>): Config? {

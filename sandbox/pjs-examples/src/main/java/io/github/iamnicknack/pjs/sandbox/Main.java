@@ -4,13 +4,13 @@ import com.pi4j.extension.Plugin;
 import com.pi4j.plugin.ffm.FFMPlugin;
 import com.pi4j.plugin.mock.MockPlugin;
 import io.github.iamnicknack.pi4j.grpc.client.GrpcPlugin;
-import io.github.iamnicknack.pjs.ffm.NativeDeviceRegistryLoader;
+import io.github.iamnicknack.pjs.ffm.NativeDeviceFactoryLoader;
 import io.github.iamnicknack.pjs.grpc.GrpcDeviceFactory;
 import io.github.iamnicknack.pjs.http.client.HttpDeviceRegistry;
-import io.github.iamnicknack.pjs.logging.LoggingDeviceRegistry;
+import io.github.iamnicknack.pjs.logging.LoggingDeviceFactory;
 import io.github.iamnicknack.pjs.mock.MockDeviceFactory;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
-import io.github.iamnicknack.pjs.pi4j.Pi4jDeviceRegistryLoader;
+import io.github.iamnicknack.pjs.pi4j.Pi4JDeviceFactoryLoader;
 import io.github.iamnicknack.pjs.sandbox.example.*;
 import io.github.iamnicknack.pjs.util.LoggingUtils;
 import io.github.iamnicknack.pjs.util.StartupUtils;
@@ -136,7 +136,7 @@ public class Main {
                     commandLineArgs.getOptionValue("grpc-host"),
                     commandLineArgs.getParsedOptionValue("grpc-port", 9090)
             );
-            case "ffm" -> new NativeDeviceRegistryLoader().load();
+            case "ffm" -> new NativeDeviceFactoryLoader().load().asDeviceRegistry();
             case "pi4j" -> {
                 Class<? extends Plugin> pluginClass = switch (commandLineArgs.getOptionValue("mode")) {
                     case "mock" -> MockPlugin.class;
@@ -144,13 +144,13 @@ public class Main {
                     case "grpc" -> GrpcPlugin.class;
                     case null, default -> null;
                 };
-                var loader = new Pi4jDeviceRegistryLoader(pluginClass);
-                yield loader.load(optionsAsSystemProperties(commandLineArgs));
+                var loader = new Pi4JDeviceFactoryLoader(pluginClass);
+                yield loader.load(optionsAsSystemProperties(commandLineArgs)).asDeviceRegistry();
             }
             default -> new MockDeviceFactory().asDeviceRegistry();
         }) {
             var registryDelegate = (commandLineArgs.hasOption("logging"))
-                    ? new LoggingDeviceRegistry(registry)
+                    ? new LoggingDeviceFactory(registry).asDeviceRegistry()
                     : registry;
 
             Runnable example;

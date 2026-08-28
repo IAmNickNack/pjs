@@ -1,9 +1,9 @@
 package io.github.iamnicknack.pjs.server
 
-import io.github.iamnicknack.pjs.logging.LoggingDeviceRegistry
-import io.github.iamnicknack.pjs.mock.MockDeviceRegistry
+import io.github.iamnicknack.pjs.logging.LoggingDeviceFactory
+import io.github.iamnicknack.pjs.mock.MockDeviceFactory
+import io.github.iamnicknack.pjs.model.device.DeviceFactoryLoader
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
-import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader
 import org.slf4j.LoggerFactory
 import java.util.*
 
@@ -36,27 +36,28 @@ class ConfigurableDeviceRegistryFactory(
 
     /**
      * The device registry used to manage the devices.
-     * Registries are loaded using the [io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader] service loader.
+     * Registries are loaded using the [DeviceFactoryLoader] service loader.
      */
     override fun createDeviceRegistry(): DeviceRegistry {
-        val registry = ServiceLoader
-            .load(DeviceRegistryLoader::class.java, DeviceRegistryLoader::class.java.classLoader)
+        var factory = ServiceLoader
+            .load(DeviceFactoryLoader::class.java, DeviceFactoryLoader::class.java.classLoader)
             .firstOrNull { loader ->
                 loader.isLoadable(propertyMap)
                     .also { logger.debug("Loader {}: isLoadable={}", loader.javaClass.simpleName, it) }
             }
             ?.load(propertyMap)
-            ?: MockDeviceRegistry()
+            ?: MockDeviceFactory()
 
-        logger.info("Using {} devices", registry.javaClass.simpleName)
+        logger.info("Using {} devices", factory.javaClass.simpleName)
 
-        if (logging) {
+        factory = if (logging) {
             logger.info("Using logging devices")
-            return LoggingDeviceRegistry(registry)
-//            return ExtensionByDelegation.delegate(registry, LoggingDeviceFactory(registry))
+            LoggingDeviceFactory(factory)
         } else {
-            return registry
+            factory
         }
+
+        return factory.asDeviceRegistry()
     }
 
     override fun toString(): String {

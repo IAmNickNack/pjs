@@ -12,8 +12,8 @@ import io.github.iamnicknack.pjs.ffm.device.context.GpioOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.device.context.IoctlOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.device.context.PollingOperationsImpl;
 import io.github.iamnicknack.pjs.ffm.event.EventPollerFactoryImpl;
-import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
-import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader;
+import io.github.iamnicknack.pjs.model.device.DeviceFactoryLoader;
+import io.github.iamnicknack.pjs.model.device.GenericDeviceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
-public class NativeDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRegistryLoader.NoConfig> {
+public class NativeDeviceFactoryLoader implements DeviceFactoryLoader<DeviceFactoryLoader.NoConfig> {
 
-    private final Logger logger = LoggerFactory.getLogger(NativeDeviceRegistryLoader.class);
+    private final Logger logger = LoggerFactory.getLogger(NativeDeviceFactoryLoader.class);
 
     @Override
     public boolean isLoadable(Map<String, Object> properties) {
@@ -34,17 +34,17 @@ public class NativeDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRe
     }
 
     @Override
-    public DeviceRegistry load() {
-        return load(DeviceRegistryLoader.NoConfig.INSTANCE);
+    public GenericDeviceFactory load() {
+        return load(DeviceFactoryLoader.NoConfig.INSTANCE);
     }
 
     @Override
-    public DeviceRegistry load(Map<String, Object> ignored) {
-        return load(DeviceRegistryLoader.NoConfig.INSTANCE);
+    public GenericDeviceFactory load(Map<String, Object> ignored) {
+        return load(DeviceFactoryLoader.NoConfig.INSTANCE);
     }
 
     @Override
-    public DeviceRegistry load(NoConfig ignored) {
+    public GenericDeviceFactory load(NoConfig ignored) {
         var context = ServiceLoader.load(NativeContext.class, NativeContext.class.getClassLoader()).stream()
                 .findFirst()
                 .map(ServiceLoader.Provider::get)
@@ -88,6 +88,6 @@ public class NativeDeviceRegistryLoader implements DeviceRegistryLoader<DeviceRe
                 spiFactory,
                 pwmFactory,
                 i2cFactory
-        ).asDeviceRegistry();
+        );
     }
 }
