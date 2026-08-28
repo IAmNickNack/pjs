@@ -88,6 +88,6 @@ public class NativeDeviceFactoryLoader implements DeviceFactoryLoader<DeviceFact
                 spiFactory,
                 pwmFactory,
                 i2cFactory
-        );
+        ).asDeviceRegistry();
     }
 }
