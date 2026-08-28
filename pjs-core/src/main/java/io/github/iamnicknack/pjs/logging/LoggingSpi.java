@@ -43,6 +43,7 @@ public class LoggingSpi implements Spi, WithDelegateDevice<Spi> {
 
     @Override
     public void close() throws Exception {
+        logger.info("Closing SPI: {}", this.getConfig().getId());
         delegate.close();
     }
 

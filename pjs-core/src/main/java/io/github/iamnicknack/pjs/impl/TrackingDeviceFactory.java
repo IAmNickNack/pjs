@@ -109,7 +109,7 @@ public class TrackingDeviceFactory implements DeviceRegistry {
                 Arrays.stream(instance.getClass().getInterfaces())
         ).distinct().toArray(Class<?>[]::new);
 
-        // a new proxy which explicitly implements the determined interface and AutoCloseable
+        // a new proxy which implements the device interface and other interfaces implemented by `instance`
         return (T) Proxy.newProxyInstance(
                 Thread.currentThread().getContextClassLoader(),
                 interfaces,
@@ -137,7 +137,6 @@ public class TrackingDeviceFactory implements DeviceRegistry {
             if (DEVICE_CLOSE_METHOD.equals(method)) {
                 // remove the device from tracking
                 var device = TrackingDeviceFactory.this.devices.remove(instance.getConfig().getId());
-                logger.info("{}, Method: {}", delegate.getClass(), method);
                 if (device != null) {
                     try {
                         instance.close();
