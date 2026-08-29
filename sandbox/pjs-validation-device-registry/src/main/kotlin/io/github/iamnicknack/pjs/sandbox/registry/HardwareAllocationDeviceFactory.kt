@@ -17,6 +17,8 @@ import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocation
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.LineType
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.MutableHardwareAllocationIndex
+import io.github.iamnicknack.pjs.sandbox.registry.hardware.ReadonlyHardwareAllocationIndex
+import io.github.iamnicknack.pjs.sandbox.registry.line.LineSupplier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -34,8 +36,21 @@ class HardwareAllocationDeviceFactory(
 
     constructor(
         delegate: GenericDeviceFactory,
-        availableHardware: HardwareAllocationIndex
-    ) : this(delegate, availableHardware, MutableHardwareAllocationIndex())
+        availableHardware: HardwareAllocationIndex,
+    ) : this(
+        delegate,
+        availableHardware,
+        MutableHardwareAllocationIndex()
+    )
+
+    constructor(
+        delegate: GenericDeviceFactory,
+        lineSupplier: LineSupplier
+    ) : this(
+        delegate,
+        ReadonlyHardwareAllocationIndex(lineSupplier.lines()),
+        MutableHardwareAllocationIndex()
+    )
 
     private val logger: Logger = LoggerFactory.getLogger(HardwareAllocationDeviceFactory::class.java)
 
@@ -271,6 +286,7 @@ class HardwareAllocationDeviceFactory(
         ) : HardwareAllocationException(
             "Pins not available: ${requested.name}, unavailable: ${unavailable.joinToString(", ")}"
         )
+
         /**
          * Exception thrown when attempting to allocate hardware that is already in use.
          *
@@ -318,6 +334,7 @@ class HardwareAllocationDeviceFactory(
         ) : HardwareAllocationException("Channel $channel on bus $bus is not configured for $lineType")
     }
 
+    @Suppress("JavaDefaultMethodsNotOverriddenByDelegation")
     private inner class GpioPortDelegate(
         private val delegate: GpioPort
     ) : GpioPort by delegate {
@@ -328,6 +345,7 @@ class HardwareAllocationDeviceFactory(
         }
     }
 
+    @Suppress("JavaDefaultMethodsNotOverriddenByDelegation")
     private inner class PwmDelegate(
         private val delegate: Pwm
     ) : Pwm by delegate {
@@ -338,6 +356,7 @@ class HardwareAllocationDeviceFactory(
         }
     }
 
+    @Suppress("JavaDefaultMethodsNotOverriddenByDelegation")
     private inner class SpiDelegate(
         private val delegate: Spi
     ) : Spi by delegate {

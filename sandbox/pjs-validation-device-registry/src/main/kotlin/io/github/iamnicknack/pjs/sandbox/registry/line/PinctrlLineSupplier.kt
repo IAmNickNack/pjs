@@ -2,6 +2,7 @@ package io.github.iamnicknack.pjs.sandbox.registry.line
 
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex
 import java.io.FileNotFoundException
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
@@ -15,15 +16,7 @@ class PinctrlLineSupplier : LineSupplier {
     }
 
     override fun lines(): Set<HardwareAllocationIndex.Line> {
-        val str = runCatching {
-            val proc = ProcessBuilder("bash", "-c", "pinctrl | head -n 27")
-                .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                .redirectError(ProcessBuilder.Redirect.PIPE)
-                .start()
-
-            proc.waitFor(5, TimeUnit.SECONDS)
-            proc.inputStream.bufferedReader().readText()
-        }
+        val str = runCatching { readBashOutput("pinctrl | head -n 27") }
 
         val lines = str.getOrNull()
             ?.let { PinctrlParser.readLines(it.reader()) }
@@ -33,23 +26,12 @@ class PinctrlLineSupplier : LineSupplier {
     }
 
     companion object {
-
+        /**
+         * Check if pinctrl is installed
+         */
         @JvmStatic
         fun isSupported(): Boolean {
-            val path = runCatching {
-                val proc = ProcessBuilder("bash", "-c", "which pinctrl")
-                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                    .redirectError(ProcessBuilder.Redirect.PIPE)
-                    .start()
-
-                proc.waitFor(5, TimeUnit.SECONDS)
-
-                if (proc.exitValue() != 0) {
-                    throw FileNotFoundException("pinctrl not found")
-                }
-
-                proc.inputStream.bufferedReader().readText().trim()
-            }
+            val path = runCatching { readBashOutput("which pinctrl") }
 
             return path
                 .map { Files.exists(Paths.get(it)) }
@@ -59,6 +41,10 @@ class PinctrlLineSupplier : LineSupplier {
                 )
         }
 
+        /**
+         * Create a [LineSupplier] from `pinctrl` output stored in the specified file
+         * @return a [LineSupplier] from the contents of the file at [path]
+         */
         @JvmStatic
         fun from(path: String): LineSupplier {
             val stream = if (Files.exists(Paths.get(path))) {
@@ -72,6 +58,27 @@ class PinctrlLineSupplier : LineSupplier {
                 ?: throw FileNotFoundException(path)
 
             return { lines }
+        }
+
+        /**
+         * Read the standard output of a bash command
+         * @param command the bash command to execute
+         * @return the standard output of the command
+         * @throws IOException if the command fails
+         */
+        private fun readBashOutput(command: String): String {
+            val proc = ProcessBuilder("bash", "-c", command)
+                .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                .redirectError(ProcessBuilder.Redirect.PIPE)
+                .start()
+
+            proc.waitFor(5, TimeUnit.SECONDS)
+
+            if (proc.exitValue() != 0) {
+                throw IOException("bash command failed: $command")
+            }
+
+            return proc.inputStream.bufferedReader().readText()
         }
     }
 }

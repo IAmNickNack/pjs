@@ -4,6 +4,9 @@ import io.github.iamnicknack.pjs.logging.LoggingDeviceFactory
 import io.github.iamnicknack.pjs.mock.MockDeviceFactory
 import io.github.iamnicknack.pjs.model.device.DeviceFactoryLoader
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
+import io.github.iamnicknack.pjs.sandbox.registry.HardwareAllocationDeviceFactory
+import io.github.iamnicknack.pjs.sandbox.registry.line.JacksonLineSupplier
+import io.github.iamnicknack.pjs.sandbox.registry.line.PinctrlLineSupplier
 import org.slf4j.LoggerFactory
 import java.util.*
 
@@ -12,13 +15,15 @@ class ConfigurableDeviceRegistryFactory(
     val proxyHost: String? = System.getProperty("pjs.proxy.host"),
     val proxyPort: Int? = System.getProperty("pjs.proxy.port")?.toInt(),
     val logging: Boolean = System.getProperty("pjs.logging", "false").toBoolean(),
+    val hardwareAllocationConfig: String? = System.getProperty("pjs.hardware")
 ) : DeviceRegistryFactory {
 
     constructor(config: ServerConfiguration) : this(
         preferredMode = config.preferredMode ?: "mock",
         proxyHost = config.proxyHost,
         proxyPort = config.proxyPort,
-        logging = config.logging
+        logging = config.logging,
+        hardwareAllocationConfig = config.hardwareAllocationConfig
     )
 
     private val logger = LoggerFactory.getLogger(ConfigurableDeviceRegistryFactory::class.java)
@@ -54,6 +59,20 @@ class ConfigurableDeviceRegistryFactory(
             logger.info("Using logging devices")
             LoggingDeviceFactory(factory)
         } else {
+            factory
+        }
+
+        factory = if (hardwareAllocationConfig?.endsWith(".yaml") == true) {
+            logger.info("Loading available hardware from YAML: $hardwareAllocationConfig")
+            HardwareAllocationDeviceFactory(factory, JacksonLineSupplier(hardwareAllocationConfig))
+        } else if (hardwareAllocationConfig?.endsWith(".txt") == true) {
+            logger.info("Loading available hardware from TXT: $hardwareAllocationConfig")
+            HardwareAllocationDeviceFactory(factory, PinctrlLineSupplier.from(hardwareAllocationConfig))
+        } else if (PinctrlLineSupplier.isSupported()) {
+            logger.info("Loading available hardware from pinctrl")
+            HardwareAllocationDeviceFactory(factory, PinctrlLineSupplier())
+        } else {
+            logger.info("No available hardware configuration found")
             factory
         }
 

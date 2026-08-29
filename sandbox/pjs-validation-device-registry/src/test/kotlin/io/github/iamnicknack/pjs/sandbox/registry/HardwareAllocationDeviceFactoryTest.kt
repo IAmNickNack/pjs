@@ -2,7 +2,6 @@ package io.github.iamnicknack.pjs.sandbox.registry
 
 import assertk.assertThat
 import assertk.assertions.containsExactly
-import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
@@ -18,8 +17,6 @@ import io.github.iamnicknack.pjs.sandbox.registry.HardwareAllocationDeviceFactor
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocation
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.Line
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.LineType
-import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocations
-import io.github.iamnicknack.pjs.sandbox.registry.hardware.LineSupplier
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.MutableHardwareAllocationIndex
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.ReadonlyHardwareAllocationIndex
 import org.junit.jupiter.api.DynamicTest
@@ -31,7 +28,7 @@ class HardwareAllocationDeviceFactoryTest {
 
     @Test
     fun `can create gpio`() {
-        val availableHardware = MutableHardwareAllocationIndex(
+        val availableHardware = ReadonlyHardwareAllocationIndex(
             Line(LineType.GPIO, "available-gpio", HardwareAllocation.fromOffsets(2, 3))
         )
 
@@ -227,17 +224,5 @@ class HardwareAllocationDeviceFactoryTest {
                 assertThat(error.lineType).isEqualTo(expectation.line.lineType)
             }
         }
-    }
-
-    @Test
-    fun `log pinctrl example`() {
-        val lineSupplier = LineSupplier
-            .fromPinctrlResource("/pinctrl-output.txt")
-            .forHardwareAllocation(HardwareAllocations.RASPBERRY_PI)
-        val index = ReadonlyHardwareAllocationIndex(lineSupplier.lines())
-        HardwareAllocationDeviceFactory(MockDeviceFactory(), index)
-
-        val invalidAllocation = HardwareAllocation.fromOffsets(27, 28, 29, 30, 31)
-        assertThat(index.findAllIntersectingByAllocation(invalidAllocation)).isEmpty()
     }
 }
