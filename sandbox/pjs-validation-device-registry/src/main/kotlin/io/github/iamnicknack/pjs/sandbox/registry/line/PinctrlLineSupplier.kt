@@ -78,7 +78,7 @@ class PinctrlLineSupplier : LineSupplier {
                 throw IOException("bash command failed: $command")
             }
 
-            return proc.inputStream.bufferedReader().readText()
+            return proc.inputStream.bufferedReader().readText().trim()
         }
     }
 }
