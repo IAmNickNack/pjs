@@ -26,8 +26,10 @@ import io.github.iamnicknack.pjs.http.i2c.I2CHandler
 import io.github.iamnicknack.pjs.http.pwm.PwmHandler
 import io.github.iamnicknack.pjs.http.spi.SpiHandler
 import io.github.iamnicknack.pjs.http.spi.SpiTransferHandler
+import io.github.iamnicknack.pjs.impl.TrackingDeviceFactory
 import io.github.iamnicknack.pjs.model.device.Device
 import io.github.iamnicknack.pjs.model.device.DeviceConfig
+import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import io.github.iamnicknack.pjs.model.device.GenericDeviceFactory
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -39,11 +41,23 @@ import kotlinx.coroutines.runBlocking
 
 sealed class HttpDeviceFactory(client: HttpClient) : GenericDeviceFactory {
 
-    protected val portHandler: GpioPortClientHandler = HttpGpioPortHandler(client, this.asDeviceRegistry())
+    /**
+     * Explicit registry definition required by [portHandler] to perform device lookups during SSE event propagation
+     */
+    private val registry: TrackingDeviceFactory = TrackingDeviceFactory(this)
+
+    protected val portHandler: GpioPortClientHandler = HttpGpioPortHandler(client, registry)
     protected val i2cHandler: I2CHandler = HttpI2CHandler(client)
     protected val spiHandler: SpiHandler = HttpSpiHandler(client)
     protected val spiTransferHandler: SpiTransferHandler = HttpSpiTransferHandler(client)
     protected val pwmHandler: PwmHandler = HttpPwmHandler(client)
+
+    /**
+     * Disables dynamic creation of any registry instance by providing a reference to [registry]
+     */
+    override fun asDeviceRegistry(): DeviceRegistry {
+        return registry
+    }
 
     /**
      * Factory with the default behaviour of delegating construction of a new device instance to the server

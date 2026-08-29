@@ -34,10 +34,11 @@ public class TrackingDeviceFactory implements DeviceRegistry {
 
     @Override
     public <T extends Device<T>, V extends DeviceConfig<T>> T create(V config) {
-        var device = interceptClose(delegate.create(config));
-        devices.put(config.getId(), device);
+        var device = delegate.create(config);
+        var proxy = interceptClose(device);
+        devices.put(config.getId(), proxy);
         logger.atInfo().log("Created {} device with id: {}", device.getClass().getSimpleName(), config.getId());
-        return device;
+        return proxy;
     }
 
     @Override

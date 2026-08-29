@@ -21,6 +21,6 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
     retry {
-        maxRetries = 3
+        maxRetries = 2
     }
 }

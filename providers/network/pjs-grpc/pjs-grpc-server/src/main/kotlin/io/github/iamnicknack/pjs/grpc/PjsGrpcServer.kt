@@ -23,10 +23,11 @@ object PjsGrpcServer {
             val port = config.port ?: 9090
             val serverProvider = DefaultGrpcServer.ServerBuilderFactory  { ServerBuilder.forPort(port) }
             val registry = ConfigurableDeviceRegistryFactory(
-                 preferredMode = config.preferredMode ?: "native",
-                 proxyHost = config.proxyHost,
-                 proxyPort = config.proxyPort,
-                 logging = config.logging
+                preferredMode = config.preferredMode ?: "native",
+                proxyHost = config.proxyHost,
+                proxyPort = config.proxyPort,
+                logging = config.logging,
+                hardwareAllocationConfig = config.hardwareAllocationConfig
              )
 
             DefaultGrpcServer(registry, serverProvider)

@@ -16,7 +16,7 @@ public class LoggingSpi implements Spi, WithDelegateDevice<Spi> {
 
     public LoggingSpi(Spi delegate) {
         this.delegate = delegate;
-        this.logger = LoggerFactory.getLogger("device." + delegate.getClass().getSimpleName() + "." + delegate.getConfig().getId());
+        this.logger = LoggerFactory.getLogger("device." + Spi.class.getSimpleName() + "." + delegate.getConfig().getId());
     }
 
     @Override

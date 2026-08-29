@@ -1,5 +1,6 @@
 package io.github.iamnicknack.pjs.sandbox.example;
 
+import io.github.iamnicknack.pjs.device.gpio.GpioEventMode;
 import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
@@ -12,13 +13,14 @@ public class GpioExample implements Runnable {
 
     private static final GpioPortConfig INPUT_CONFIG = GpioPortConfig.builder()
             .id("GPIO-INPUT")
-            .pin(22)
+            .pin(5)
             .portMode(GpioPortMode.INPUT)
+            .eventMode(GpioEventMode.BOTH)
             .build();
 
     private static final GpioPortConfig OUTPUT_CONFIG = GpioPortConfig.builder()
             .id("GPIO-OUTPUT")
-            .pin(1, 27)
+            .pin(19, 26)
             .portMode(GpioPortMode.OUTPUT)
             .build();
 

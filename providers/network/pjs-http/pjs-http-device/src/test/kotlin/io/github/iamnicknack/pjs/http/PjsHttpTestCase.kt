@@ -1,6 +1,6 @@
 package io.github.iamnicknack.pjs.http
 
-import io.github.iamnicknack.pjs.http.client.HttpDeviceRegistry
+import io.github.iamnicknack.pjs.http.client.HttpDeviceFactory
 import io.github.iamnicknack.pjs.http.server.handlerModule
 import io.github.iamnicknack.pjs.http.server.ktorModule
 import io.github.iamnicknack.pjs.mock.MockDeviceFactory
@@ -19,8 +19,8 @@ import org.koin.ktor.plugin.Koin
  */
 class PjsHttpTestCase(
     val mockDeviceRegistry: DeviceRegistry,
-    val httpDeviceRegistry: HttpDeviceRegistry.Default,
-    val httpProxyDeviceRegistry: HttpDeviceRegistry.Proxy
+    val httpDeviceRegistry: DeviceRegistry,
+    val httpProxyDeviceRegistry: DeviceRegistry
 )
 
 fun pjsHttpTestCase(block: suspend PjsHttpTestCase.() -> Unit) = testApplication {
@@ -47,8 +47,8 @@ fun pjsHttpTestCase(block: suspend PjsHttpTestCase.() -> Unit) = testApplication
         install(SSE)
     }
 
-    val httpDeviceRegistry = HttpDeviceRegistry.Default(client)
-    val httpProxyDeviceRegistry = HttpDeviceRegistry.Proxy(client)
+    val httpDeviceRegistry = HttpDeviceFactory.Default(client).asDeviceRegistry()
+    val httpProxyDeviceRegistry = HttpDeviceFactory.Proxy(client).asDeviceRegistry()
 
     block(PjsHttpTestCase(mockDeviceRegistry, httpDeviceRegistry, httpProxyDeviceRegistry))
 

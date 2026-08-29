@@ -73,7 +73,7 @@ class HttpDeviceRegistryTest {
         ).map { (type, consumer) ->
             DynamicTest.dynamicTest(type.simpleName) {
                 pjsHttpTestCase {
-                    val device = consumer(httpDeviceRegistry)
+                    consumer(httpDeviceRegistry)
                     assertTrue { mockDeviceRegistry.contains(id) }
                     httpDeviceRegistry.close()
                     assertFalse { mockDeviceRegistry.contains(id) }
@@ -83,7 +83,7 @@ class HttpDeviceRegistryTest {
     }
 
     @Test
-    fun `can lazily create a device`() = pjsHttpTestCase {
+    fun `can create local instance of remotely managed device`() = pjsHttpTestCase {
         val remoteConfig = GpioPortConfig.builder()
             .id("test-port")
             .portMode(GpioPortMode.OUTPUT)
@@ -93,13 +93,13 @@ class HttpDeviceRegistryTest {
         // create the device in the remote registry
         mockDeviceRegistry.create(remoteConfig)
         // fetch the device from the local registry
-        val localDevice = httpDeviceRegistry.device(remoteConfig.id, GpioPort::class.java)
-        val localConfig = localDevice?.config as? GpioPortConfig
+        val localDevice = httpProxyDeviceRegistry.create(remoteConfig)
+        val localConfig = localDevice.config as? GpioPortConfig
         assertThat(localConfig).isEqualTo(remoteConfig)
 
         // remove the device from the local registry
-        httpDeviceRegistry.remove(remoteConfig.id)
-        assertThat(httpDeviceRegistry.contains(remoteConfig.id)).isFalse()
+        localDevice.close()
+        assertThat(httpProxyDeviceRegistry.contains(remoteConfig.id)).isFalse()
 
         // assert that the device still exists in the remote registry
         assertThat(mockDeviceRegistry.device(remoteConfig.id, GpioPort::class.java)).isNotNull()
@@ -125,7 +125,8 @@ class HttpDeviceRegistryTest {
         assertThat(localConfig).isEqualTo(remoteConfig)
 
         // remove the device from the local registry
-        httpDeviceRegistry.remove(remoteConfig.id)
+//        httpDeviceRegistry.remove(remoteConfig.id)
+        localDevice.close()
         assertThat(httpDeviceRegistry.contains(remoteConfig.id)).isFalse()
 
         // assert that the device still exists in the remote registry
