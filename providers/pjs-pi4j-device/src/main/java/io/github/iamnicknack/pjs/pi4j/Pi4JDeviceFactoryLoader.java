@@ -7,8 +7,8 @@ import com.pi4j.extension.Plugin;
 import com.pi4j.extension.PluginService;
 import com.pi4j.platform.Platform;
 import com.pi4j.provider.Provider;
-import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
-import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader;
+import io.github.iamnicknack.pjs.model.device.DeviceFactoryLoader;
+import io.github.iamnicknack.pjs.model.device.GenericDeviceFactory;
 import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
@@ -16,16 +16,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class Pi4jDeviceRegistryLoader implements DeviceRegistryLoader<Pi4jDeviceRegistryLoader.Config> {
+public class Pi4JDeviceFactoryLoader implements DeviceFactoryLoader<Pi4JDeviceFactoryLoader.Config> {
 
     @Nullable
     private final Class<? extends Plugin> preferredPlugin;
 
-    public Pi4jDeviceRegistryLoader() {
+    public Pi4JDeviceFactoryLoader() {
         this(null);
     }
 
-    public Pi4jDeviceRegistryLoader(@Nullable Class<? extends Plugin> preferredPlugin) {
+    public Pi4JDeviceFactoryLoader(@Nullable Class<? extends Plugin> preferredPlugin) {
         this.preferredPlugin = preferredPlugin;
     }
 
@@ -37,7 +37,7 @@ public class Pi4jDeviceRegistryLoader implements DeviceRegistryLoader<Pi4jDevice
     }
 
     @Override
-    public DeviceRegistry load(Config registryConfig) {
+    public GenericDeviceFactory load(Config registryConfig) {
         var javaProperties = new HashMap<>(registryConfig.javaProperties());
 
         if (registryConfig.grpcHost() != null) {
@@ -49,9 +49,9 @@ public class Pi4jDeviceRegistryLoader implements DeviceRegistryLoader<Pi4jDevice
             var contextBuilder = Pi4J.newContextBuilder().properties(javaProperties);
             var plugin = pluginInstance(preferredPlugin);
             plugin.initialize(new CustomPluginService(contextBuilder, javaProperties));
-            return new Pi4jDeviceRegistry(contextBuilder.build());
+            return new Pi4jDeviceFactory(contextBuilder.build());
         } else {
-            return new Pi4jDeviceRegistry(Pi4J.newContextBuilder()
+            return new Pi4jDeviceFactory(Pi4J.newContextBuilder()
                     .properties(javaProperties)
                     .autoDetect()
                     .build()
@@ -60,7 +60,7 @@ public class Pi4jDeviceRegistryLoader implements DeviceRegistryLoader<Pi4jDevice
     }
 
     @Override
-    public @Nullable DeviceRegistry load(Map<String, Object> properties) {
+    public @Nullable GenericDeviceFactory load(Map<String, Object> properties) {
         return load(new Config(properties));
     }
 

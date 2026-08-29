@@ -3,7 +3,7 @@
 ## What this repo is
 - PJs is a JVM hardware abstraction layer: application code targets `Port`/`Pin`/`SerialPort` APIs, while transport-specific adapters live in provider modules (`README.md`, `docs/PORTS.md`, `docs/SERIAL.md`).
 - Core API and contracts are in `pjs-core`; shared utility/logging helpers are in `pjs-utils`.
-- Real IO is selected at runtime by `DeviceRegistryLoader` implementations (mock, gRPC, FFM, Pi4J), discovered via Java `ServiceLoader` (`pjs-core/src/main/java/io/github/iamnicknack/pjs/model/device/DeviceRegistryLoader.java`).
+- Real IO is selected at runtime by `DeviceFactoryLoader` implementations (mock, gRPC, FFM, Pi4J), discovered via Java `ServiceLoader` (`pjs-core/src/main/java/io/github/iamnicknack/pjs/model/device/DeviceRegistryLoader.java`).
 
 ## Build topology you need to respect
 - This is a composite Gradle build: root includes `build-logic`, `providers`, and `sandbox` (`settings.gradle.kts`).

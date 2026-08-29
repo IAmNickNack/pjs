@@ -30,7 +30,7 @@ class GrpcPortConfigService(
 
     override suspend fun fetchDevices(request: Empty): PortConfigListResponse {
         return deviceRegistry
-            .mapNotNull { it.config as? GpioPortConfig }
+            .mapNotNull { device -> device.config as? GpioPortConfig }
             .fold(PortConfigListResponse.newBuilder()) { builder, config ->
                 builder.addConfig(config.asPortConfigPayload())
             }
@@ -39,7 +39,7 @@ class GrpcPortConfigService(
 
     override suspend fun remove(request: DeviceRequest): Empty {
         val device = deviceRegistry.deviceOrThrow<GpioPort>(request.deviceId)
-        deviceRegistry.remove(device)
+        device.close()
         return Empty.getDefaultInstance()
     }
 }

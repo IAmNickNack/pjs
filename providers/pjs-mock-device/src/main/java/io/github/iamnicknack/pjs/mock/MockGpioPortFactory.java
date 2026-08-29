@@ -7,6 +7,6 @@ import io.github.iamnicknack.pjs.model.device.DeviceFactory;
 public class MockGpioPortFactory implements DeviceFactory<GpioPort, GpioPortConfig> {
     @Override
     public GpioPort create(GpioPortConfig config) {
-        return new MockGpioPort(config);
+        return new MockGpioPortImpl(config);
     }
 }

@@ -4,13 +4,12 @@ import com.pi4j.extension.Plugin;
 import com.pi4j.plugin.ffm.FFMPlugin;
 import com.pi4j.plugin.mock.MockPlugin;
 import io.github.iamnicknack.pi4j.grpc.client.GrpcPlugin;
-import io.github.iamnicknack.pjs.ffm.NativeDeviceRegistryLoader;
-import io.github.iamnicknack.pjs.grpc.GrpcDeviceRegistry;
-import io.github.iamnicknack.pjs.http.client.HttpDeviceRegistry;
-import io.github.iamnicknack.pjs.logging.LoggingDeviceRegistry;
-import io.github.iamnicknack.pjs.mock.MockDeviceRegistry;
-import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
-import io.github.iamnicknack.pjs.pi4j.Pi4jDeviceRegistryLoader;
+import io.github.iamnicknack.pjs.ffm.NativeDeviceFactoryLoader;
+import io.github.iamnicknack.pjs.grpc.GrpcDeviceFactory;
+import io.github.iamnicknack.pjs.http.client.HttpDeviceFactory;
+import io.github.iamnicknack.pjs.logging.LoggingDeviceFactory;
+import io.github.iamnicknack.pjs.mock.MockDeviceFactory;
+import io.github.iamnicknack.pjs.pi4j.Pi4JDeviceFactoryLoader;
 import io.github.iamnicknack.pjs.sandbox.example.*;
 import io.github.iamnicknack.pjs.util.LoggingUtils;
 import io.github.iamnicknack.pjs.util.StartupUtils;
@@ -29,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Main {
 
@@ -122,7 +122,7 @@ public class Main {
             return;
         }
 
-        try(DeviceRegistry registry = switch (commandLineArgs.getOptionValue("plugin")) {
+        var factory = switch (commandLineArgs.getOptionValue("plugin")) {
             case "grpc" -> {
                 var channel = Grpc.newChannelBuilderForAddress(
                         commandLineArgs.getOptionValue("grpc-host", "localhost"),
@@ -130,13 +130,13 @@ public class Main {
                         InsecureChannelCredentials.create()
                 ).build();
 
-                yield new GrpcDeviceRegistry(channel);
+                yield new GrpcDeviceFactory(channel);
             }
-            case "http" -> new HttpDeviceRegistry.Default(
+            case "http" -> new HttpDeviceFactory.Default(
                     commandLineArgs.getOptionValue("grpc-host"),
                     commandLineArgs.getParsedOptionValue("grpc-port", 9090)
             );
-            case "ffm" -> new NativeDeviceRegistryLoader().load();
+            case "ffm" -> new NativeDeviceFactoryLoader().load();
             case "pi4j" -> {
                 Class<? extends Plugin> pluginClass = switch (commandLineArgs.getOptionValue("mode")) {
                     case "mock" -> MockPlugin.class;
@@ -144,15 +144,17 @@ public class Main {
                     case "grpc" -> GrpcPlugin.class;
                     case null, default -> null;
                 };
-                var loader = new Pi4jDeviceRegistryLoader(pluginClass);
+                var loader = new Pi4JDeviceFactoryLoader(pluginClass);
                 yield loader.load(optionsAsSystemProperties(commandLineArgs));
             }
-            default -> new MockDeviceRegistry();
-        }) {
-            var registryDelegate = (commandLineArgs.hasOption("logging"))
-                    ? new LoggingDeviceRegistry(registry)
-                    : registry;
+            default -> new MockDeviceFactory();
+        };
 
+        factory = (commandLineArgs.hasOption("logging"))
+                ? new LoggingDeviceFactory(factory)
+                : factory;
+
+        try(var registryDelegate = Objects.requireNonNull(factory).asDeviceRegistry()) {
             Runnable example;
             if (commandLineArgs.hasOption("gpio")) {
                 example = new GpioExample(registryDelegate);

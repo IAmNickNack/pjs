@@ -1,6 +1,6 @@
 package io.github.iamnicknack.pjs.device.gpio;
 
-import io.github.iamnicknack.pjs.mock.MockGpioPort;
+import io.github.iamnicknack.pjs.mock.MockGpioPortImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +8,7 @@ class GpioPortTest {
 
     @Test
     void canCreateMaskedPin() {
-        var port = new MockGpioPort(GpioPortConfig.builder().pin(0, 2).build());
+        var port = new MockGpioPortImpl(GpioPortConfig.builder().pin(0, 2).build());
         var pin = port.pin();
 
         pin.high();

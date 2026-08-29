@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * Delegating construction of a registry to the loader allows the loading
  * @param <T> the type of the registry configuration.
  */
-public interface DeviceRegistryLoader<T> {
+public interface DeviceFactoryLoader<T> {
 
     /**
      * Assert that the registry can be loaded from the given properties.
@@ -44,7 +44,7 @@ public interface DeviceRegistryLoader<T> {
      * @param registryConfig the registry configuration to load from.
      * @return the loaded device registry.
      */
-    DeviceRegistry load(T registryConfig);
+    GenericDeviceFactory load(T registryConfig);
 
     /**
      * Load a device registry from the given properties.
@@ -52,7 +52,7 @@ public interface DeviceRegistryLoader<T> {
      * @return the loaded device registry, or null if no device registry could be configured.
      */
     @Nullable
-    DeviceRegistry load(Map<String, Object> properties);
+    GenericDeviceFactory load(Map<String, Object> properties);
 
     /**
      * Load a device registry from the provided java properties
@@ -60,7 +60,7 @@ public interface DeviceRegistryLoader<T> {
      * @return the loaded device registry, or null if no device registry could be configured.
      */
     @Nullable
-    default DeviceRegistry load(Properties properties) {
+    default GenericDeviceFactory load(Properties properties) {
         return load(toMap(properties));
     }
 
@@ -69,7 +69,7 @@ public interface DeviceRegistryLoader<T> {
      * @return the loaded device registry, or null if no device registry could be configured.
      */
     @Nullable
-    default DeviceRegistry load() {
+    default GenericDeviceFactory load() {
         return load(System.getProperties());
     }
 
@@ -80,16 +80,16 @@ public interface DeviceRegistryLoader<T> {
     }
 
     /**
-     * Load the default device registry, providing any configuration only from system properties.
-     * @return the default device registry.
+     * Load the default device factory, providing any configuration only from system properties.
+     * @return the default device factory.
      */
-    static DeviceRegistry defaultRegistry() {
-        return ServiceLoader.load(DeviceRegistryLoader.class, DeviceRegistryLoader.class.getClassLoader()).stream()
+    static GenericDeviceFactory defaultFactory() {
+        return ServiceLoader.load(DeviceFactoryLoader.class, DeviceFactoryLoader.class.getClassLoader()).stream()
                 .map(ServiceLoader.Provider::get)
-                .filter(DeviceRegistryLoader::isLoadable)
+                .filter(DeviceFactoryLoader::isLoadable)
                 .findFirst()
-                .map(DeviceRegistryLoader::load)
-                .orElseThrow(() -> new IllegalStateException("No device registry loader found."));
+                .map(DeviceFactoryLoader::load)
+                .orElseThrow(() -> new IllegalStateException("No device factory loader found."));
 
     }
 

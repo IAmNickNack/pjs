@@ -2,7 +2,7 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>NewLineAtEndOfFile:GrpcDeviceRegistryLoader.kt:io.github.iamnicknack.pjs.grpc.GrpcDeviceRegistryLoader.kt</ID>
+    <ID>NewLineAtEndOfFile:GrpcDeviceFactoryLoader.kt:io.github.iamnicknack.pjs.grpc.GrpcDeviceFactoryLoaderkt</ID>
     <ID>NewLineAtEndOfFile:GrpcGpioPort.kt:io.github.iamnicknack.pjs.grpc.GrpcGpioPort.kt</ID>
     <ID>NewLineAtEndOfFile:GrpcI2C.kt:io.github.iamnicknack.pjs.grpc.GrpcI2C.kt</ID>
     <ID>NewLineAtEndOfFile:GrpcI2CFactory.kt:io.github.iamnicknack.pjs.grpc.GrpcI2CFactory.kt</ID>

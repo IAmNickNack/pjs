@@ -45,18 +45,6 @@ sealed class HttpDeviceRegistry(client: HttpClient) : DefaultDeviceRegistry() {
     private val spiTransferHandler: SpiTransferHandler = HttpSpiTransferHandler(client)
     private val pwmHandler: PwmHandler = HttpPwmHandler(client)
 
-    constructor(baseUrl: String) : this(
-        HttpClient(CIO) {
-            install(DefaultRequest) {
-                url(baseUrl)
-            }
-            install(ContentNegotiation) {
-                jackson()
-            }
-            install(SSE)
-        }
-    )
-
     init {
         registerFactory(HttpGpioPortFactory(this.portHandler), GpioPortConfig::class.java)
         registerFactory(HttpI2CFactory(i2cHandler), I2CConfig::class.java)

@@ -8,6 +8,7 @@ import io.github.iamnicknack.pjs.model.device.Device;
 import io.github.iamnicknack.pjs.model.device.DeviceConfig;
 import io.github.iamnicknack.pjs.model.device.DeviceFactory;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,11 +23,12 @@ import java.util.Map;
 /**
  * Registry to help manage the lifecycle of factories and devices
  */
+@Deprecated
 public class DefaultDeviceRegistry implements DeviceRegistry {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final Map<Class<?>, DeviceFactory<?, ?>> factories = new HashMap<>();
     private final Map<String, Device<?>> devices = new HashMap<>();
+    private final Map<Class<?>, DeviceFactory<?, ?>> factories = new HashMap<>();
 
     /**
      * Register a device factory.
@@ -73,7 +75,6 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void remove(Device<?> device) {
         remove(device.getConfig().getId());
     }
@@ -81,7 +82,6 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void remove(String id) {
         var device = devices.remove(id);
         if (device != null) {
@@ -99,6 +99,7 @@ public class DefaultDeviceRegistry implements DeviceRegistry {
      */
     @SuppressWarnings("unchecked")
     @Override
+    @Nullable
     public <T extends Device<T>> T device(String id, Class<T> deviceType) {
         var device = devices.get(id);
         if (device != null && deviceType.isAssignableFrom(device.getClass())) {

@@ -52,7 +52,7 @@ fun Spi.writeToInputBuffer(vararg data: ByteArray) = with (mockDelegate) {
 }
 
 /**
- * Allow the [MockI2C.deviceBuffer] position to be reset on [I2C]
+ * Allow the [MockI2CImpl.deviceBuffer] position to be reset on [I2C]
  */
 fun I2C.rewindBuffer() {
     mockDelegate.deviceBuffer.position(0)

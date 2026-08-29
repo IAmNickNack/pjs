@@ -94,6 +94,7 @@ public class LoggingPwm implements Pwm, WithDelegateDevice<Pwm> {
 
     @Override
     public void close() throws Exception {
+        logger.info("Closing PWM: {}", this.getConfig().getId());
         delegate.close();
     }
 

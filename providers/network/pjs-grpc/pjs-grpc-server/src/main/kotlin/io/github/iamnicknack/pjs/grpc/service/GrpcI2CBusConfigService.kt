@@ -39,7 +39,7 @@ class GrpcI2CBusConfigService(
 
     override suspend fun remove(request: DeviceRequest): Empty {
         val device = deviceRegistry.deviceOrThrow<I2C>(request.deviceId)
-        deviceRegistry.remove(device)
+        device.close()
         return Empty.getDefaultInstance()
     }
 }

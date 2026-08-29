@@ -1,7 +1,7 @@
 package io.github.iamnicknack.pjs.grpc
 
 import io.github.iamnicknack.pjs.grpc.service.*
-import io.github.iamnicknack.pjs.mock.MockDeviceRegistry
+import io.github.iamnicknack.pjs.mock.MockDeviceFactory
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import io.grpc.Channel
 import io.grpc.Server
@@ -22,8 +22,8 @@ class PjsExtension : BeforeEachCallback, AfterEachCallback, ParameterResolver {
 
     override fun beforeEach(context: ExtensionContext) {
         channel = InProcessChannelBuilder.forName("test").build()
-        remoteRegistry = MockDeviceRegistry()
-        localRegistry = GrpcDeviceRegistry(channel)
+        remoteRegistry = MockDeviceFactory().asDeviceRegistry()
+        localRegistry = GrpcDeviceFactory(channel).asDeviceRegistry()
         server = InProcessServerBuilder.forName("test").directExecutor()
             .addService(GrpcPortService(remoteRegistry))
             .addService(GrpcPortConfigService(remoteRegistry))

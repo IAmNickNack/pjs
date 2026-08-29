@@ -15,14 +15,12 @@ class GrpcDeviceConfigService(
     private val logger: Logger = LoggerFactory.getLogger(GrpcDeviceConfigService::class.java)
 
     override suspend fun removeDevice(request: DeviceRequest): Empty {
-        if (!deviceRegistry.contains(request.deviceId)) {
-            throw Status.NOT_FOUND
-                .withDescription("Device with id ${request.deviceId} does not exist")
-                .asRuntimeException()
-        }
+        val device = deviceRegistry.find { it.config.id == request.deviceId } ?: throw Status.NOT_FOUND
+            .withDescription("Device with id ${request.deviceId} does not exist")
+            .asRuntimeException()
 
         try {
-            deviceRegistry.remove(request.deviceId)
+            device.close()
         } catch (e: DeviceRegistry.RegistryException) {
             logger.error("Failed to remove device: {}", request.deviceId, e)
             throw Status.INTERNAL

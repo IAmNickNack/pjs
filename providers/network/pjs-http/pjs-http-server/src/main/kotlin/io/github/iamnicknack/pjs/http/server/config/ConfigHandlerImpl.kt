@@ -16,12 +16,12 @@ class ConfigHandlerImpl<T : Device<T>>(
     override suspend  fun createDevice(deviceId: String, config: DeviceConfigPayload<T>): DeviceConfig<T> {
         deviceRegistry.cannotContain(deviceId)
         val device = deviceRegistry.create(config.asDeviceConfig(deviceId))
-        return device.config as DeviceConfig<T>
+        return device.config
     }
 
     override suspend  fun removeDevice(deviceId: String) {
         deviceRegistry.device(deviceId, deviceClass)
-            ?.also { deviceRegistry.remove(it) }
+            ?.also(AutoCloseable::close)
             ?: throw DeviceNotFoundException(deviceId)
     }
 

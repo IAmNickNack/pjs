@@ -1,14 +1,14 @@
 package io.github.iamnicknack.pjs.logging;
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
-import io.github.iamnicknack.pjs.mock.MockGpioPort;
+import io.github.iamnicknack.pjs.mock.MockGpioPortImpl;
 import org.junit.jupiter.api.Test;
 
 class LoggingGpioPortTest {
 
     @Test
     void writesToDelegatePort() {
-        var gpioPort = new MockGpioPort(GpioPortConfig.builder().pin(1).build());
+        var gpioPort = new MockGpioPortImpl(GpioPortConfig.builder().pin(1).build());
         var loggingPort = new LoggingGpioPort(gpioPort);
 
         loggingPort.write(1);

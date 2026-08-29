@@ -26,21 +26,21 @@ class MockGpioPortTest {
 
     @Test
     void canWritePort() {
-        MockGpioPort port = new MockGpioPort(outputConfig);
+        MockGpioPortImpl port = new MockGpioPortImpl(outputConfig);
         port.write(1);
         assertThat(port.read()).isEqualTo(1);
     }
 
     @Test
     void canReadPort() {
-        var mock = new MockGpioPort(inputConfig);
+        var mock = new MockGpioPortImpl(inputConfig);
         mock.write(1);
         assertThat(mock.read()).isEqualTo(1);
     }
 
     @Test
     void portRaisesInputEvents() throws InterruptedException {
-        var mock = new MockGpioPort(inputConfig);
+        var mock = new MockGpioPortImpl(inputConfig);
         var invoked = new AtomicBoolean(false);
         var latch = new CountDownLatch(1);
         mock.addListener(_ -> {

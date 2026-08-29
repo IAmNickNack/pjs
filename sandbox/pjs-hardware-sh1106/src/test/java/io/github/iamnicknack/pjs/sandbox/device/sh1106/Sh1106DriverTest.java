@@ -4,7 +4,8 @@ import io.github.iamnicknack.pjs.device.i2c.I2CConfig;
 import io.github.iamnicknack.pjs.logging.LoggingI2C;
 import io.github.iamnicknack.pjs.logging.LoggingUtils;
 import io.github.iamnicknack.pjs.model.SerialWriteOperation;
-import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader;
+import io.github.iamnicknack.pjs.model.device.DeviceFactoryLoader;
+import io.github.iamnicknack.pjs.model.device.GenericDeviceFactory;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Driver.Command;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.Sh1106Driver.CommandSequence;
 import io.github.iamnicknack.pjs.sandbox.device.sh1106.impl.DefaultSh1106Driver;
@@ -78,10 +79,12 @@ class Sh1106DriverTest {
                 .bus(1)
                 .build();
 
+        private final GenericDeviceFactory factory = DeviceFactoryLoader.defaultFactory();
+
         @Test
         void test() {
 
-            try (var registry = DeviceRegistryLoader.defaultRegistry()) {
+            try (var registry = factory.asDeviceRegistry()) {
                 assertNotNull(registry);
 
                 var device = new LoggingI2C(registry.create(oledConfig));
@@ -122,7 +125,7 @@ class Sh1106DriverTest {
 
         @Test
         void writeText() {
-            try (var registry = DeviceRegistryLoader.defaultRegistry()) {
+            try (var registry = factory.asDeviceRegistry()) {
                 var device = new LoggingI2C(registry.create(oledConfig));
                 var oled = new DefaultSh1106Driver(device, 0x3c);
 
@@ -151,7 +154,7 @@ class Sh1106DriverTest {
 
         @Test
         void displayOperations() {
-            try (var registry = DeviceRegistryLoader.defaultRegistry()) {
+            try (var registry = factory.asDeviceRegistry()) {
                 var device = new LoggingI2C(registry.create(oledConfig));
                 var oled = new DefaultSh1106Driver(device, 0x3c);
                 var operations = new Sh1106Operations(oled);

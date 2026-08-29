@@ -63,6 +63,7 @@ public class LoggingGpioPort implements GpioPort, WithDelegateDevice<GpioPort> {
 
     @Override
     public void close() throws Exception {
+        logger.info("Closing GPIO port: {}", this.getConfig().getId());
         delegate.close();
     }
 

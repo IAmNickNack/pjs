@@ -1,11 +1,11 @@
 package io.github.iamnicknack.pjs.http.client
 
-import io.github.iamnicknack.pjs.model.device.DeviceRegistryLoader
+import io.github.iamnicknack.pjs.model.device.DeviceFactoryLoader
 
 /**
- * [DeviceRegistryLoader] for [HttpDeviceRegistry]
+ * [io.github.iamnicknack.pjs.model.device.DeviceFactoryLoader] for [HttpDeviceFactory]
  */
-class HttpDeviceRegistryLoader : DeviceRegistryLoader<HttpDeviceRegistryConfig> {
+class HttpDeviceFactoryLoader : DeviceFactoryLoader<HttpDeviceFactoryConfig> {
 
     override fun isLoadable(properties: Map<String, Any>) = config(properties)
         ?.let { properties["pjs.mode"]?.toString() == "http" }
@@ -14,10 +14,10 @@ class HttpDeviceRegistryLoader : DeviceRegistryLoader<HttpDeviceRegistryConfig> 
     override fun load(properties: Map<String, Any>) = config(properties)
         ?.let(this::load)
 
-    override fun load(config: HttpDeviceRegistryConfig) = if (config.mode == HttpDeviceRegistryConfig.Mode.PROXY) {
-        HttpDeviceRegistry.Proxy(config.proxyHost, config.proxyPort)
+    override fun load(config: HttpDeviceFactoryConfig) = if (config.mode == HttpDeviceFactoryConfig.Mode.PROXY) {
+        HttpDeviceFactory.Proxy(config.proxyHost, config.proxyPort)
     } else {
-        HttpDeviceRegistry.Default(config.proxyHost, config.proxyPort)
+        HttpDeviceFactory.Default(config.proxyHost, config.proxyPort)
     }
 
     /**
@@ -25,14 +25,14 @@ class HttpDeviceRegistryLoader : DeviceRegistryLoader<HttpDeviceRegistryConfig> 
      * @param properties the properties to load from
      * @return the configuration, or null if the properties are not valid
      */
-    private fun config(properties: Map<String, Any>): HttpDeviceRegistryConfig? {
+    private fun config(properties: Map<String, Any>): HttpDeviceFactoryConfig? {
         return if (properties["pjs.proxy.port"] != null && properties["pjs.proxy.host"] != null) {
-            HttpDeviceRegistryConfig(
+            HttpDeviceFactoryConfig(
                 properties["pjs.proxy.host"] as String,
                 properties["pjs.proxy.port"].toString().toIntOrNull() ?: 8080,
                 properties["pjs.http.mode"]?.toString()
-                    ?.let { HttpDeviceRegistryConfig.Mode.valueOf(it.uppercase()) }
-                    ?: HttpDeviceRegistryConfig.Mode.DEFAULT
+                    ?.let { HttpDeviceFactoryConfig.Mode.valueOf(it.uppercase()) }
+                    ?: HttpDeviceFactoryConfig.Mode.DEFAULT
             )
         } else {
             null

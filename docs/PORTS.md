@@ -23,29 +23,29 @@ A `Pin` is a specific implementation of a `Port` which is only capable of readin
 
 --- 
 
-## Configure the `DeviceRegistry`
+## Configure the `DeviceFactory`
 
-Although it's possible to create devices directly, it's more convenient to use a `DeviceRegistry` to manage the creation of devices.
-Delegating to the device registry provides some benefits:
+Although it's possible to create devices directly, it's more convenient to use a `DeviceFactory` to manage the creation of devices.
+Delegating to the device factory provides some benefits:
 
 * It provides a single point of configuration for the application
-* It provides a single point where the lifecycle of devices can be managed
-* It abstracts device provider configurations
+* When applied to a `DeviceRegistry`, it provides a single point where the lifecycle of devices can be managed
+* It abstracts device factory configurations
 * It can be swapped out depending on the runtime requirement
 
 ```kotlin
-var actualRegistry: DeviceRegistry = MockDeviceRegistry()
+var actualFactory: DeviceFactory = MockDeviceFactory()
 ```
 
-### Registry decoration by delegation
+### Factory decoration by delegation
 
-Devices created via the registry can be decorated with debug logging information, by wrapping the registry instance with a `LoggingRegistry`.
+Devices created via the factory can be decorated with debug logging information, by wrapping the factory instance with a `LoggingDeviceFactory`.
 
-The logging registry wraps all `Device` instances with logging decorators which can emit log messages when the device
+The logging factory simply wraps all `Device` instances with logging decorators which can emit log messages when the device
 is operated on.
 
 ```kotlin
-val deviceRegistry: DeviceRegistry = LoggingDeviceRegistry(actualRegistry)
+val deviceFactory: DeviceFactory = LoggingDeviceFactory(actualFactory)
 ```
 
 ## Create a pin device
@@ -58,15 +58,15 @@ Here a `GpioPort` is created with an arbitrary `id`, mapped to hardware pin `0` 
 val pinConfig: GpioPortConfig = GpioPortConfig.builder()
     .id("test-pin")
     .pin(0)
-    .mode(GpioPortMode.OUTPUT)
+    .portMode(GpioPortMode.OUTPUT)
     .build()
 
-val pinPort: GpioPort = deviceRegistry.create(pinConfig)
+val pinPort: GpioPort = deviceFactory.create(pinConfig)
 ```
 
 ```shell
-INFO io.github.iamnicknack.pjs.mock.MockDeviceRegistry - Created MockGpioPort device with id: test-pin
-INFO io.github.iamnicknack.pjs.logging.LoggingDeviceRegistry - Created LoggingGpioPort device with id: test-pin
+INFO io.github.iamnicknack.pjs.mock.MockDeviceFactory - Created MockGpioPort device with id: test-pin
+INFO io.github.iamnicknack.pjs.logging.LoggingDeviceFactory - Created LoggingGpioPort device with id: test-pin
 ```
 
 Similarly to how this might be done with the low-level Linux APIs for GPIO `lines` (where a line is mapped to one or many `offset`s which represent the individual pins),

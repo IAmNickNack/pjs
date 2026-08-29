@@ -52,4 +52,10 @@ public class LoggingI2C implements I2C, WithDelegateDevice<I2C> {
     public I2C getDelegate() {
         return delegate;
     }
+
+    @Override
+    public void close() throws Exception {
+        logger.info("Closing GPIO port: {}", this.getConfig().getId());
+        delegate.close();
+    }
 }

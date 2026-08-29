@@ -1,21 +1,24 @@
 package io.github.iamnicknack.pjs.sandbox.registry
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPinMask
+import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
+import io.github.iamnicknack.pjs.device.i2c.I2C
 import io.github.iamnicknack.pjs.device.i2c.I2CConfig
+import io.github.iamnicknack.pjs.device.pwm.Pwm
 import io.github.iamnicknack.pjs.device.pwm.PwmConfig
+import io.github.iamnicknack.pjs.device.spi.Spi
 import io.github.iamnicknack.pjs.device.spi.SpiConfig
 import io.github.iamnicknack.pjs.model.device.Device
 import io.github.iamnicknack.pjs.model.device.DeviceConfig
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
+import io.github.iamnicknack.pjs.model.device.GenericDeviceFactory
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocation
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.LineType
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.MutableHardwareAllocationIndex
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.*
-import java.util.function.Consumer
 
 /**
  * A [DeviceRegistry] able to validate device configurations based on hardware availability.
@@ -23,21 +26,21 @@ import java.util.function.Consumer
  * @param availableHardware The [HardwareAllocationIndex] representing the available hardware.
  * @param usedHardware The index representing the hardware which has been allocated to devices in this registry.
  */
-class HardwareAllocationDeviceRegistry(
-    private val delegate: DeviceRegistry,
+class HardwareAllocationDeviceFactory(
+    private val delegate: GenericDeviceFactory,
     private val availableHardware: HardwareAllocationIndex,
     private val usedHardware: HardwareAllocationIndex.Mutable
-) : DeviceRegistry by delegate {
+) : GenericDeviceFactory {
 
     constructor(
-        delegate: DeviceRegistry,
+        delegate: GenericDeviceFactory,
         availableHardware: HardwareAllocationIndex
     ) : this(delegate, availableHardware, MutableHardwareAllocationIndex())
 
-    private val logger: Logger = LoggerFactory.getLogger(HardwareAllocationDeviceRegistry::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(HardwareAllocationDeviceFactory::class.java)
 
     init {
-        logger.info("Initializing HardwareAllocationDeviceRegistry")
+        logger.info("Initializing HardwareAllocationDeviceFactory")
         availableHardware.forEach { line ->
             val pinMask = GpioPinMask.fromMask(line.allocation.mask and 0xFFFFFFFFL)
 
@@ -72,29 +75,31 @@ class HardwareAllocationDeviceRegistry(
     /**
      * Validate that it is possible to allocate hardware before creating a device.
      */
+    @Suppress("UNCHECKED_CAST")
     override fun <T : Device<T>, V : DeviceConfig<T>> create(config: V): T {
-        val line = when(config) {
+        return when(config) {
             is GpioPortConfig -> gpioConfigLineFactory.validateLine(config)
+                .let { line ->
+                    GpioPortDelegate(delegate.create(config))
+                        .also { usedHardware.add(line) }
+                }
             is I2CConfig -> i2cConfigLineFactory.validateLine(config)
+                .let { line ->
+                    I2CDelegate(delegate.create(config))
+                        .also { usedHardware.add(line) }
+                }
             is SpiConfig -> spiConfigLineFactory.validateLine(config)
+                .let { line ->
+                    SpiDelegate(delegate.create(config))
+                        .also { usedHardware.add(line) }
+                }
             is PwmConfig -> pwmConfigLineFactory.validateLine(config)
+                .let { line ->
+                    PwmDelegate(delegate.create(config))
+                        .also { usedHardware.add(line) }
+                }
             else -> throw IllegalArgumentException("Unsupported device configuration type: ${config::class.simpleName}")
-        }
-        return delegate.create(config).also { usedHardware.add(line) }
-    }
-
-    override fun remove(device: Device<*>) {
-        val line = when(val config = device.config) {
-            is GpioPortConfig -> gpioConfigLineFactory.createLine(config)
-            is I2CConfig -> i2cConfigLineFactory.createLine(config)
-            is SpiConfig -> spiConfigLineFactory.createLine(config)
-            is PwmConfig -> pwmConfigLineFactory.createLine(config)
-            else -> throw IllegalArgumentException("Unsupported device configuration type: ${config::class.simpleName}")
-        }
-
-        usedHardware.remove(line)
-
-        delegate.remove(device)
+        } as T
     }
 
     /**
@@ -296,6 +301,43 @@ class HardwareAllocationDeviceRegistry(
             HardwareAllocationException("Bus $bus is not configured for $lineType")
     }
 
-    override fun forEach(action: Consumer<in Device<*>>?) = delegate.forEach(action)
-    override fun spliterator(): Spliterator<Device<*>?> = delegate.spliterator()
+    private inner class GpioPortDelegate(
+        private val delegate: GpioPort
+    ) : GpioPort by delegate {
+        override fun close() {
+            gpioConfigLineFactory.createLine(this.config as GpioPortConfig)
+                .also(usedHardware::remove)
+            delegate.close()
+        }
+    }
+
+    private inner class PwmDelegate(
+        private val delegate: Pwm
+    ) : Pwm by delegate {
+        override fun close() {
+            pwmConfigLineFactory.createLine(this.config as PwmConfig)
+                .also(usedHardware::remove)
+            delegate.close()
+        }
+    }
+
+    private inner class SpiDelegate(
+        private val delegate: Spi
+    ) : Spi by delegate {
+        override fun close() {
+            spiConfigLineFactory.createLine(this.config as SpiConfig)
+                .also(usedHardware::remove)
+            delegate.close()
+        }
+    }
+
+    private inner class I2CDelegate(
+        private val delegate: I2C
+    ) : I2C by delegate {
+        override fun close() {
+            i2cConfigLineFactory.createLine(this.config as I2CConfig)
+                .also(usedHardware::remove)
+            delegate.close()
+        }
+    }
 }

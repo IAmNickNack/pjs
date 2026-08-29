@@ -7,7 +7,7 @@ package io.github.iamnicknack.pjs.http.client
  * @param mode whether to manage the device lifecycle with [Mode.DEFAULT] or delegate to another instance
  *  with [Mode.PROXY]
  */
-data class HttpDeviceRegistryConfig(
+data class HttpDeviceFactoryConfig(
     val proxyHost: String,
     val proxyPort: Int,
     val mode: Mode,

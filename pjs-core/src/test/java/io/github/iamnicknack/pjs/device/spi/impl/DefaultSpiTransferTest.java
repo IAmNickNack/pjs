@@ -3,7 +3,7 @@ package io.github.iamnicknack.pjs.device.spi.impl;
 import io.github.iamnicknack.pjs.device.spi.Spi;
 import io.github.iamnicknack.pjs.device.spi.SpiConfig;
 import io.github.iamnicknack.pjs.device.spi.SpiTransfer;
-import io.github.iamnicknack.pjs.mock.MockSpi;
+import io.github.iamnicknack.pjs.mock.MockSpiImpl;
 import io.github.iamnicknack.pjs.model.device.DeviceConfig;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ class DefaultSpiTransferTest {
 
     @Test
     void canWriteReadSingleMessage() {
-        var spi = new MockSpi(SpiConfig.builder().id("test-spi").build());
+        var spi = new MockSpiImpl(SpiConfig.builder().id("test-spi").build());
         var transfer = new DefaultSpiTransfer(spi);
 
         transfer.transfer(SpiTransfer.Message.write(new byte[] { 1, 2, 3 }));
@@ -34,7 +34,7 @@ class DefaultSpiTransferTest {
 
     @Test
     void canWriteThenReadMultipleMessages() {
-        var spi = new MockSpi(SpiConfig.builder().id("test-spi").build());
+        var spi = new MockSpiImpl(SpiConfig.builder().id("test-spi").build());
 
         // put data in the buffer
         spi.writeBytes(new byte[] { 0, 0, 0, 4, 5, 6 });
@@ -54,7 +54,7 @@ class DefaultSpiTransferTest {
 
     @Test
     void doesntFailWithNoMessages() {
-        var spi = new MockSpi(SpiConfig.builder().id("test-spi").build());
+        var spi = new MockSpiImpl(SpiConfig.builder().id("test-spi").build());
         var transfer = new DefaultSpiTransfer(spi);
 
         transfer.transfer();
@@ -87,7 +87,7 @@ class DefaultSpiTransferTest {
 
     @Test
     void compositeMessageTransferCanExecuteSingleTransfer() {
-        var spi = new MockSpi(SpiConfig.builder().id("test-spi").build());
+        var spi = new MockSpiImpl(SpiConfig.builder().id("test-spi").build());
         spi.writeBytes(new byte[] { 0, 0, 0, 7, 8, 9, 0, 0, 0 });
         spi.swapBuffers();
 
@@ -113,7 +113,7 @@ class DefaultSpiTransferTest {
 
     @Test
     void compositeMessageTransferCanExecuteMultipleTransfers() {
-        var spi = new MockSpi(SpiConfig.builder().id("test-spi").build());
+        var spi = new MockSpiImpl(SpiConfig.builder().id("test-spi").build());
         spi.writeBytes(new byte[] { 0, 0, 0, 7, 8, 9, 0, 0, 0 });
         spi.swapBuffers();
 

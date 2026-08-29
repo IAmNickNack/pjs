@@ -4,9 +4,9 @@ import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.device.i2c.I2C;
 import io.github.iamnicknack.pjs.device.pwm.Pwm;
 import io.github.iamnicknack.pjs.device.spi.Spi;
-import io.github.iamnicknack.pjs.impl.DefaultDeviceRegistry;
 import io.github.iamnicknack.pjs.model.device.Device;
 import io.github.iamnicknack.pjs.model.device.DeviceConfig;
+import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
 import io.github.iamnicknack.pjs.model.device.GenericDeviceFactory;
 
 public class LoggingDeviceFactory implements GenericDeviceFactory {
@@ -35,7 +35,7 @@ public class LoggingDeviceFactory implements GenericDeviceFactory {
             case Spi spi -> {
                 return (T) new LoggingSpi(spi);
             }
-            default -> throw new DefaultDeviceRegistry.RegistryException("Unsupported device type for logging: " + device.getClass(), new IllegalArgumentException());
+            default -> throw new DeviceRegistry.RegistryException("Unsupported device type for logging: " + device.getClass(), new IllegalArgumentException());
         }
     }
 }

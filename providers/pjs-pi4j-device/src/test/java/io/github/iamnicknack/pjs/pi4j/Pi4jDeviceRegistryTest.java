@@ -14,19 +14,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 class Pi4jDeviceRegistryTest {
 
     @Test
-    void canRemoveDigitalDevices() {
+    void canRemoveDigitalDevices() throws Exception {
         var context = Pi4J.newContextBuilder()
                 .add(new MockDigitalInputProviderImpl())
                 .add(new MockDigitalOutputProviderImpl())
                 .build();
-        var registry = new Pi4jDeviceRegistry(context);
+        var registry = new Pi4jDeviceFactory(context).asDeviceRegistry();
 
         var device = registry.create(GpioPortConfig.builder().pin(1, 2).build());
 
         assertThat(registry.contains(device.getConfig().getId())).isTrue();
         assertThat(context.registry().all().size()).isEqualTo(2);
 
-        registry.remove(device.getConfig().getId());
+        device.close();
 
         assertThat(registry.contains(device.getConfig().getId())).isFalse();
         assertThat(context.registry().all().size()).isEqualTo(0);
@@ -38,7 +38,7 @@ class Pi4jDeviceRegistryTest {
                 .add(new MockI2CProviderImpl())
                 .build();
 
-        try (var registry = new Pi4jDeviceRegistry(context);
+        try (var registry = new Pi4jDeviceFactory(context).asDeviceRegistry();
              var device = registry.create(I2CConfig.builder().bus(1).build())) {
             device.transfer(new I2C.Message(0x10, new byte[]{(byte) 0xFF}, 0, 1, I2C.Message.Type.WRITE));
 
