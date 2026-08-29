@@ -11,6 +11,6 @@ dependencies {
     implementation(project(":providers:pjs-mock-device"))
     implementation(libs.slf4j.api)
     implementation(libs.apache.cli)
-    implementation(project(":sandbox:pjs-validation-device-registry"))
+    implementation(project(":sandbox:pjs-device-factory-validation"))
 }
 

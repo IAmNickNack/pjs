@@ -4,9 +4,9 @@ import io.github.iamnicknack.pjs.logging.LoggingDeviceFactory
 import io.github.iamnicknack.pjs.mock.MockDeviceFactory
 import io.github.iamnicknack.pjs.model.device.DeviceFactoryLoader
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
-import io.github.iamnicknack.pjs.sandbox.registry.HardwareAllocationDeviceFactory
-import io.github.iamnicknack.pjs.sandbox.registry.line.JacksonLineSupplier
-import io.github.iamnicknack.pjs.sandbox.registry.line.PinctrlLineSupplier
+import io.github.iamnicknack.pjs.sandbox.factory.HardwareAllocationDeviceFactory
+import io.github.iamnicknack.pjs.sandbox.factory.line.JacksonLineSupplier
+import io.github.iamnicknack.pjs.sandbox.factory.line.PinctrlLineSupplier
 import org.slf4j.LoggerFactory
 import java.util.*
 
