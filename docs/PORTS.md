@@ -48,6 +48,52 @@ is operated on.
 val deviceFactory: DeviceFactory = LoggingDeviceFactory(actualFactory)
 ```
 
+### Devices are closeable
+
+Devices implement `AutoCloseable` and as such, own any resources they require to operate. It is generally the responsibility of the caller to close the devices when they are no longer needed:
+
+```kotlin
+val config: GpioPortConfig = GpioPortConfig.builder().id("test-port").pin(1).build()
+val port: GpioPort = deviceFactory.create(config)
+port.write(1)
+port.close()
+```
+```shell
+DEBUG [device.GpioPort.test-port           ] Writing port value: ------------------------------1-, 1
+INFO  [device.GpioPort.test-port           ] Closing GPIO port: test-port
+```
+
+### Tracking factory (aka Registry)
+
+As an alternative to explicitly closing each device, a tracking factory (or registry) can be used to manage the lifecycle of devices.
+
+On shutdown, this factory is aware of the devices it has created and will close them automatically:
+
+```kotlin
+deviceFactory.asDeviceRegistry().use {
+    notebookLogger.info("Creating ports using ${it.javaClass}")
+    val port1 = it.create(GpioPortConfig.builder().id("test-port-1").pin(1).build())
+    val port2 = it.create(GpioPortConfig.builder().id("test-port-2").pin(2).build())
+    port1.write(1)
+    port2.write(1)
+    port1.write(0)
+}
+```
+```shell
+INFO  [notebook                            ] Creating ports using class io.github.iamnicknack.pjs.impl.TrackingDeviceFactory
+INFO  [i.g.i.pjs.impl.TrackingDeviceFactory] Created LoggingGpioPort device with id: test-port-1
+INFO  [i.g.i.pjs.impl.TrackingDeviceFactory] Created LoggingGpioPort device with id: test-port-2
+DEBUG [device.GpioPort.test-port-1         ] Writing port value: ------------------------------1-, 1
+DEBUG [device.GpioPort.test-port-2         ] Writing port value: -----------------------------1--, 1
+DEBUG [device.GpioPort.test-port-1         ] Writing port value: ------------------------------0-, 0
+INFO  [i.g.i.pjs.impl.TrackingDeviceFactory] Closing device: test-port-2, jdk.proxy9.$Proxy39
+INFO  [device.GpioPort.test-port-2         ] Closing GPIO port: test-port-2
+INFO  [i.g.i.pjs.impl.TrackingDeviceFactory] Closing device: test-port-1, jdk.proxy9.$Proxy39
+INFO  [device.GpioPort.test-port-1         ] Closing GPIO port: test-port-1
+```
+In the real world, we'd unlikely choose to wrap a registry in a `use` or `try-with-resources` block. More likely, it would be created at startup and closed at shutdown.
+The use of `use` here is purely to demonstrate the closeable nature of the registry.
+
 ## Create a pin device
 
 The registry can now be used to create a device. Only device configuration needs to be passed to the registry. If an appropriate provider is configured, the registry will handle the construction of the device.
