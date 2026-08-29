@@ -13,8 +13,8 @@ import io.github.iamnicknack.pjs.device.pwm.PwmConfig
 import io.github.iamnicknack.pjs.device.spi.SpiConfig
 import io.github.iamnicknack.pjs.mock.MockDeviceFactory
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
-import io.github.iamnicknack.pjs.sandbox.registry.HardwareAllocationDeviceFactory.HardwareAllocationException
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocation
+import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationException
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.Line
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.LineType
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.MutableHardwareAllocationIndex

@@ -14,6 +14,7 @@ import io.github.iamnicknack.pjs.model.device.DeviceConfig
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import io.github.iamnicknack.pjs.model.device.GenericDeviceFactory
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocation
+import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationException
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.HardwareAllocationIndex.LineType
 import io.github.iamnicknack.pjs.sandbox.registry.hardware.MutableHardwareAllocationIndex
@@ -21,6 +22,7 @@ import io.github.iamnicknack.pjs.sandbox.registry.hardware.ReadonlyHardwareAlloc
 import io.github.iamnicknack.pjs.sandbox.registry.line.LineSupplier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import kotlin.math.max
 
 /**
  * A [DeviceRegistry] able to validate device configurations based on hardware availability.
@@ -56,15 +58,7 @@ class HardwareAllocationDeviceFactory(
 
     init {
         logger.info("Initializing HardwareAllocationDeviceFactory")
-        availableHardware.forEach { line ->
-            val pinMask = GpioPinMask.fromMask(line.allocation.mask and 0xFFFFFFFFL)
-
-            logger.info("> {} - {}: {}",
-                pinMask.maskString,
-                "${line.lineType}${line.bus ?: ""}".padEnd(5, ' '),
-                pinMask.offsets().joinToString(", ") { "%02d".format(it) }
-            )
-        }
+        availableHardware.dump { logger.info(it) }
     }
 
     /**
@@ -92,29 +86,35 @@ class HardwareAllocationDeviceFactory(
      */
     @Suppress("UNCHECKED_CAST")
     override fun <T : Device<T>, V : DeviceConfig<T>> create(config: V): T {
-        return when(config) {
+        val device = when(config) {
             is GpioPortConfig -> gpioConfigLineFactory.validateLine(config)
                 .let { line ->
+                    logger.atDebug().log { line.dumpString() }
                     GpioPortDelegate(delegate.create(config))
                         .also { usedHardware.add(line) }
                 }
             is I2CConfig -> i2cConfigLineFactory.validateLine(config)
                 .let { line ->
+                    logger.atDebug().log { line.dumpString() }
                     I2CDelegate(delegate.create(config))
                         .also { usedHardware.add(line) }
                 }
             is SpiConfig -> spiConfigLineFactory.validateLine(config)
                 .let { line ->
+                    logger.atDebug().log { line.dumpString() }
                     SpiDelegate(delegate.create(config))
                         .also { usedHardware.add(line) }
                 }
             is PwmConfig -> pwmConfigLineFactory.validateLine(config)
                 .let { line ->
+                    logger.atDebug().log { line.dumpString() }
                     PwmDelegate(delegate.create(config))
                         .also { usedHardware.add(line) }
                 }
             else -> throw IllegalArgumentException("Unsupported device configuration type: ${config::class.simpleName}")
-        } as T
+        }
+
+        return device as T
     }
 
     /**
@@ -274,66 +274,6 @@ class HardwareAllocationDeviceFactory(
         }
     }
 
-    sealed class HardwareAllocationException(message: String) : RuntimeException(message) {
-        /**
-         * Exception thrown when attempting to allocate pins that are not available.
-         * @param requested the requested line
-         * @param unavailable the unavailable lines
-         */
-        class PinsNotAvailable(
-            val requested: HardwareAllocationIndex.Line,
-            val unavailable: HardwareAllocation
-        ) : HardwareAllocationException(
-            "Pins not available: ${requested.name}, unavailable: ${unavailable.joinToString(", ")}"
-        )
-
-        /**
-         * Exception thrown when attempting to allocate hardware that is already in use.
-         *
-         * @param requested the requested line
-         * @param conflicts the lines already in use which conflict with [requested]
-         */
-        class PinsInUse(
-            val requested: HardwareAllocationIndex.Line,
-            conflicts: Iterable<HardwareAllocationIndex.Line>
-        ) : HardwareAllocationException(
-            "Pins in use: ${requested.name}, conflicts: ${conflicts.joinToString(", ") { it.name }}")
-        {
-            val conflicts: List<HardwareAllocationIndex.Line> = conflicts
-                .map { HardwareAllocationIndex.Line(it.lineType, it.name, it.allocation and requested.allocation) }
-        }
-
-        /**
-         * Exception thrown when attempting to allocate hardware on a bus that is already in use.
-         * @param requested the requested bus
-         * @param current the line already using the bus
-         */
-        class BusInUse(
-            val requested: HardwareAllocationIndex.Line,
-            val current: HardwareAllocationIndex.Line
-        ) : HardwareAllocationException(
-            "Bus ${requested.bus} is already in use for ${requested.lineType} by ${current.name}"
-        )
-
-        /**
-         * Exception thrown when attempting to allocate hardware on a bus that is not configured.
-         */
-        class BusNotConfigured(val bus: Int, val lineType: LineType) :
-            HardwareAllocationException("Bus $bus is not configured for $lineType")
-
-        /**
-         * Exception thrown when attempting to allocate hardware on a channel that is not configured.
-         * @param bus the bus the channel is on
-         * @param channel the channel that is not configured
-         * @param lineType the type of line the channel is for
-         */
-        class ChannelNotConfigured(
-            val bus: Int,
-            val channel: Int,
-            val lineType: LineType
-        ) : HardwareAllocationException("Channel $channel on bus $bus is not configured for $lineType")
-    }
-
     @Suppress("JavaDefaultMethodsNotOverriddenByDelegation")
     private inner class GpioPortDelegate(
         private val delegate: GpioPort
@@ -374,6 +314,25 @@ class HardwareAllocationDeviceFactory(
             i2cConfigLineFactory.createLine(this.config as I2CConfig)
                 .also(usedHardware::remove)
             delegate.close()
+        }
+    }
+
+    companion object {
+
+        private fun HardwareAllocationIndex.Line.dumpString(nameLength: Int = name.length): String {
+            val pinMask = GpioPinMask.fromMask(allocation.mask and 0xFFFFFFFFL)
+            return "> ${pinMask.maskString} " +
+                    "- ${name.padEnd(nameLength + 1, ' ')}" +
+                    ": ${pinMask.offsets().joinToString(", ") { "%02d".format(it) }}"
+        }
+
+        private fun HardwareAllocationIndex.dump(consumer: (String) -> Unit) {
+            val maxNameLength = this.map { it.name.length }
+                .fold(0) { acc, v -> max(acc, v) }
+
+            forEach { line ->
+                consumer(line.dumpString(maxNameLength))
+            }
         }
     }
 }
