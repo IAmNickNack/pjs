@@ -1,7 +1,7 @@
 package io.github.iamnicknack.pjs.http.client
 
 /**
- * Configuration required by an [HttpDeviceRegistry]
+ * Configuration required by an [HttpDeviceFactory]
  * @param proxyHost the remote host
  * @param proxyPort the remote port
  * @param mode whether to manage the device lifecycle with [Mode.DEFAULT] or delegate to another instance
