@@ -2,6 +2,6 @@
  * PJs device framework
  */
 @NullMarked
-package io.github.iamnicknack.pjs.device.pwm;
+package io.github.iamnicknack.pjs.ffm.device;
 
 import org.jspecify.annotations.NullMarked;
