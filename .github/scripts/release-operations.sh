@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 
-export BUILD_VERSION=$(./gradlew printVersion -q | grep '^version:' | awk '{print $2}')
+export BUILD_VERSION=$(./gradlew --no-configuration-cache printVersion -q | grep '^version:' | awk '{print $2}')
 export GRPC_DIST_ZIP=$(find . -name "pjs-grpc-server-${BUILD_VERSION}.zip")
 export HTTP_DIST_ZIP=$(find . -name "pjs-http-server-${BUILD_VERSION}.zip")
+
+if [[ "${BUILD_VERSION}" == "" ]]; then
+  echo "ERROR: Failed to determine build version" >&2
+  exit 1
+fi
 
 # `true` if BUILD_VERSION ends with `SNAPSHOT`
 is_snapshot() {
@@ -74,7 +79,7 @@ upload_github_packages() {
 do_release() {
   if can_release; then
     create_github_release && \
-      ./gradlew publishToMavenCentral -Pversion=${BUILD_VERSION} --console plain && \
+      ./gradlew --no-configuration-cache publishToMavenCentral -Pversion=${BUILD_VERSION} --console plain && \
       upload_github_packages
   fi
 }
