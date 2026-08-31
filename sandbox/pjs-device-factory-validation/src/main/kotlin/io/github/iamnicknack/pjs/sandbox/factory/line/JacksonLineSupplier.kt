@@ -15,6 +15,7 @@ import tools.jackson.dataformat.yaml.YAMLMapper
 import tools.jackson.module.kotlin.kotlinModule
 import tools.jackson.module.kotlin.readValue
 import java.io.FileNotFoundException
+import java.io.Reader
 import java.io.Writer
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -71,6 +72,18 @@ class JacksonLineSupplier(
         @JvmStatic
         fun dump(lineSupplier: LineSupplier, writer: Writer = System.out.writer()) {
             YAML_MAPPER.writeValue(writer, lineSupplier.lines())
+        }
+
+        /**
+         * Create a [LineSupplier] from the YAML provided by [reader].
+         * @param reader the reader to read the YAML from
+         * @return a [LineSupplier] instance
+         */
+        @JvmStatic
+        fun from(reader: Reader): LineSupplier {
+            YAML_MAPPER.readValue<Set<HardwareAllocationIndex.Line>>(reader).let { lines ->
+                return LineSupplier { lines }
+            }
         }
     }
 }
