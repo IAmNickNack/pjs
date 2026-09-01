@@ -4,7 +4,6 @@ import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
 import io.github.iamnicknack.pjs.device.i2c.I2CConfig;
 import io.github.iamnicknack.pjs.mock.MockDeviceFactory;
-import io.github.iamnicknack.pjs.mock.MockDeviceRegistry;
 import io.github.iamnicknack.pjs.mock.MockI2CFactory;
 import io.github.iamnicknack.pjs.model.device.GenericDeviceFactory;
 import org.junit.jupiter.api.Test;
