@@ -100,7 +100,7 @@ The above code is functionally the same as:
 var genericDeviceFactory = new MockDeviceFactory();
 ```
 
-### Factory Decoration 
+## Factory Decoration 
 
 Additional functionality can be added to the factory during construction. 
 
@@ -198,3 +198,87 @@ the registry is `AutoCloseable` and can be relied upon to close all dangling dev
 The user can still explicitly close a device to reclaim resource whenever necessary. However, they also have the 
 option of deferring this as appropriate and close all devices at once by closing the registry.
 
+### Obtaining a registry
+
+Internally, the `DeviceRegistry` is implemented by `TrackingDeviceFactory` according to the decorator pattern described 
+above. However, as a significant feature of the API, `GenericDeviceFactory::asDeviceRegistry()` provides explicit
+registry construction.
+ 
+```kotlin
+// kotlin 
+
+val registry: DeviceRegistry = GenericDeviceFactory.builder()
+    .factory(::MockDeviceFactory)
+    .decorator(::LoggingDeviceFactory)
+    .build()
+    .asDeviceRegistry()             // <== Obtain a DeviceRegistry from the factory
+```
+
+### Accessing the registry
+
+Devices can be created via the registry in exactly the same way as a factory:
+
+```kotlin
+// kotlin
+
+val port1: GpioPort = registry.create(GpioPortConfig.builder()
+    .id("port1")
+    .pin(2, 3)
+    .build()
+)
+```
+```
+INFO  [main      ] [i.g.i.pjs.impl.TrackingDeviceFactory ] Created LoggingGpioPort device with id: port1
+```
+
+However, it's now also possible to create a device and to fetch a reference to it later:
+
+```kotlin
+// kotlin
+
+registry.create(GpioPortConfig.builder()
+    .id("port2")
+    .pin(4)
+    .build()
+)
+
+val port2: GpioPort = registry.device("port2", GpioPort::class.java)
+```
+```
+INFO  [main      ] [i.g.i.pjs.impl.TrackingDeviceFactory ] Created LoggingGpioPort device with id: port2
+```
+
+### Closing the registry
+
+Exactly the same as with a plain `GenericDeviceFactory`, devices can be explicitly closed to free resources:
+
+```kotlin
+// kotlin
+
+port2.close()
+
+if (!registry.contains("port2")) {
+    logger.info("port2 has been removed from the registry")
+}
+```
+```
+INFO  [main      ] [device.GpioPort.port2                ] Closing GPIO port: port2
+INFO  [main      ] [example-logger                       ] port2 has been removed from the registry
+```
+
+However, when using the `DeviceRegistry`, dangling devices not closed by the user will be closed when the registry 
+is closed. This allows the user to defer all lifecycle management to the registry, if desired
+
+```kotlin
+// kotlin 
+
+logger.info("Closing the registry ...")
+registry.close()
+logger.info("... done")
+```
+```
+INFO  [main      ] [example-logger                       ] Closing the registry ...
+INFO  [main      ] [i.g.i.pjs.impl.TrackingDeviceFactory ] Closing device: port1, jdk.proxy6.$Proxy18
+INFO  [main      ] [device.GpioPort.port1                ] Closing GPIO port: port1
+INFO  [main      ] [example-logger                       ] ... done
+```
