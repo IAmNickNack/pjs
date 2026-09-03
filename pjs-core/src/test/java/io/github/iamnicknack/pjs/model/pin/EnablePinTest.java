@@ -2,9 +2,10 @@ package io.github.iamnicknack.pjs.model.pin;
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
-import io.github.iamnicknack.pjs.logging.LoggingDeviceRegistry;
-import io.github.iamnicknack.pjs.mock.MockDeviceRegistry;
+import io.github.iamnicknack.pjs.logging.LoggingDeviceFactory;
+import io.github.iamnicknack.pjs.mock.MockDeviceFactory;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
+import io.github.iamnicknack.pjs.model.device.GenericDeviceFactory;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
@@ -15,7 +16,12 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 class EnablePinTest {
 
-    private final DeviceRegistry registry = new LoggingDeviceRegistry(new MockDeviceRegistry());
+    private final DeviceRegistry registry = GenericDeviceFactory.builder()
+            .factory(MockDeviceFactory::new)
+            .decorator(LoggingDeviceFactory::new)
+            .build()
+            .asDeviceRegistry();
+
     private final Pin pin = registry.create(
                     GpioPortConfig.builder()
                             .id("pin")
@@ -34,7 +40,7 @@ class EnablePinTest {
             pin.write(!expectation.activeState);
             assertThat(expectation.enablePin.read()).isEqualTo(!expectation.activeState);
             expectation.enablePin.enable();
-            assertThat(expectation.enablePin.read()).isEqualTo(expectation.activeState);;
+            assertThat(expectation.enablePin.read()).isEqualTo(expectation.activeState);
             expectation.enablePin.disable();
             assertThat(expectation.enablePin.read()).isEqualTo(!expectation.activeState);
         }));
