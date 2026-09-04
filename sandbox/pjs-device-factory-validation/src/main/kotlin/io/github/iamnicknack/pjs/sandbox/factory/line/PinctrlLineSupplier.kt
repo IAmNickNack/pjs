@@ -3,6 +3,7 @@ package io.github.iamnicknack.pjs.sandbox.factory.line
 import io.github.iamnicknack.pjs.sandbox.factory.hardware.HardwareAllocationIndex
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.io.Reader
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
@@ -58,6 +59,15 @@ class PinctrlLineSupplier : LineSupplier {
                 ?: throw FileNotFoundException(path)
 
             return { lines }
+        }
+
+        /**
+         * Create a [LineSupplier] from `pinctrl` output stored in the specified [Reader]
+         * @return a [LineSupplier] from the contents of the [Reader]
+         */
+        @JvmStatic
+        fun from(reader: Reader): LineSupplier {
+            return { PinctrlParser.readLines(reader) }
         }
 
         /**

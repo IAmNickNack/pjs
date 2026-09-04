@@ -15,6 +15,7 @@ sealed class HardwareAllocationException(message: String) : RuntimeException(mes
     ) : HardwareAllocationException(
         "Pins not available: ${requested.name}, unavailable: ${unavailable.joinToString(", ")}"
     )
+
     /**
      * Exception thrown when attempting to allocate hardware that is already in use.
      *
@@ -25,10 +26,11 @@ sealed class HardwareAllocationException(message: String) : RuntimeException(mes
         val requested: HardwareAllocationIndex.Line,
         conflicts: Iterable<HardwareAllocationIndex.Line>
     ) : HardwareAllocationException(
-        "Pins in use: ${requested.name}, conflicts: ${conflicts.joinToString(", ") { it.name }}")
+        "Request for `${requested.name}` conflicts with ${conflicts.joinToString(", ") { "`${it.name}`" }}")
     {
         val conflicts: List<HardwareAllocationIndex.Line> = conflicts
             .map { HardwareAllocationIndex.Line(it.lineType, it.name, it.allocation and requested.allocation) }
+            .filter { it.allocation != HardwareAllocations.EMPTY }
     }
 
     /**

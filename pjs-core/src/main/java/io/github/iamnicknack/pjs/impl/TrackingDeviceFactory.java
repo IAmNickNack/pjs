@@ -44,8 +44,9 @@ public class TrackingDeviceFactory implements DeviceRegistry {
     @Override
     public void close() {
         new ArrayList<>(this.devices.values()).forEach(device -> {
+            var instance = (device instanceof TrackingProxy proxy) ? proxy.getDelegate() : device;
             try {
-                logger.atInfo().log("Closing device: {}, {}", device.getConfig().getId(), device.getClass().getName());
+                logger.atInfo().log("Closing device: {}, {}", device.getConfig().getId(), instance.getClass().getSimpleName());
                 device.close();
             } catch (Exception e) {
                 logger.atError().log("Failed to close device: {}", device, e);
@@ -106,7 +107,7 @@ public class TrackingDeviceFactory implements DeviceRegistry {
         };
 
         var interfaces = Stream.concat(
-                Stream.of(type),
+                Stream.of(type, TrackingProxy.class),
                 Arrays.stream(instance.getClass().getInterfaces())
         ).distinct().toArray(Class<?>[]::new);
 
@@ -124,7 +125,8 @@ public class TrackingDeviceFactory implements DeviceRegistry {
      */
     private class CloseableInvocationHandler<T extends Device<?>> implements InvocationHandler {
 
-        private static final Method DEVICE_CLOSE_METHOD = initCloseMethod();
+        private static final Method DEVICE_CLOSE_METHOD = initMethod(Device.class, "close");
+        private static final Method TRACKING_PROXY_GET_DELEGATE_METHOD = initMethod(TrackingProxy.class, "getDelegate");
 
         private final T instance;
 
@@ -139,14 +141,14 @@ public class TrackingDeviceFactory implements DeviceRegistry {
                 // remove the device from tracking
                 var device = TrackingDeviceFactory.this.devices.remove(instance.getConfig().getId());
                 if (device != null) {
-                    try {
-                        instance.close();
-                    } catch (Exception e) {
-                        logger.atError().log("Failed to close device: {}", device, e);
-                    }
+                    instance.close();
                 }
                 return null;
+            } else if (TRACKING_PROXY_GET_DELEGATE_METHOD.equals(method)) {
+                // return the delegate
+                return instance;
             } else {
+                // call the method on the delegate
                 try {
                     return method.invoke(instance, args);
                 } catch (InvocationTargetException e) {
@@ -155,12 +157,16 @@ public class TrackingDeviceFactory implements DeviceRegistry {
             }
         }
 
-        private static Method initCloseMethod() {
+        private static Method initMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
             try {
-                return Device.class.getMethod("close");
+                return clazz.getMethod(methodName, parameterTypes);
             } catch (NoSuchMethodException e) {
                 throw new ExceptionInInitializerError(e);
             }
         }
+    }
+
+    public interface TrackingProxy {
+        Object getDelegate();
     }
 }

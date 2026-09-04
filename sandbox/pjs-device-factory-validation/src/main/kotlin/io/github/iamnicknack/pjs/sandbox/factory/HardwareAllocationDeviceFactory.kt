@@ -33,7 +33,7 @@ import kotlin.math.max
 class HardwareAllocationDeviceFactory(
     private val delegate: GenericDeviceFactory,
     private val availableHardware: HardwareAllocationIndex,
-    private val usedHardware: HardwareAllocationIndex.Mutable
+    usedHardware: HardwareAllocationIndex.Mutable
 ) : GenericDeviceFactory {
 
     constructor(
@@ -55,6 +55,15 @@ class HardwareAllocationDeviceFactory(
     )
 
     private val logger: Logger = LoggerFactory.getLogger(HardwareAllocationDeviceFactory::class.java)
+
+    /**
+     * Wrapper for [usedHardware] that logs modifications.
+     */
+    private val usedHardware: HardwareAllocationIndex.Mutable = if (logger.isDebugEnabled) {
+        LoggingMutableIndex(usedHardware)
+    } else {
+        usedHardware
+    }
 
     init {
         logger.info("Initializing HardwareAllocationDeviceFactory")
@@ -89,25 +98,21 @@ class HardwareAllocationDeviceFactory(
         val device = when(config) {
             is GpioPortConfig -> gpioConfigLineFactory.validateLine(config)
                 .let { line ->
-                    logger.atDebug().log { line.dumpString() }
                     GpioPortDelegate(delegate.create(config))
                         .also { usedHardware.add(line) }
                 }
             is I2CConfig -> i2cConfigLineFactory.validateLine(config)
                 .let { line ->
-                    logger.atDebug().log { line.dumpString() }
                     I2CDelegate(delegate.create(config))
                         .also { usedHardware.add(line) }
                 }
             is SpiConfig -> spiConfigLineFactory.validateLine(config)
                 .let { line ->
-                    logger.atDebug().log { line.dumpString() }
                     SpiDelegate(delegate.create(config))
                         .also { usedHardware.add(line) }
                 }
             is PwmConfig -> pwmConfigLineFactory.validateLine(config)
                 .let { line ->
-                    logger.atDebug().log { line.dumpString() }
                     PwmDelegate(delegate.create(config))
                         .also { usedHardware.add(line) }
                 }
@@ -271,6 +276,22 @@ class HardwareAllocationDeviceFactory(
             }
 
             return line
+        }
+    }
+
+    @Suppress("JavaDefaultMethodsNotOverriddenByDelegation")
+    private inner class LoggingMutableIndex(
+        private val usedHardware: HardwareAllocationIndex.Mutable
+    ) : HardwareAllocationIndex.Mutable by usedHardware {
+        override fun add(line: HardwareAllocationIndex.Line): HardwareAllocationIndex.Mutable {
+            logger.atDebug().log("Reserving line: {}", line)
+            logger.atDebug().log { line.dumpString() }
+            return usedHardware.add(line)
+        }
+
+        override fun remove(line: HardwareAllocationIndex.Line): HardwareAllocationIndex.Mutable {
+            logger.atDebug().log("Releasing line: {}", line)
+            return usedHardware.remove(line)
         }
     }
 
