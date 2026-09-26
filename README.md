@@ -39,6 +39,7 @@ Applications would typically use these abstractions to interact with hardware di
 
 * [PORTS.md](docs/PORTS.md) - An overview and example usage of the PJs `Port<>` and `Pin` abstractions.
 * [SERIAL.md](docs/SERIAL.md) - An overview and example usage of the PJs `SerialPort`, `SPI` and `I2C` abstractions.
+* [LIFECYCLE.md](docs/LIFECYCLE.md) - An overview of the device lifecycle and ownership as implemented by PJs.
 
 ## Device Adapters
 
