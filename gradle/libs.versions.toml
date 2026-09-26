@@ -28,7 +28,8 @@ dokka = "2.2.0"
 pi4j = "4.0.2"
 pi4j-grpc = "0.1.0"
 
-ktor = "3.6.0"
+# holding at 3.5.2 while investigating SSE issue with 3.6.0
+ktor = "3.5.2"
 koin = "4.2.2"
 
 [libraries]
