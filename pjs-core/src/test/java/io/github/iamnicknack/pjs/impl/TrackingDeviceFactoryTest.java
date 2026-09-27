@@ -21,6 +21,7 @@ class TrackingDeviceFactoryTest {
         var mockDevice = (MockDevice<GpioPort>) proxy.getDelegate();
 
         assertFalse(mockDevice.isClosed(), "Device should not initially be closed");
+        assertTrue(factory.contains("test-port"), "Factory should contain the device");
 
         factory.close();
 
