@@ -11,7 +11,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MockGpioPortImpl implements MockGpioPort {
+public class MockGpioPortImpl extends MockDevice.Default<GpioPort> implements MockGpioPort {
 
     private final Logger logger = LoggerFactory.getLogger(MockGpioPortImpl.class);
 

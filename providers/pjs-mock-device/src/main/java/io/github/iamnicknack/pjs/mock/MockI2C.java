@@ -4,7 +4,7 @@ import io.github.iamnicknack.pjs.device.i2c.I2C;
 
 import java.nio.ByteBuffer;
 
-public interface MockI2C extends I2C {
+public interface MockI2C extends I2C, MockDevice<I2C> {
     /**
      * Access the device buffer
      * @return the device buffer

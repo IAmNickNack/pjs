@@ -4,7 +4,7 @@ import io.github.iamnicknack.pjs.device.spi.Spi;
 
 import java.nio.ByteBuffer;
 
-public interface MockSpi extends Spi {
+public interface MockSpi extends Spi, MockDevice<Spi> {
     /**
      * Moves the contents of the output buffer into the input buffer, allowing previously
      * written bytes to be read.

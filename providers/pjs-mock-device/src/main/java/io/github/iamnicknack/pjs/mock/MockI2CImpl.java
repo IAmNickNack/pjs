@@ -7,7 +7,7 @@ import io.github.iamnicknack.pjs.model.device.DeviceConfig;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
-public class MockI2CImpl implements MockI2C {
+public class MockI2CImpl extends MockDevice.Default<I2C> implements MockI2C {
 
     private final I2CConfig config;
     private final Map<Integer, ByteBuffer> registers = new java.util.HashMap<>();
