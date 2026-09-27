@@ -16,7 +16,7 @@ public class LoggingUtils {
             sb.append(String.format("%02X ", bytes[i]));
         }
         if (bytes.length > (offset + length)) {
-            sb.append("...");
+            sb.append("... (").append(bytes.length).append(")");
         }
         return sb.toString().trim() + ']';
     }
