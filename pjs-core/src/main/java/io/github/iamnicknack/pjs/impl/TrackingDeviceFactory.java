@@ -1,9 +1,5 @@
 package io.github.iamnicknack.pjs.impl;
 
-import io.github.iamnicknack.pjs.device.gpio.GpioPort;
-import io.github.iamnicknack.pjs.device.i2c.I2C;
-import io.github.iamnicknack.pjs.device.pwm.Pwm;
-import io.github.iamnicknack.pjs.device.spi.Spi;
 import io.github.iamnicknack.pjs.model.device.Device;
 import io.github.iamnicknack.pjs.model.device.DeviceConfig;
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry;
@@ -17,10 +13,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public class TrackingDeviceFactory implements DeviceRegistry {
@@ -46,7 +43,7 @@ public class TrackingDeviceFactory implements DeviceRegistry {
         new ArrayList<>(this.devices.values()).forEach(device -> {
             var instance = (device instanceof TrackingProxy proxy) ? proxy.getDelegate() : device;
             try {
-                logger.atInfo().log("Closing device: {}, {}", device.getConfig().getId(), instance.getClass().getSimpleName());
+                logger.atDebug().log("Closing dangling device: {}, {}", device.getConfig().getId(), instance.getClass().getSimpleName());
                 device.close();
             } catch (Exception e) {
                 logger.atError().log("Failed to close device: {}", device, e);
@@ -97,18 +94,9 @@ public class TrackingDeviceFactory implements DeviceRegistry {
      */
     @SuppressWarnings("unchecked")
     private <T extends Device<?>> T interceptClose(T instance) {
-        // the interface to be represented by the proxy
-        var type = switch (instance) {
-            case GpioPort _ -> GpioPort.class;
-            case Spi _ -> Spi.class;
-            case I2C _ -> I2C.class;
-            case Pwm _ -> Pwm.class;
-            default -> throw new IllegalArgumentException("Unsupported type: " + instance.getClass().getName());
-        };
-
         var interfaces = Stream.concat(
-                Stream.of(type, TrackingProxy.class),
-                Arrays.stream(instance.getClass().getInterfaces())
+                Stream.of(TrackingProxy.class),
+                ReflectionUtils.interfacesFor(instance.getClass())
         ).distinct().toArray(Class<?>[]::new);
 
         // a new proxy which implements the device interface and other interfaces implemented by `instance`
@@ -126,6 +114,7 @@ public class TrackingDeviceFactory implements DeviceRegistry {
     private class CloseableInvocationHandler<T extends Device<?>> implements InvocationHandler {
 
         private static final Method DEVICE_CLOSE_METHOD = initMethod(Device.class, "close");
+        private static final Method AUTOCLOSEABLE_CLOSE_METHOD = initMethod(AutoCloseable.class, "close");
         private static final Method TRACKING_PROXY_GET_DELEGATE_METHOD = initMethod(TrackingProxy.class, "getDelegate");
 
         private final T instance;
@@ -137,7 +126,7 @@ public class TrackingDeviceFactory implements DeviceRegistry {
         @Override
         @Nullable
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            if (DEVICE_CLOSE_METHOD.equals(method)) {
+            if (DEVICE_CLOSE_METHOD.equals(method) || AUTOCLOSEABLE_CLOSE_METHOD.equals(method)) {
                 // remove the device from tracking
                 var device = TrackingDeviceFactory.this.devices.remove(instance.getConfig().getId());
                 if (device != null) {
@@ -168,5 +157,28 @@ public class TrackingDeviceFactory implements DeviceRegistry {
 
     public interface TrackingProxy {
         Object getDelegate();
+    }
+
+    private static class ReflectionUtils {
+        public static Stream<Class<?>> superTypesFor(Class<?> type) {
+            return Stream.concat(
+                    Stream.of(type),
+                    (type.getSuperclass() != null) ? superTypesFor(type.getSuperclass()) : Stream.empty()
+            );
+        }
+
+        public static Stream<Class<?>> interfacesFor(Class<?> type) {
+            var set = new HashSet<Class<?>>();
+            superTypesFor(type).forEach(cls -> collectInterfaces(cls, set));
+            return set.stream().distinct();
+        }
+
+        private static void collectInterfaces(Class<?> cls, Set<Class<?>> out) {
+            for (Class<?> iface : cls.getInterfaces()) {
+                if (out.add(iface)) {
+                    collectInterfaces(iface, out);
+                }
+            }
+        }
     }
 }

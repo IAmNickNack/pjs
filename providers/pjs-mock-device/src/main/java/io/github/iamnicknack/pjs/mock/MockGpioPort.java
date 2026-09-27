@@ -2,7 +2,7 @@ package io.github.iamnicknack.pjs.mock;
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 
-public interface MockGpioPort extends GpioPort {
+public interface MockGpioPort extends GpioPort, MockDevice<GpioPort> {
     /**
      * Update the value which backs the mock
      * @param value the new value

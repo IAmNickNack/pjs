@@ -6,7 +6,7 @@ import io.github.iamnicknack.pjs.model.device.DeviceConfig;
 
 import java.nio.ByteBuffer;
 
-public class MockSpiImpl implements MockSpi {
+public class MockSpiImpl extends MockDevice.Default<Spi> implements MockSpi {
 
     private final SpiConfig config;
 
