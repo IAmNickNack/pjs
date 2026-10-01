@@ -3,6 +3,10 @@ import java.nio.file.Paths
 import kotlin.io.path.exists
 import kotlin.io.path.name
 
+pluginManagement {
+    apply(from = "build-logic/src/main/kotlin/buildlogic/repositories.settings.gradle.kts")
+}
+
 rootProject.name = "pjs"
 
 includeBuild("build-logic")
