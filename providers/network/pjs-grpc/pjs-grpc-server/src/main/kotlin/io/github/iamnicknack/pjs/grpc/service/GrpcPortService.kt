@@ -5,13 +5,13 @@ import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.grpc.asGpioPortMode
 import io.github.iamnicknack.pjs.grpc.deviceOrThrow
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.Empty
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.EventMode
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortModePayload
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortServiceGrpcKt
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.RemoveListenerRequest
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.StateChangeEvent
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.DeviceRequest
+import io.github.iamnicknack.pjs.grpc.gen.v1.types.Empty
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.IntegerRequest
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.IntegerResponse
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry

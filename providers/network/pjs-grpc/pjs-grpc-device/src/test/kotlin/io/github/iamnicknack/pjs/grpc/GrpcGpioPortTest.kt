@@ -1,7 +1,9 @@
 package io.github.iamnicknack.pjs.grpc
 
 import assertk.assertThat
+import assertk.assertions.endsWith
 import assertk.assertions.isEqualTo
+import assertk.assertions.isTrue
 import io.github.iamnicknack.pjs.device.gpio.GpioEventMode
 import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
@@ -17,7 +19,6 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import kotlin.test.assertEquals
 
 @ExtendWith(PjsExtension::class)
 class GrpcGpioPortTest {
@@ -84,7 +85,7 @@ class GrpcGpioPortTest {
         logger.info("Setting value")
         remoteDevice.mockValue(42)
 
-        latch.await(1, TimeUnit.SECONDS)
+        assertThat(latch.await(1, TimeUnit.SECONDS)).isTrue()
     }
 
     @Test
@@ -111,7 +112,7 @@ class GrpcGpioPortTest {
 
             future.get(5, TimeUnit.SECONDS)
 
-            latch.await(10, TimeUnit.SECONDS)
+            assertThat(latch.await(10, TimeUnit.SECONDS)).isTrue()
         } finally {
             executor.shutdownNow()
         }
@@ -126,6 +127,6 @@ class GrpcGpioPortTest {
         val remoteDevice = remoteRegistry.device<GpioPort>(errorPortConfig.id) as MockGpioPort
         remoteDevice.setFailWith(RuntimeException("test exception"))
         val result = runCatching { device.read() }
-        assertEquals(true, result.exceptionOrNull()?.message?.endsWith("test exception"))
+        assertThat(result.exceptionOrNull()?.message ?: "").endsWith("test exception")
     }
 }

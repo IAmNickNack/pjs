@@ -1,8 +1,8 @@
 package io.github.iamnicknack.pjs.grpc.service
 
 import io.github.iamnicknack.pjs.grpc.gen.v1.config.DeviceConfigServiceGrpcKt
-import io.github.iamnicknack.pjs.grpc.gen.v1.config.Empty
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.DeviceRequest
+import io.github.iamnicknack.pjs.grpc.gen.v1.types.Empty
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import io.grpc.Status
 import org.slf4j.Logger
