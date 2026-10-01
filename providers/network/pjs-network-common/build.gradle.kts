@@ -1,5 +1,4 @@
 plugins {
-    id("buildlogic.repositories")
     id("buildlogic.kotlin-core")
     id("buildlogic.test.test-kotlin")
     id("buildlogic.java-library")

@@ -5,11 +5,6 @@ plugins {
     `version-catalog`
 }
 
-repositories {
-    mavenCentral()
-    gradlePluginPortal()
-}
-
 dependencies {
     api(files(libs.javaClass.protectionDomain.codeSource.location.toURI().toPath()))
     implementation(libs.dokka)

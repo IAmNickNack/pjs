@@ -2,14 +2,6 @@
 
 import com.github.benmanes.gradle.versions.VersionsPlugin
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import kotlin.time.Duration
-
-/**
- * Basic dependency update check to be added to the root project.
- */
-plugins {
-    id("buildlogic.repositories")
-}
 
 allprojects {
     apply<VersionsPlugin>()
