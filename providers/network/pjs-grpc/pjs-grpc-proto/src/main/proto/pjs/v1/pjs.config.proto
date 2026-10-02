@@ -12,7 +12,7 @@ import "pjs/v1/pjs.types.proto";
 ///////////////////////////////////////////////////////////////////////////////////////
 
 service DeviceConfigService {
-  rpc removeDevice(types.DeviceRequest) returns (Empty) {}
+  rpc removeDevice(types.DeviceRequest) returns (types.Empty) {}
 }
 
 message DeviceListResponse {
@@ -27,8 +27,6 @@ message DeviceConfigPayload {
   DeviceType deviceType = 1;
   map<string, string> config = 2;
 }
-
-message Empty {}
 
 enum DeviceType {
   PORT = 0;

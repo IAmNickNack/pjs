@@ -3,7 +3,7 @@ package io.github.iamnicknack.pjs.grpc
 import io.github.iamnicknack.pjs.grpc.service.*
 import io.github.iamnicknack.pjs.mock.MockDeviceFactory
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
-import io.grpc.Channel
+import io.grpc.ManagedChannel
 import io.grpc.Server
 import io.grpc.inprocess.InProcessChannelBuilder
 import io.grpc.inprocess.InProcessServerBuilder
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.extension.ParameterResolver
 
 class PjsExtension : BeforeEachCallback, AfterEachCallback, ParameterResolver {
 
-    private lateinit var channel: Channel
+    private lateinit var channel: ManagedChannel
     private lateinit var localRegistry: DeviceRegistry
     private lateinit var remoteRegistry: DeviceRegistry
     private lateinit var server: Server
@@ -41,6 +41,7 @@ class PjsExtension : BeforeEachCallback, AfterEachCallback, ParameterResolver {
     }
 
     override fun afterEach(context: ExtensionContext) {
+        channel.shutdownNow()
         server.shutdownNow()
     }
 
