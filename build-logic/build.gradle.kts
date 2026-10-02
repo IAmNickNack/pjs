@@ -20,6 +20,7 @@ dependencies {
         }
     }
     implementation("dev.detekt:detekt-gradle-plugin:2.0.0-alpha.6")
+    implementation("org.jetbrains.kotlinx:kotlinx-rpc-gradle-plugin:0.11.0-grpc-190")
 }
 
 kotlin {
