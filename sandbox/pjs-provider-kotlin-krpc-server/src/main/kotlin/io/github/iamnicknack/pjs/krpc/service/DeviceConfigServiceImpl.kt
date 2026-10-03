@@ -1,4 +1,4 @@
-package io.github.iamnicknack.pjs.krpc
+package io.github.iamnicknack.pjs.krpc.service
 
 import io.github.iamnicknack.pjs.grpc.gen.v1.config.DeviceConfigService
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.DeviceRequest
@@ -20,16 +20,7 @@ class DeviceConfigServiceImpl(
             .withDescription("Device with id ${message.deviceId} does not exist")
             .asRuntimeException()
 
-        return runCatching { device.close() }
-            .fold(
-                onSuccess = { Empty {} },
-                onFailure = { e ->
-                    logger.error("Failed to close device with id ${message.deviceId}", e)
-                    throw Status.INTERNAL
-                        .withDescription("Failed to close device with id ${message.deviceId}")
-                        .withCause(e)
-                        .asRuntimeException()
-                }
-            )
+        device.close()
+        return Empty {}
     }
 }

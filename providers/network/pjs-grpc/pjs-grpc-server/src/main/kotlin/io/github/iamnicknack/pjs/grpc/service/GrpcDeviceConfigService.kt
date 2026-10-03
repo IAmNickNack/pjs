@@ -25,6 +25,7 @@ class GrpcDeviceConfigService(
             logger.error("Failed to remove device: {}", request.deviceId, e)
             throw Status.INTERNAL
                 .withDescription("Failed to remove device with id ${request.deviceId}")
+                .withCause(e)
                 .asRuntimeException()
         }
 

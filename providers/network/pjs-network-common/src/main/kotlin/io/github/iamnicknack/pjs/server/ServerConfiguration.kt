@@ -3,6 +3,7 @@ package io.github.iamnicknack.pjs.server
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.Option
 import org.apache.commons.cli.Options
+import org.apache.commons.cli.help.HelpFormatter
 
 data class ServerConfiguration(
     val port: Int?,
@@ -30,6 +31,11 @@ data class ServerConfiguration(
     }
 
     companion object {
+
+        fun printHelp() {
+            HelpFormatter.builder().setShowSince(false).get()
+                .also { it.printOptions(options) }
+        }
 
         val options: Options = Options()
             .addOption(Option.builder()

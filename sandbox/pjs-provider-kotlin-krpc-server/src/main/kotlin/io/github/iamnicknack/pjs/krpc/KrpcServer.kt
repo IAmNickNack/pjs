@@ -1,9 +1,12 @@
 package io.github.iamnicknack.pjs.krpc
 
-import io.github.iamnicknack.pjs.grpc.gen.v1.config.DeviceConfigService
+import io.github.iamnicknack.pjs.server.ServerConfiguration
 import kotlinx.coroutines.runBlocking
 import kotlinx.rpc.grpc.server.GrpcServer
-import kotlinx.rpc.registerService
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.dsl.module
+import org.koin.mp.KoinPlatform
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -12,14 +15,22 @@ object KrpcServer {
 }
 
 fun main(args: Array<String>): Unit = runBlocking {
-    val server = GrpcServer(9090) {
-        services {
-            registerService<DeviceConfigService> { DeviceConfigServiceImpl() }
-        }
+    val serverConfiguration: ServerConfiguration = ServerConfiguration.createFromCommandLine(args)
+    if (serverConfiguration.help) {
+        ServerConfiguration.printHelp()
+        return@runBlocking
     }
 
-    server.start()
-    KrpcServer.logger.info("KRPC server started on port 9090")
-    server.awaitTermination()
+    startKoin {
+        modules(
+            module { single<ServerConfiguration> { serverConfiguration } },
+            serverModule
+        )
+    }
+    with (KoinPlatform.getKoin().get<GrpcServer>()) {
+        start()
+        KrpcServer.logger.info("KRPC server started on port $port")
+        awaitTermination()
+    }
+    stopKoin()
 }
-

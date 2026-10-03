@@ -1,4 +1,4 @@
-package io.github.iamnicknack.pjs.krpc
+package io.github.iamnicknack.pjs.krpc.service
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
@@ -14,11 +14,13 @@ import io.github.iamnicknack.pjs.grpc.gen.v1.types.Empty
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.IntegerRequest
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.IntegerResponse
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.invoke
+import io.github.iamnicknack.pjs.krpc.asGpioPortMode
+import io.github.iamnicknack.pjs.krpc.deviceOrThrow
+import io.github.iamnicknack.pjs.krpc.withDevice
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import io.github.iamnicknack.pjs.model.event.GpioChangeEventType
 import io.github.iamnicknack.pjs.model.event.GpioEventListener
 import io.grpc.Status
-import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -33,7 +35,7 @@ class PortServiceImpl(
 ) : PortService {
 
     private val logger: Logger = LoggerFactory.getLogger(PortServiceImpl::class.java)
-    private val listeners: ConcurrentMap<String, DeviceListener> = ConcurrentHashMap()
+    private val listeners: ConcurrentMap<String, AutoCloseable> = ConcurrentHashMap()
 
     override suspend fun read(message: DeviceRequest): IntegerResponse {
         return deviceRegistry.withDevice<GpioPort, IntegerResponse>(message.deviceId) {
@@ -86,9 +88,14 @@ class PortServiceImpl(
                 trySend(changeEvent)
             }
 
-            listeners[listenerId] = DeviceListener(device, listener, this)
-            device.addListener(listener)
+            listeners[listenerId] = AutoCloseable {
+                this.close()
+                device.removeListener(listener)
+                listeners.remove(listenerId)
+                logger.info("Removed listener for device: {} -> {}", device.config.id, listenerId)
+            }
 
+            device.addListener(listener)
             logger.info("Added listener for device: {} -> {}", message.deviceId, listenerId)
 
             val registerEvent = StateChangeEvent {
@@ -107,26 +114,7 @@ class PortServiceImpl(
     }
 
     override suspend fun removeListener(message: RemoveListenerRequest): Empty {
-        listeners[message.listenerId]
-            ?.also {
-                it.eventProducer.close()
-                it.device.removeListener(it.listener)
-                listeners.remove(message.listenerId)
-
-                logger.info("Removed listener for device: {} -> {}", it.device.config.id, message.listenerId)
-            }
+        listeners[message.listenerId]?.close()
         return Empty {}
     }
-
-    /**
-     * Associated pair of device and event-listener.
-     * @param device the device
-     * @param listener the event listener
-     * @param eventProducer the event producer
-     */
-    private class DeviceListener(
-        val device: GpioPort,
-        val listener: GpioEventListener<GpioPort>,
-        val eventProducer: ProducerScope<StateChangeEvent>
-    )
 }
