@@ -22,6 +22,8 @@ grpc-kotlin = "1.5.0"
 protobuf = "4.36.2"
 protobuf-plugin = "0.10.0"
 
+krpc-grpc = "0.11.0-grpc-190"
+
 publish-vanniktech = "0.37.0"
 dokka = "2.2.0"
 
@@ -75,6 +77,13 @@ protobuf-plugin = {group = "com.google.protobuf", name = "protobuf-gradle-plugin
 
 protoc-gen-grpc-java = { group = "io.grpc", name = "protoc-gen-grpc-java", version.ref = "grpc-core" }
 protoc-gen-grpc-kotlin = { group = "io.grpc", name = "protoc-gen-grpc-kotlin", version.ref = "grpc-kotlin" }
+
+krpc-grpc-bom = { group = "org.jetbrains.kotlinx", name = "kotlinx-rpc-bom", version.ref = "krpc-grpc" }
+krpc-grpc-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-rpc-grpc-core", version.ref = "krpc-grpc" }
+krpc-grpc-protobuf = { group = "org.jetbrains.kotlinx", name = "kotlinx-rpc-protobuf", version.ref = "krpc-grpc" }
+krpc-grpc-protobuf-jvm = { group = "org.jetbrains.kotlinx", name = "kotlinx-rpc-protobuf-jvm", version.ref = "krpc-grpc" }
+krpc-grpc-client = { group = "org.jetbrains.kotlinx", name = "kotlinx-rpc-grpc-client", version.ref = "krpc-grpc" }
+krpc-grpc-server = { group = "org.jetbrains.kotlinx", name = "kotlinx-rpc-grpc-server", version.ref = "krpc-grpc" }
 
 publish-vanniktech = { group = "com.vanniktech.maven.publish", name = "com.vanniktech.maven.publish.gradle.plugin", version.ref = "publish-vanniktech" }
 dokka = { group = "org.jetbrains.dokka-javadoc", name = "org.jetbrains.dokka-javadoc.gradle.plugin", version.ref = "dokka" }

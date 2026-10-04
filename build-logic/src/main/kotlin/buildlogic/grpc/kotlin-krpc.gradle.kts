@@ -8,15 +8,12 @@ plugins {
 }
 
 dependencies {
-    api(platform("org.jetbrains.kotlinx:kotlinx-rpc-bom:0.11.0-grpc-190"))
-    api("org.jetbrains.kotlinx:kotlinx-rpc-grpc-core")
-    api("org.jetbrains.kotlinx:kotlinx-rpc-protobuf")
-    implementation("org.jetbrains.kotlinx:kotlinx-rpc-grpc-client")
-    implementation("org.jetbrains.kotlinx:kotlinx-rpc-grpc-server")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-rpc-protobuf-jvm")
-
     withVersionCatalog {
+        api(libs.krpc.grpc.core)
+        api(libs.krpc.grpc.protobuf)
+        implementation(libs.krpc.grpc.protobuf.jvm)
+        implementation(libs.krpc.grpc.client)
+        implementation(libs.krpc.grpc.server)
         implementation(libs.grpc.netty)
     }
 }
