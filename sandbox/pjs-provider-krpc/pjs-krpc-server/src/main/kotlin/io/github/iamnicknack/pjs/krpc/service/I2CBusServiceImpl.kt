@@ -15,10 +15,10 @@ class I2CBusServiceImpl(
     private val deviceRegistry: DeviceRegistry,
 ) : I2CBusService {
 
-    override suspend fun transfer(request: TransferRequest): TransferResponse {
-        val device = deviceRegistry.deviceOrThrow<I2C>(request.deviceId)
+    override suspend fun transfer(message: TransferRequest): TransferResponse {
+        val device = deviceRegistry.deviceOrThrow<I2C>(message.deviceId)
 
-        val transferMessages = request.message
+        val transferMessages = message.message
             .map {
                 val data = if (it.type == MessageType.READ) {
                     ByteArray(it.data.size)
@@ -38,7 +38,7 @@ class I2CBusServiceImpl(
 
         device.transfer(*transferMessages)
 
-        return request.message
+        return message.message
             .mapIndexed { index, message ->
                 if (message.type == MessageType.READ) {
                     I2CBusMessage.invoke {
@@ -55,6 +55,6 @@ class I2CBusServiceImpl(
                 }
             }
             .toList()
-            .let { TransferResponse { message = it } }
+            .let { TransferResponse { this.message = it } }
     }
 }
