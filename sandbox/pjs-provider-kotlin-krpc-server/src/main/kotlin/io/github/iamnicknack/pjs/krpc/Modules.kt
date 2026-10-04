@@ -2,14 +2,19 @@ package io.github.iamnicknack.pjs.krpc
 
 import io.github.iamnicknack.pjs.ffm.NativeDeviceFactoryLoader
 import io.github.iamnicknack.pjs.grpc.gen.v1.config.DeviceConfigService
+import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.I2CBusConfigService
+import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.I2CBusService
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortConfigService
 import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortService
+import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PwmConfigService
+import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PwmService
+import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiConfigService
+import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiService
+import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiTransferService
 import io.github.iamnicknack.pjs.http.client.HttpDeviceFactoryConfig
 import io.github.iamnicknack.pjs.http.client.HttpDeviceFactoryLoader
 import io.github.iamnicknack.pjs.krpc.ErrorHandlingProxy.withErrorHandling
-import io.github.iamnicknack.pjs.krpc.service.DeviceConfigServiceImpl
-import io.github.iamnicknack.pjs.krpc.service.PortConfigServiceImpl
-import io.github.iamnicknack.pjs.krpc.service.PortServiceImpl
+import io.github.iamnicknack.pjs.krpc.service.*
 import io.github.iamnicknack.pjs.logging.LoggingDeviceFactory
 import io.github.iamnicknack.pjs.mock.MockDeviceFactory
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
@@ -97,6 +102,13 @@ val servicesModule = module {
     single<DeviceConfigService> { DeviceConfigServiceImpl(get()).withErrorHandling() }
     single<PortConfigService> { PortConfigServiceImpl(get()).withErrorHandling() }
     single<PortService> { PortServiceImpl(get()).withErrorHandling() }
+    single<I2CBusConfigService> { I2CBusConfigServiceImpl(get()).withErrorHandling() }
+    single<I2CBusService> { I2CBusServiceImpl(get()).withErrorHandling() }
+    single<PwmConfigService> { PwmConfigServiceImpl(get()).withErrorHandling() }
+    single<PwmService> { PwmServiceImpl(get()).withErrorHandling() }
+    single<SpiConfigService> { SpiConfigServiceImpl(get()).withErrorHandling() }
+    single<SpiService> { SpiServiceImpl(get()).withErrorHandling() }
+    single<SpiTransferService> { SpiTransferServiceImpl(get()).withErrorHandling() }
 }
 
 val serverModule = module {
@@ -109,6 +121,13 @@ val serverModule = module {
                 registerService<DeviceConfigService> { get() }
                 registerService<PortConfigService> { get() }
                 registerService<PortService> { get() }
+                registerService<I2CBusConfigService> { get() }
+                registerService<I2CBusService> { get() }
+                registerService<PwmConfigService> { get() }
+                registerService<PwmService> { get() }
+                registerService<SpiConfigService> { get() }
+                registerService<SpiService> { get() }
+                registerService<SpiTransferService> { get() }
             }
         }
     }
