@@ -9,11 +9,11 @@ import io.github.iamnicknack.pjs.grpc.gen.v1.types.Empty
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.LongRequest
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.LongResponse
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.invoke
-import io.github.iamnicknack.pjs.krpc.asLongResponse
-import io.github.iamnicknack.pjs.krpc.asPolarity
-import io.github.iamnicknack.pjs.krpc.asPolarityResponse
-import io.github.iamnicknack.pjs.krpc.asPwmPolarity
-import io.github.iamnicknack.pjs.krpc.deviceOrThrow
+import io.github.iamnicknack.pjs.krpc.proto.asLongResponse
+import io.github.iamnicknack.pjs.krpc.proto.asPolarity
+import io.github.iamnicknack.pjs.krpc.proto.asPolarityResponse
+import io.github.iamnicknack.pjs.krpc.proto.asPwmPolarity
+import io.github.iamnicknack.pjs.krpc.proto.deviceOrThrow
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 
 class PwmServiceImpl(

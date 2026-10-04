@@ -9,10 +9,10 @@ import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.invoke
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.DeviceRequest
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.Empty
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.invoke
-import io.github.iamnicknack.pjs.krpc.asI2CBusConfig
-import io.github.iamnicknack.pjs.krpc.asI2CBusConfigPayload
-import io.github.iamnicknack.pjs.krpc.cannotContain
-import io.github.iamnicknack.pjs.krpc.withDevice
+import io.github.iamnicknack.pjs.krpc.proto.asI2CBusConfig
+import io.github.iamnicknack.pjs.krpc.proto.asI2CBusConfigPayload
+import io.github.iamnicknack.pjs.krpc.proto.cannotContain
+import io.github.iamnicknack.pjs.krpc.proto.withDevice
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 
 class I2CBusConfigServiceImpl(

@@ -13,8 +13,6 @@ class DeviceConfigServiceImpl(
     private val deviceRegistry: DeviceRegistry
 ) : DeviceConfigService {
 
-    private val logger: Logger = LoggerFactory.getLogger(DeviceConfigServiceImpl::class.java)
-
     override suspend fun removeDevice(message: DeviceRequest): Empty {
         val device = deviceRegistry.find { it.config.id == message.deviceId } ?: throw Status.NOT_FOUND
             .withDescription("Device with id ${message.deviceId} does not exist")

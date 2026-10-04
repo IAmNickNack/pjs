@@ -1,6 +1,6 @@
 @file:Suppress("TooManyFunctions")
 
-package io.github.iamnicknack.pjs.krpc
+package io.github.iamnicknack.pjs.krpc.proto
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.device.pwm.Pwm

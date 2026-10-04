@@ -28,41 +28,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.function.Supplier
 
-val serverModule = module {
-    includes(servicesModule)
-    single<GrpcServer> {
-        val serverConfiguration: ServerConfiguration by inject()
-
-        GrpcServer(serverConfiguration.port ?: 9090) {
-            services {
-                registerService<DeviceConfigService> { get() }
-                registerService<PortConfigService> { get() }
-                registerService<PortService> { get() }
-                registerService<I2CBusConfigService> { get() }
-                registerService<I2CBusService> { get() }
-                registerService<PwmConfigService> { get() }
-                registerService<PwmService> { get() }
-                registerService<SpiConfigService> { get() }
-                registerService<SpiService> { get() }
-                registerService<SpiTransferService> { get() }
-            }
-        }
-    }
-}
-
-val servicesModule = module {
-    includes(registryModule)
-    single<DeviceConfigService> { DeviceConfigServiceImpl(get()).withErrorHandling() }
-    single<PortConfigService> { PortConfigServiceImpl(get()).withErrorHandling() }
-    single<PortService> { PortServiceImpl(get()).withErrorHandling() }
-    single<I2CBusConfigService> { I2CBusConfigServiceImpl(get()).withErrorHandling() }
-    single<I2CBusService> { I2CBusServiceImpl(get()).withErrorHandling() }
-    single<PwmConfigService> { PwmConfigServiceImpl(get()).withErrorHandling() }
-    single<PwmService> { PwmServiceImpl(get()).withErrorHandling() }
-    single<SpiConfigService> { SpiConfigServiceImpl(get()).withErrorHandling() }
-    single<SpiService> { SpiServiceImpl(get()).withErrorHandling() }
-    single<SpiTransferService> { SpiTransferServiceImpl(get()).withErrorHandling() }
-}
 
 val registryModule = module {
     val logger: Logger = LoggerFactory.getLogger("io.github.iamnicknack.pjs.krpc.registry")
@@ -109,14 +74,13 @@ val registryModule = module {
                 )
             }
             ServerConfiguration.Mode.GRPC -> Supplier {
-                error("GRPC device factory is not supported")
-//                logger.info("Using grpc device factory")
-//                GrpcDeviceFactoryLoader().load(
-//                    GrpcDeviceFactoryLoader.Config(
-//                        proxyHost = serverConfiguration.proxyHost ?: "localhost",
-//                        proxyPort = serverConfiguration.proxyPort ?: 9090
-//                    )
-//                )
+                logger.info("Using grpc device factory")
+                KrpcDeviceFactoryLoader().load(
+                    KrpcDeviceFactoryLoader.Config(
+                        proxyHost = serverConfiguration.proxyHost ?: "localhost",
+                        proxyPort = serverConfiguration.proxyPort ?: 9090
+                    )
+                )
             }
             ServerConfiguration.Mode.HTTP -> Supplier {
                 logger.info("Using http device factory")
@@ -127,6 +91,42 @@ val registryModule = module {
                         mode = HttpDeviceFactoryConfig.Mode.DEFAULT
                     )
                 )
+            }
+        }
+    }
+}
+
+val servicesModule = module {
+    includes(registryModule)
+    single<DeviceConfigService> { DeviceConfigServiceImpl(get()).withErrorHandling() }
+    single<PortConfigService> { PortConfigServiceImpl(get()).withErrorHandling() }
+    single<PortService> { PortServiceImpl(get()).withErrorHandling() }
+    single<I2CBusConfigService> { I2CBusConfigServiceImpl(get()).withErrorHandling() }
+    single<I2CBusService> { I2CBusServiceImpl(get()).withErrorHandling() }
+    single<PwmConfigService> { PwmConfigServiceImpl(get()).withErrorHandling() }
+    single<PwmService> { PwmServiceImpl(get()).withErrorHandling() }
+    single<SpiConfigService> { SpiConfigServiceImpl(get()).withErrorHandling() }
+    single<SpiService> { SpiServiceImpl(get()).withErrorHandling() }
+    single<SpiTransferService> { SpiTransferServiceImpl(get()).withErrorHandling() }
+}
+
+val serverModule = module {
+    includes(servicesModule)
+    single<GrpcServer> {
+        val serverConfiguration: ServerConfiguration by inject()
+
+        GrpcServer(serverConfiguration.port ?: 9090) {
+            services {
+                registerService<DeviceConfigService> { get() }
+                registerService<PortConfigService> { get() }
+                registerService<PortService> { get() }
+                registerService<I2CBusConfigService> { get() }
+                registerService<I2CBusService> { get() }
+                registerService<PwmConfigService> { get() }
+                registerService<PwmService> { get() }
+                registerService<SpiConfigService> { get() }
+                registerService<SpiService> { get() }
+                registerService<SpiTransferService> { get() }
             }
         }
     }

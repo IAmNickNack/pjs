@@ -9,10 +9,10 @@ import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.invoke
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.DeviceRequest
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.Empty
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.invoke
-import io.github.iamnicknack.pjs.krpc.asPwmConfig
-import io.github.iamnicknack.pjs.krpc.asPwmConfigPayload
-import io.github.iamnicknack.pjs.krpc.cannotContain
-import io.github.iamnicknack.pjs.krpc.deviceOrThrow
+import io.github.iamnicknack.pjs.krpc.proto.asPwmConfig
+import io.github.iamnicknack.pjs.krpc.proto.asPwmConfigPayload
+import io.github.iamnicknack.pjs.krpc.proto.cannotContain
+import io.github.iamnicknack.pjs.krpc.proto.deviceOrThrow
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 
 class PwmConfigServiceImpl(

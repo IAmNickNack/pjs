@@ -9,10 +9,10 @@ import io.github.iamnicknack.pjs.grpc.gen.v1.port.invoke
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.DeviceRequest
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.Empty
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.invoke
-import io.github.iamnicknack.pjs.krpc.asGpioPortConfig
-import io.github.iamnicknack.pjs.krpc.asPortConfigPayload
-import io.github.iamnicknack.pjs.krpc.cannotContain
-import io.github.iamnicknack.pjs.krpc.withDevice
+import io.github.iamnicknack.pjs.krpc.proto.asGpioPortConfig
+import io.github.iamnicknack.pjs.krpc.proto.asPortConfigPayload
+import io.github.iamnicknack.pjs.krpc.proto.cannotContain
+import io.github.iamnicknack.pjs.krpc.proto.withDevice
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 
 class PortConfigServiceImpl(

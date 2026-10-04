@@ -1,4 +1,4 @@
-package io.github.iamnicknack.pjs.krpc
+package io.github.iamnicknack.pjs.krpc.proto
 
 import io.github.iamnicknack.pjs.device.gpio.GpioEventMode
 import io.github.iamnicknack.pjs.device.gpio.GpioPinMask

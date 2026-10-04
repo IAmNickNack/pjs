@@ -1,11 +1,13 @@
 plugins {
     id("buildlogic.kotlin-core")
     id("buildlogic.logging")
-    id("buildlogic.grpc.kotlin-krpc")
     application
 }
 
 dependencies {
+    implementation(project(":sandbox:pjs-provider-krpc:pjs-krpc-proto"))
+    implementation(project(":sandbox:pjs-provider-krpc:pjs-krpc-device"))
+    implementation("org.jetbrains.kotlinx:kotlinx-rpc-grpc-server")
     implementation(project(":pjs-core"))
     implementation(project(":providers:pjs-mock-device"))
     implementation(project(":providers:pjs-pi4j-device"))

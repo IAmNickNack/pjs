@@ -2,10 +2,10 @@ package io.github.iamnicknack.pjs.krpc.service
 
 import io.github.iamnicknack.pjs.device.spi.Spi
 import io.github.iamnicknack.pjs.device.spi.SpiConfig
-import io.github.iamnicknack.pjs.krpc.asSpiConfig
-import io.github.iamnicknack.pjs.krpc.asSpiConfigPayload
-import io.github.iamnicknack.pjs.krpc.cannotContain
-import io.github.iamnicknack.pjs.krpc.deviceOrThrow
+import io.github.iamnicknack.pjs.krpc.proto.asSpiConfig
+import io.github.iamnicknack.pjs.krpc.proto.asSpiConfigPayload
+import io.github.iamnicknack.pjs.krpc.proto.cannotContain
+import io.github.iamnicknack.pjs.krpc.proto.deviceOrThrow
 import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiConfigListResponse
 import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiConfigPayload
 import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiConfigService

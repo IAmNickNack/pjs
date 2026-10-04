@@ -14,9 +14,9 @@ import io.github.iamnicknack.pjs.grpc.gen.v1.types.Empty
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.IntegerRequest
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.IntegerResponse
 import io.github.iamnicknack.pjs.grpc.gen.v1.types.invoke
-import io.github.iamnicknack.pjs.krpc.asGpioPortMode
-import io.github.iamnicknack.pjs.krpc.deviceOrThrow
-import io.github.iamnicknack.pjs.krpc.withDevice
+import io.github.iamnicknack.pjs.krpc.proto.asGpioPortMode
+import io.github.iamnicknack.pjs.krpc.proto.deviceOrThrow
+import io.github.iamnicknack.pjs.krpc.proto.withDevice
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import io.github.iamnicknack.pjs.model.event.GpioChangeEventType
 import io.github.iamnicknack.pjs.model.event.GpioEventListener
