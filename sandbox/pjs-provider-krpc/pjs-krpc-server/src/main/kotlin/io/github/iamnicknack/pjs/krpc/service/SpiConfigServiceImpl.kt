@@ -6,13 +6,13 @@ import io.github.iamnicknack.pjs.krpc.proto.asSpiConfig
 import io.github.iamnicknack.pjs.krpc.proto.asSpiConfigPayload
 import io.github.iamnicknack.pjs.krpc.proto.cannotContain
 import io.github.iamnicknack.pjs.krpc.proto.deviceOrThrow
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiConfigListResponse
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiConfigPayload
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiConfigService
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.invoke
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.DeviceRequest
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.Empty
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.SpiConfigListResponse
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.SpiConfigPayload
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.SpiConfigService
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.DeviceRequest
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.Empty
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.invoke
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 
 class SpiConfigServiceImpl(

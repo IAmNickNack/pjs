@@ -2,10 +2,10 @@ package io.github.iamnicknack.pjs.krpc.service
 
 import io.github.iamnicknack.pjs.device.spi.Spi
 import io.github.iamnicknack.pjs.device.spi.SpiTransfer
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiTransferMessage
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiTransferMessageList
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiTransferService
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.SpiTransferMessage
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.SpiTransferMessageList
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.SpiTransferService
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.invoke
 import io.github.iamnicknack.pjs.krpc.proto.deviceOrThrow
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import kotlinx.io.bytestring.ByteString

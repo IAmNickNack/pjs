@@ -1,16 +1,16 @@
 package io.github.iamnicknack.pjs.krpc
 
 import io.github.iamnicknack.pjs.ffm.NativeDeviceFactoryLoader
-import io.github.iamnicknack.pjs.grpc.gen.v1.config.DeviceConfigService
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.I2CBusConfigService
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.I2CBusService
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortConfigService
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortService
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PwmConfigService
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PwmService
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiConfigService
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiService
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiTransferService
+import io.github.iamnicknack.pjs.krpc.gen.v1.config.DeviceConfigService
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.I2CBusConfigService
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.I2CBusService
+import io.github.iamnicknack.pjs.krpc.gen.v1.port.PortConfigService
+import io.github.iamnicknack.pjs.krpc.gen.v1.port.PortService
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.PwmConfigService
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.PwmService
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.SpiConfigService
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.SpiService
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.SpiTransferService
 import io.github.iamnicknack.pjs.http.client.HttpDeviceFactoryConfig
 import io.github.iamnicknack.pjs.http.client.HttpDeviceFactoryLoader
 import io.github.iamnicknack.pjs.krpc.ErrorHandlingProxy.withErrorHandling

@@ -1,14 +1,14 @@
 package io.github.iamnicknack.pjs.krpc.service
 
 import io.github.iamnicknack.pjs.device.pwm.Pwm
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PolarityRequest
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PolarityResponse
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PwmService
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.DeviceRequest
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.Empty
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.LongRequest
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.LongResponse
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.PolarityRequest
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.PolarityResponse
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.PwmService
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.DeviceRequest
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.Empty
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.LongRequest
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.LongResponse
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.invoke
 import io.github.iamnicknack.pjs.krpc.proto.asLongResponse
 import io.github.iamnicknack.pjs.krpc.proto.asPolarity
 import io.github.iamnicknack.pjs.krpc.proto.asPolarityResponse

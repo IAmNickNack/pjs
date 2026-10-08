@@ -3,8 +3,8 @@ package io.github.iamnicknack.pjs.krpc
 import io.github.iamnicknack.pjs.device.i2c.I2C
 import io.github.iamnicknack.pjs.device.i2c.I2CConfig
 import io.github.iamnicknack.pjs.device.i2c.I2CFactory
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.I2CBusConfigService
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.I2CBusService
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.I2CBusConfigService
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.I2CBusService
 import io.github.iamnicknack.pjs.krpc.proto.asI2CBusConfig
 import io.github.iamnicknack.pjs.krpc.proto.asI2CBusConfigPayload
 import kotlinx.coroutines.runBlocking

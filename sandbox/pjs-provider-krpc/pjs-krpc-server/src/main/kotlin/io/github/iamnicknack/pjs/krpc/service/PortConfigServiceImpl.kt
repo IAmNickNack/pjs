@@ -2,13 +2,13 @@ package io.github.iamnicknack.pjs.krpc.service
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortConfigListResponse
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortConfigPayload
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortConfigService
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.invoke
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.DeviceRequest
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.Empty
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.port.PortConfigListResponse
+import io.github.iamnicknack.pjs.krpc.gen.v1.port.PortConfigPayload
+import io.github.iamnicknack.pjs.krpc.gen.v1.port.PortConfigService
+import io.github.iamnicknack.pjs.krpc.gen.v1.port.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.DeviceRequest
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.Empty
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.invoke
 import io.github.iamnicknack.pjs.krpc.proto.asGpioPortConfig
 import io.github.iamnicknack.pjs.krpc.proto.asPortConfigPayload
 import io.github.iamnicknack.pjs.krpc.proto.cannotContain

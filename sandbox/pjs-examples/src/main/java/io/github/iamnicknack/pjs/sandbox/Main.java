@@ -7,6 +7,7 @@ import io.github.iamnicknack.pi4j.grpc.client.GrpcPlugin;
 import io.github.iamnicknack.pjs.ffm.NativeDeviceFactoryLoader;
 import io.github.iamnicknack.pjs.grpc.GrpcDeviceFactory;
 import io.github.iamnicknack.pjs.http.client.HttpDeviceFactory;
+import io.github.iamnicknack.pjs.krpc.KrpcDeviceFactoryLoader;
 import io.github.iamnicknack.pjs.logging.LoggingDeviceFactory;
 import io.github.iamnicknack.pjs.mock.MockDeviceFactory;
 import io.github.iamnicknack.pjs.pi4j.Pi4JDeviceFactoryLoader;
@@ -35,7 +36,7 @@ public class Main {
     static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     enum Mode  {
-        MOCK, GRPC, FFM, PI4J;
+        MOCK, GRPC, FFM, PI4J, KRPC;
 
         public static Mode fromString(String value) {
             return switch (value.toLowerCase()) {
@@ -43,6 +44,7 @@ public class Main {
                 case "grpc" -> GRPC;
                 case "ffm" -> FFM;
                 case "pi4j" -> PI4J;
+                case "krpc" -> KRPC;
                 default -> throw new IllegalArgumentException("Unknown mode: " + value);
             };
         }
@@ -52,7 +54,7 @@ public class Main {
             .addOption(Option.builder()
                     .option("p")
                     .longOpt("plugin")
-                    .desc("Which plugin to load. (`mock`, `grpc`, `ffm`, `pi4j`)")
+                    .desc("Which plugin to load. (`mock`, `grpc`, `ffm`, `pi4j`, `krpc`)")
                     .hasArg()
                     .type(Mode.class)
                     .converter(Mode::fromString)
@@ -132,6 +134,12 @@ public class Main {
 
                 yield new GrpcDeviceFactory(channel);
             }
+            case "krpc" -> new KrpcDeviceFactoryLoader().load(
+                    new KrpcDeviceFactoryLoader.Config(
+                            commandLineArgs.getOptionValue("grpc-host", "localhost"),
+                            commandLineArgs.getParsedOptionValue("grpc-port", 9090)
+                    )
+            );
             case "http" -> new HttpDeviceFactory.Default(
                     commandLineArgs.getOptionValue("grpc-host"),
                     commandLineArgs.getParsedOptionValue("grpc-port", 9090)

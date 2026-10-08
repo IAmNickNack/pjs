@@ -1,12 +1,12 @@
 package io.github.iamnicknack.pjs.krpc.service
 
 import io.github.iamnicknack.pjs.device.i2c.I2C
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.I2CBusMessage
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.I2CBusService
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.MessageType
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.TransferRequest
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.TransferResponse
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.I2CBusMessage
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.I2CBusService
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.MessageType
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.TransferRequest
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.TransferResponse
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.invoke
 import io.github.iamnicknack.pjs.krpc.proto.deviceOrThrow
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import kotlinx.io.bytestring.ByteString

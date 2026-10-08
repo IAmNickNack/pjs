@@ -4,20 +4,20 @@ package io.github.iamnicknack.pjs.krpc.proto
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.device.pwm.Pwm
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortModePayload
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.invoke
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PolarityRequest
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PolarityResponse
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PwmPolarity
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.invoke
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.DataRequest
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.DataResponse
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.DeviceRequest
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.IntegerRequest
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.IntegerResponse
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.LongRequest
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.LongResponse
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.port.PortModePayload
+import io.github.iamnicknack.pjs.krpc.gen.v1.port.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.PolarityRequest
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.PolarityResponse
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.PwmPolarity
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.DataRequest
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.DataResponse
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.DeviceRequest
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.IntegerRequest
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.IntegerResponse
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.LongRequest
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.LongResponse
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.invoke
 import io.github.iamnicknack.pjs.model.device.DeviceConfig
 import kotlinx.io.bytestring.ByteString
 

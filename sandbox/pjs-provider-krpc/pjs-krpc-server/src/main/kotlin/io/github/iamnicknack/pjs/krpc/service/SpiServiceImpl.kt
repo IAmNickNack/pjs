@@ -3,9 +3,9 @@ package io.github.iamnicknack.pjs.krpc.service
 import io.github.iamnicknack.pjs.device.spi.Spi
 import io.github.iamnicknack.pjs.krpc.proto.asDataResponse
 import io.github.iamnicknack.pjs.krpc.proto.deviceOrThrow
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiService
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.DataRequest
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.DataResponse
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.SpiService
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.DataRequest
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.DataResponse
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 
 class SpiServiceImpl(

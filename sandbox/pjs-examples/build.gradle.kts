@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":providers:pjs-mock-device"))
     implementation(project(":providers:pjs-native:pjs-native-device"))
     implementation(project(":providers:network:pjs-grpc::pjs-grpc-device"))
+    implementation(project(":sandbox:pjs-provider-krpc:pjs-krpc-device"))
     implementation(project(":providers:network:pjs-http:pjs-http-device"))
     api(project(":providers:pjs-pi4j-device"))
 

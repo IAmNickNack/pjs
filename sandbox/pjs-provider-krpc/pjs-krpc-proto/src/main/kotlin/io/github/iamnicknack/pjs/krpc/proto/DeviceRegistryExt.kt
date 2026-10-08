@@ -1,3 +1,4 @@
+@file:Suppress("TooManyFunctions")
 package io.github.iamnicknack.pjs.krpc.proto
 
 import io.github.iamnicknack.pjs.device.gpio.GpioEventMode
@@ -7,16 +8,16 @@ import io.github.iamnicknack.pjs.device.gpio.GpioPortMode
 import io.github.iamnicknack.pjs.device.i2c.I2CConfig
 import io.github.iamnicknack.pjs.device.pwm.PwmConfig
 import io.github.iamnicknack.pjs.device.spi.SpiConfig
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.I2CBusConfigPayload
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.invoke
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.EventMode
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortConfigPayload
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortMode
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.invoke
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PwmConfigPayload
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.invoke
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiConfigPayload
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.I2CBusConfigPayload
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.port.EventMode
+import io.github.iamnicknack.pjs.krpc.gen.v1.port.PortConfigPayload
+import io.github.iamnicknack.pjs.krpc.gen.v1.port.PortMode
+import io.github.iamnicknack.pjs.krpc.gen.v1.port.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.PwmConfigPayload
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.SpiConfigPayload
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.invoke
 import io.github.iamnicknack.pjs.model.device.Device
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import io.grpc.Status

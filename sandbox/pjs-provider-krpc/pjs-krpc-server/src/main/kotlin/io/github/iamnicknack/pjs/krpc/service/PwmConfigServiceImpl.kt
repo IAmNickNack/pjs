@@ -2,13 +2,13 @@ package io.github.iamnicknack.pjs.krpc.service
 
 import io.github.iamnicknack.pjs.device.pwm.Pwm
 import io.github.iamnicknack.pjs.device.pwm.PwmConfig
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PwmConfigListResponse
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PwmConfigPayload
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PwmConfigService
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.invoke
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.DeviceRequest
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.Empty
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.PwmConfigListResponse
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.PwmConfigPayload
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.PwmConfigService
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.DeviceRequest
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.Empty
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.invoke
 import io.github.iamnicknack.pjs.krpc.proto.asPwmConfig
 import io.github.iamnicknack.pjs.krpc.proto.asPwmConfigPayload
 import io.github.iamnicknack.pjs.krpc.proto.cannotContain

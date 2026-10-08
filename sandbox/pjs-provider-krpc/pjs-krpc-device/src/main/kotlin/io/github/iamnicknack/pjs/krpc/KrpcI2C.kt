@@ -2,12 +2,12 @@ package io.github.iamnicknack.pjs.krpc
 
 import io.github.iamnicknack.pjs.device.i2c.I2C
 import io.github.iamnicknack.pjs.device.i2c.I2CConfig
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.I2CBusConfigService
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.I2CBusMessage
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.I2CBusService
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.MessageType
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.TransferRequest
-import io.github.iamnicknack.pjs.grpc.gen.v1.i2c.bus.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.I2CBusConfigService
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.I2CBusMessage
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.I2CBusService
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.MessageType
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.TransferRequest
+import io.github.iamnicknack.pjs.krpc.gen.v1.i2c.bus.invoke
 import io.github.iamnicknack.pjs.krpc.proto.asDeviceRequest
 import io.github.iamnicknack.pjs.model.device.DeviceConfig
 import kotlinx.coroutines.runBlocking

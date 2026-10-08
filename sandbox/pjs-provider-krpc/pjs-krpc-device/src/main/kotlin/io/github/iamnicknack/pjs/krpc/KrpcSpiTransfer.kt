@@ -2,15 +2,14 @@ package io.github.iamnicknack.pjs.krpc
 
 import io.github.iamnicknack.pjs.device.spi.SpiConfig
 import io.github.iamnicknack.pjs.device.spi.SpiTransfer
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiTransferMessage
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiTransferMessageList
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.SpiTransferService
-import io.github.iamnicknack.pjs.grpc.gen.v1.spi.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.SpiTransferMessage
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.SpiTransferMessageList
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.SpiTransferService
+import io.github.iamnicknack.pjs.krpc.gen.v1.spi.invoke
 import kotlinx.coroutines.runBlocking
 import kotlinx.io.bytestring.ByteString
 
 class KrpcSpiTransfer(
-    private val config: SpiConfig,
     private val spiTransferService: SpiTransferService
 ) : SpiTransfer {
 

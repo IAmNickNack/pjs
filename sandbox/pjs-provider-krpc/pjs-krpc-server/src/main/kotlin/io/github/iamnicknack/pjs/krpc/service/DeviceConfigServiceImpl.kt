@@ -1,13 +1,11 @@
 package io.github.iamnicknack.pjs.krpc.service
 
-import io.github.iamnicknack.pjs.grpc.gen.v1.config.DeviceConfigService
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.DeviceRequest
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.Empty
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.config.DeviceConfigService
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.DeviceRequest
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.Empty
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.invoke
 import io.github.iamnicknack.pjs.model.device.DeviceRegistry
 import io.grpc.Status
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 class DeviceConfigServiceImpl(
     private val deviceRegistry: DeviceRegistry

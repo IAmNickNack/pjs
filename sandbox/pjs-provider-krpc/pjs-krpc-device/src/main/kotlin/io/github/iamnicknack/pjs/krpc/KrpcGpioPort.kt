@@ -2,18 +2,19 @@ package io.github.iamnicknack.pjs.krpc
 
 import io.github.iamnicknack.pjs.device.gpio.GpioPort
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.EventMode
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortConfigService
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.PortService
-import io.github.iamnicknack.pjs.grpc.gen.v1.port.StateChangeEvent
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.DeviceRequest
-import io.github.iamnicknack.pjs.grpc.gen.v1.types.invoke
+import io.github.iamnicknack.pjs.krpc.gen.v1.port.EventMode
+import io.github.iamnicknack.pjs.krpc.gen.v1.port.PortConfigService
+import io.github.iamnicknack.pjs.krpc.gen.v1.port.PortService
+import io.github.iamnicknack.pjs.krpc.gen.v1.port.StateChangeEvent
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.DeviceRequest
+import io.github.iamnicknack.pjs.krpc.gen.v1.types.invoke
 import io.github.iamnicknack.pjs.krpc.proto.asIntegerRequest
 import io.github.iamnicknack.pjs.model.device.DeviceConfig
 import io.github.iamnicknack.pjs.model.event.GpioChangeEvent
 import io.github.iamnicknack.pjs.model.event.GpioChangeEventType
 import io.github.iamnicknack.pjs.model.event.GpioEventListener
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -27,7 +28,8 @@ import kotlin.time.Duration.Companion.milliseconds
 class KrpcGpioPort(
     private val config: GpioPortConfig,
     private val portService: PortService,
-    private val portConfigService: PortConfigService
+    private val portConfigService: PortConfigService,
+    private val listenerDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : GpioPort {
     private val logger: Logger = LoggerFactory.getLogger(KrpcGpioPort::class.java)
 
@@ -43,10 +45,11 @@ class KrpcGpioPort(
     }
 
     override fun addListener(listener: GpioEventListener<GpioPort>): Unit = runBlocking {
+        logger.info("Adding listener to port ${config.id}")
         listeners.add(listener)
         if (listenerJob == null) {
             val completer = CompletableDeferred<Unit>()
-            listenerJob = CoroutineScope(Dispatchers.IO)
+            listenerJob = CoroutineScope(listenerDispatcher)
                 .launch {
                     portService.addListener(config.asDeviceRequest())
                         .collect { event ->
@@ -60,6 +63,7 @@ class KrpcGpioPort(
     }
 
     override fun removeListener(listener: GpioEventListener<GpioPort>) {
+        logger.info("Removing listener from port ${config.id}")
         listeners.remove(listener)
         if (listeners.isEmpty() && listenerJob != null) {
             listenerJob?.cancel()

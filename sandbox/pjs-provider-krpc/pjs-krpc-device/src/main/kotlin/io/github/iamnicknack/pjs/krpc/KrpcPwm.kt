@@ -3,8 +3,8 @@ package io.github.iamnicknack.pjs.krpc
 import io.github.iamnicknack.pjs.device.pwm.Pwm
 import io.github.iamnicknack.pjs.device.pwm.PwmBean
 import io.github.iamnicknack.pjs.device.pwm.PwmConfig
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PwmConfigService
-import io.github.iamnicknack.pjs.grpc.gen.v1.pwm.PwmService
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.PwmConfigService
+import io.github.iamnicknack.pjs.krpc.gen.v1.pwm.PwmService
 import io.github.iamnicknack.pjs.krpc.proto.asDeviceRequest
 import io.github.iamnicknack.pjs.krpc.proto.asLongRequest
 import io.github.iamnicknack.pjs.krpc.proto.asPolarity
