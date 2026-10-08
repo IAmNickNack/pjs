@@ -15,7 +15,7 @@ public class GpioExample implements Runnable {
             .id("GPIO-INPUT")
             .pin(16, 25)
             .portMode(GpioPortMode.INPUT)
-            .eventMode(GpioEventMode.BOTH)
+            .eventMode(GpioEventMode.RISING)
             .build();
 
     private static final GpioPortConfig OUTPUT_CONFIG = GpioPortConfig.builder()
@@ -39,7 +39,9 @@ public class GpioExample implements Runnable {
         try(var inputPort = deviceRegistry.create(INPUT_CONFIG);
             var outputPort = deviceRegistry.create(OUTPUT_CONFIG)) {
 
-            GpioEventListener<GpioPort> listener = value -> logger.info("GPIO-OUTPUT: {}, {}", value.eventType(), value.offset());
+            GpioEventListener<GpioPort> listener = value ->
+                logger.info("{}, {}, {}", value.port().getConfig(), value.eventType(), value.port().read());
+
             inputPort.addListener(listener);
 
             outputPort.write(1);
