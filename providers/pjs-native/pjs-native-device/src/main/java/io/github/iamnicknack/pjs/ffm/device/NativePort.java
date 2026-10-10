@@ -17,7 +17,6 @@ import io.github.iamnicknack.pjs.ffm.event.debounce.TrailingEdgeDebounceCallback
 import io.github.iamnicknack.pjs.ffm.event.debounce.LeadingEdgeDebounceCallback;
 import io.github.iamnicknack.pjs.model.event.GpioChangeEvent;
 import io.github.iamnicknack.pjs.model.event.GpioEventListener;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

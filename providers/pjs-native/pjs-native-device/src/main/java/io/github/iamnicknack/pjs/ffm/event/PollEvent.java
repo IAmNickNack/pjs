@@ -13,6 +13,10 @@ public record PollEvent(
         long timestamp,
         int offset
 ) {
+    public PollEvent(PollEventType eventType, long timestamp) {
+        this(eventType, timestamp, -1);
+    }
+
     public GpioChangeEventType asLineChangeEventType() {
         return switch (this.eventType) {
             case RISING -> GpioChangeEventType.RISING;
