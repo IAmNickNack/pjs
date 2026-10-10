@@ -8,6 +8,10 @@ package io.github.iamnicknack.pjs.model.event;
  */
 public record GpioChangeEvent<T extends GpioEventEmitter<T>>(
         T port,
-        GpioChangeEventType eventType
+        GpioChangeEventType eventType,
+        int offset
 ) {
+    public GpioChangeEvent(T port, GpioChangeEventType eventType) {
+        this(port, eventType, -1);
+    }
 }

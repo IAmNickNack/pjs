@@ -1,5 +1,6 @@
 package io.github.iamnicknack.pjs.ffm.device;
 
+import io.github.iamnicknack.pjs.device.gpio.GpioPinMask;
 import io.github.iamnicknack.pjs.device.gpio.GpioPort;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortConfig;
 import io.github.iamnicknack.pjs.device.gpio.GpioPortMode;
@@ -16,7 +17,6 @@ import io.github.iamnicknack.pjs.ffm.event.debounce.TrailingEdgeDebounceCallback
 import io.github.iamnicknack.pjs.ffm.event.debounce.LeadingEdgeDebounceCallback;
 import io.github.iamnicknack.pjs.model.event.GpioChangeEvent;
 import io.github.iamnicknack.pjs.model.event.GpioEventListener;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +40,10 @@ class NativePort implements GpioPort, AutoCloseable {
     private final Set<GpioEventListener<GpioPort>> listeners = new CopyOnWriteArraySet<>();
     private final EventPoller eventPoller;
     private final AutoCloseable closeableCallback;
+    private final GpioPinMask gpioPinMask;
 
 
-    private @NonNull LineConfig currentLineConfig;
+    private LineConfig currentLineConfig;
 
     /**
      * Create a new instance with event polling support
@@ -70,10 +71,11 @@ class NativePort implements GpioPort, AutoCloseable {
         if (pollEventsCallback instanceof AutoCloseable closeable) {
             this.closeableCallback = closeable;
         } else {
-            this.closeableCallback = null;
+            this.closeableCallback = () -> {};
         }
         this.eventPoller = eventPollerFactory.create(fileDescriptor, pollEventsCallback);
         this.currentLineConfig = (config.portMode().isSet(GpioPortMode.INPUT) ? lineConfigs.inputConfig() : lineConfigs.outputConfig());
+        this.gpioPinMask = GpioPinMask.fromMask(config.mask());
     }
 
     /**
@@ -124,12 +126,10 @@ class NativePort implements GpioPort, AutoCloseable {
     public void close() {
         logger.debug("Closing GPIO port with file descriptor: {}", fileDescriptor.fd());
         fileDescriptor.close();
-        if (closeableCallback != null) {
-            try {
-                closeableCallback.close();
-            } catch (Exception e) {
-                logger.warn("Failed to close event poller", e);
-            }
+        try {
+            closeableCallback.close();
+        } catch (Exception e) {
+            logger.warn("Failed to close event poller", e);
         }
         eventPoller.stop();
     }
@@ -154,7 +154,11 @@ class NativePort implements GpioPort, AutoCloseable {
 
     private void handleEventCallback(EventPoller poller, List<PollEvent> pollEvents) {
         pollEvents.stream()
-                .map(pollEvent -> new GpioChangeEvent<>(NativePort.this, pollEvent.asLineChangeEventType()))
+                .map(pollEvent -> {
+                    // calculate the logic pin offset for the event
+                    int offset = Integer.numberOfTrailingZeros((int) gpioPinMask.unmaskValue(1L << pollEvent.offset()));
+                    return new GpioChangeEvent<>(NativePort.this, pollEvent.asLineChangeEventType(), offset);
+                })
                 .forEach(event -> listeners.forEach(listener -> listener.onEvent(event)));
     }
 }
