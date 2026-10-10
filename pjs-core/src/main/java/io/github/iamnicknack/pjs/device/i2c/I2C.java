@@ -2,7 +2,6 @@ package io.github.iamnicknack.pjs.device.i2c;
 
 import io.github.iamnicknack.pjs.model.device.Device;
 import io.github.iamnicknack.pjs.model.port.SerialPort;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
 
@@ -67,7 +66,6 @@ public interface I2C extends Device<I2C> {
         }
 
         @Override
-        @NonNull
         public String toString() {
             return "Message{" +
                     "address=" + address +

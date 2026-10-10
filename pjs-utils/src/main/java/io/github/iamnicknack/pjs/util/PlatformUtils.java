@@ -2,8 +2,8 @@ package io.github.iamnicknack.pjs.util;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 public class PlatformUtils {
 
@@ -24,7 +24,7 @@ public class PlatformUtils {
             return false;
         }
 
-        try (var reader = new BufferedReader(new FileReader(cpuInfo, StandardCharsets.UTF_8))) {
+        try (var reader = new BufferedReader(Files.newBufferedReader(cpuInfo.toPath(), StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 var lower = line.toLowerCase();
