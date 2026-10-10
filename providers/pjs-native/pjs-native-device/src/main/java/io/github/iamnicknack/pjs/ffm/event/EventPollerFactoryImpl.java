@@ -142,7 +142,7 @@ public class EventPollerFactoryImpl implements EventPoller.Factory {
                                         .mapToObj(index -> memorySegment.asSlice(index * LINE_EVENT_SIZE, LINE_EVENT_SIZE))
                                         .map(lineEventDeserializer::deserialize)
                                         .takeWhile(event -> event.timestampNs() != 0)
-                                        .map(event -> new PollEvent(PollEventType.from(event.id()), event.timestampNs()))
+                                        .map(event -> new PollEvent(PollEventType.from(event.id()), event.timestampNs(), event.offset()))
                                         .toList()
                         );
 
