@@ -38,24 +38,6 @@ public class GpioEventEmitterDelegate<T extends GpioEventEmitter<T>>
         this.listenerExecutor = listenerExecutor;
     }
 
-    /**
-     * Handle events from the provided delegate on the current thread.
-     * @param delegate the delegate to handle events from.
-     */
-    public GpioEventEmitterDelegate(GpioEventEmitter<T> delegate) {
-        this(new DirectExecutorService(), delegate);
-    }
-
-    /**
-     * Handle events from the provided delegate on the provided executor.
-     * @param listenerExecutor the executor to use for event dispatching.
-     * @param delegate the delegate to handle events from.
-     */
-    public GpioEventEmitterDelegate(ExecutorService listenerExecutor, GpioEventEmitter<T> delegate) {
-        this.listenerExecutor = listenerExecutor;
-        delegate.addListener(this);
-    }
-
     public int getListenerCount() {
         return listeners.size();
     }
