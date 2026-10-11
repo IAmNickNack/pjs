@@ -155,7 +155,7 @@ class NativePort implements GpioPort, AutoCloseable {
     private void handleEventCallback(EventPoller poller, List<PollEvent> pollEvents) {
         pollEvents.stream()
                 .map(pollEvent -> {
-                    // calculate the logic pin offset for the event
+                    // calculate the logical pin offset for the event
                     int offset = Integer.numberOfTrailingZeros((int) gpioPinMask.unmaskValue(1L << pollEvent.offset()));
                     return new GpioChangeEvent<>(NativePort.this, pollEvent.asLineChangeEventType(), offset);
                 })

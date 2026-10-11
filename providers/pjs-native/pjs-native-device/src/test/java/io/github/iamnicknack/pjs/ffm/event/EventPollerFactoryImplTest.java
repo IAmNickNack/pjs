@@ -52,13 +52,13 @@ class EventPollerFactoryImplTest {
                         pollEvents -> pollEvents.size() == 2
                 ),
                 new Expectation(
-                        "Stops when timestamp is zero",
+                        "Event excluded when timestamp is zero",
                         new LineEvent[] {
                                 new LineEvent(1, 2, 3, 4, 5),
                                 new LineEvent(0, 7, 8, 9, 10),
                                 new LineEvent(6, 7, 8, 9, 10),
                         },
-                        pollEvents -> pollEvents.size() == 1 && pollEvents.getFirst().eventType() == PollEventType.FALLING
+                        pollEvents -> pollEvents.size() == 2 && pollEvents.getFirst().eventType() == PollEventType.FALLING
                 )
         ).map(expectation -> DynamicTest.dynamicTest(expectation.name, () -> {
                 var assertion = new AtomicBoolean(false);

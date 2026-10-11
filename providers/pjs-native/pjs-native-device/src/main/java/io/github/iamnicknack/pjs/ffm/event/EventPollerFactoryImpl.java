@@ -9,6 +9,7 @@ import io.github.iamnicknack.pjs.ffm.device.context.gpio.Poll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.foreign.ValueLayout;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -139,9 +140,9 @@ public class EventPollerFactoryImpl implements EventPoller.Factory {
                                 0,
                                 (int) (16 * LINE_EVENT_SIZE),
                                 (memorySegment, ignored) -> IntStream.range(0, 16)
+                                        .filter(index -> memorySegment.get(ValueLayout.JAVA_LONG, index * LINE_EVENT_SIZE) != 0L)
                                         .mapToObj(index -> memorySegment.asSlice(index * LINE_EVENT_SIZE, LINE_EVENT_SIZE))
                                         .map(lineEventDeserializer::deserialize)
-                                        .takeWhile(event -> event.timestampNs() != 0)
                                         .map(event -> new PollEvent(PollEventType.from(event.id()), event.timestampNs(), event.offset()))
                                         .toList()
                         );
