@@ -24,10 +24,8 @@ public class LeadingEdgeDebounceCallback implements PollEventsCallback, AutoClos
 
     @Override
     public void callback(EventPoller poller, List<PollEvent> pollEvents) {
-        var filteredEvents = pollEvents.stream().filter(eventFilter).toList();
-        if (!filteredEvents.isEmpty()) {
-            delegate.callback(poller, filteredEvents);
-        }
+        pollEvents.stream().filter(eventFilter).findFirst()
+                .ifPresent(event -> delegate.callback(poller, List.of(event)));
     }
 
     @Override

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
 import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SegmentAllocator;
 import java.time.Duration;
 import java.util.List;
@@ -88,17 +89,14 @@ class EventPollerFactoryImplTest {
             this.events = events;
         }
 
-        @Override
-        public <T> T read(int fd, int offset, int length, @NonNull ReadSegmentHandler<T> handler) {
-            var segment = segmentAllocator.allocate(length);
-
+        public int read(int fd, @NonNull MemorySegment buffer, int length) {
             for (int i = 0; i < events.length; i++) {
-                var slice = segment.asSlice(i * LineEvent.LAYOUT.byteSize(), LineEvent.LAYOUT.byteSize());
+                var slice = buffer.asSlice(i * LineEvent.LAYOUT.byteSize(), LineEvent.LAYOUT.byteSize());
                 var eventSegment = serializer.serialize(events[i]);
                 slice.copyFrom(eventSegment);
             }
 
-            return handler.apply(segment, length);
+            return (int) (events.length * LineEvent.LAYOUT.byteSize());
         }
     }
 }

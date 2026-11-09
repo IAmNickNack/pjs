@@ -9,13 +9,16 @@ import io.github.iamnicknack.pjs.ffm.device.context.gpio.Poll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.foreign.ValueLayout;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
 import java.time.Duration;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.IntStream;
+import java.util.concurrent.TimeUnit;
 
 /**
  * {@inheritDoc}
@@ -23,16 +26,16 @@ import java.util.stream.IntStream;
 public class EventPollerFactoryImpl implements EventPoller.Factory {
 
     private static final MemorySegmentDeserializer<LineEvent> lineEventDeserializer = new LineEvent.Deserializer();
-    private static final long LINE_EVENT_SIZE = LineEvent.LAYOUT.byteSize();
+    private static final int LINE_EVENT_SIZE = (int) LineEvent.LAYOUT.byteSize();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private final ExecutorService executorService;
+    private final List<EventPoller> pollers = new ArrayList<>();
 
     private final Duration timeout;
     private final PollingOperations pollingOperations;
     private final FileOperations fileOperations;
-
-    private final AtomicInteger threadCounter = new AtomicInteger(0);
-    private final ExecutorService executorService;
 
     public EventPollerFactoryImpl(
             Duration timeout,
@@ -57,15 +60,12 @@ public class EventPollerFactoryImpl implements EventPoller.Factory {
         this.timeout = timeout;
         this.pollingOperations = pollingOperations;
         this.fileOperations = fileOperations;
-        this.executorService = Executors.newFixedThreadPool(threadPoolSize, r -> {
-            Objects.requireNonNull(r);
-            var thread = new Thread(r, "gpio-event-poller[" + threadCounter.getAndIncrement() + "]");
-            thread.setDaemon(true);
-            thread.setUncaughtExceptionHandler((t, e) ->
-                    logger.error("Error on thread: {}", t.getName(), e)
-            );
-            return thread;
-        });
+        this.executorService = Executors.newFixedThreadPool(threadPoolSize, Thread.ofPlatform()
+                .name("gpio-event-poller-", 0)
+                .uncaughtExceptionHandler((t, e) -> logger.error("Error on thread: {}", t.getName(), e))
+                .daemon(true)
+                .factory()
+        );
     }
 
     /**
@@ -77,7 +77,13 @@ public class EventPollerFactoryImpl implements EventPoller.Factory {
                 fileDescriptor.fd(),
                 pollEventsCallback.getClass().getSimpleName()
         );
-        return new Poller(fileDescriptor, pollEventsCallback);
+        var poller = new Poller(
+                new DefaultEventPollerOperation(fileDescriptor, timeout),
+                new DefaultEventReaderOperation(fileDescriptor),
+                pollEventsCallback
+        );
+        pollers.add(poller);
+        return poller;
     }
 
     /**
@@ -85,7 +91,8 @@ public class EventPollerFactoryImpl implements EventPoller.Factory {
      */
     @Override
     public void close() {
-        executorService.shutdownNow();
+        pollers.forEach(EventPoller::stop);
+        executorService.shutdown();
     }
 
     /**
@@ -94,11 +101,17 @@ public class EventPollerFactoryImpl implements EventPoller.Factory {
     private class Poller implements EventPoller {
 
         private volatile boolean running;
-        private final FileDescriptor fileDescriptor;
+        private final EventPollerOperation eventPollerOperation;
+        private final EventReaderOperation eventReaderOperation;
         private final PollEventsCallback callback;
+        private final BlockingQueue<Boolean> stopSignal = new ArrayBlockingQueue<>(1);
 
-        private Poller(FileDescriptor fileDescriptor, PollEventsCallback callback) {
-            this.fileDescriptor = fileDescriptor;
+        private Poller(
+                EventPollerOperation eventPollerOperation,
+                EventReaderOperation eventReaderOperation,
+                PollEventsCallback callback) {
+            this.eventPollerOperation = eventPollerOperation;
+            this.eventReaderOperation = eventReaderOperation;
             this.callback = callback;
         }
 
@@ -111,8 +124,18 @@ public class EventPollerFactoryImpl implements EventPoller.Factory {
 
         @Override
         public void stop() {
-            logger.info("Stopping event poller on fd {}", fileDescriptor.fd());
+            if (!running) {
+                return;
+            }
+
+            logger.info("Stopping event poller");
             running = false;
+            try {
+                stopSignal.poll(timeout.toMillis(), TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.warn("Interrupted while waiting for poller to stop", e);
+            }
         }
 
         @Override
@@ -126,26 +149,32 @@ public class EventPollerFactoryImpl implements EventPoller.Factory {
                 logger.warn("Event poller is already running");
                 return;
             }
-            var pollData = new Poll(fileDescriptor.fd());
-            logger.info("Starting event poller on fd {}", fileDescriptor.fd());
+            logger.info("Starting event poller");
             running = true;
+            stopSignal.clear();
 
-            try {
+            try(var arena = Arena.ofConfined()) {
+                var eventBuffer = arena.allocate(LINE_EVENT_SIZE * 16L);
+
                 while (running) {
-                    var poll = pollingOperations.poll(pollData, (int) timeout.toMillis());
+                    var poll = eventPollerOperation.poll();
                     // got a change event?
-                    if ((poll.revents() & Poll.Flags.POLLIN.value) != 0) {
-                        var events = fileOperations.read(
-                                fileDescriptor,
-                                0,
-                                (int) (16 * LINE_EVENT_SIZE),
-                                (memorySegment, ignored) -> IntStream.range(0, 16)
-                                        .filter(index -> memorySegment.get(ValueLayout.JAVA_LONG, index * LINE_EVENT_SIZE) != 0L)
-                                        .mapToObj(index -> memorySegment.asSlice(index * LINE_EVENT_SIZE, LINE_EVENT_SIZE))
-                                        .map(lineEventDeserializer::deserialize)
-                                        .map(event -> new PollEvent(PollEventType.from(event.id()), event.timestampNs(), event.offset()))
-                                        .toList()
-                        );
+                    if ((poll.revents() & (Poll.Flags.POLLIN.value | Poll.Flags.POLLPRI.value)) != 0) {
+                        if (!running) {
+                            break;
+                        }
+                        var bytesRead = eventReaderOperation.read(eventBuffer);
+                        var events = new ArrayList<PollEvent>();
+
+                        for (int i = 0; i < bytesRead; i += LINE_EVENT_SIZE) {
+                            var lineEventSegment = eventBuffer.asSlice(i, LINE_EVENT_SIZE);
+                            var lineEvent = lineEventDeserializer.deserialize(lineEventSegment);
+
+                            if (lineEvent.timestampNs() != 0) {
+                                var pollEvent = new PollEvent(PollEventType.from(lineEvent.id()), lineEvent.timestampNs(), lineEvent.offset());
+                                events.add(pollEvent);
+                            }
+                        }
 
                         // got some events
                         if (!events.isEmpty()) {
@@ -154,8 +183,50 @@ public class EventPollerFactoryImpl implements EventPoller.Factory {
                     }
                 }
             } catch (Exception e) {
-                logger.error("Error while polling for events on fd {}", fileDescriptor.fd(), e);
+                logger.error("Error while polling for events", e);
             }
+
+            stopSignal.add(true);
+        }
+    }
+
+
+    @FunctionalInterface
+    interface EventPollerOperation {
+        Poll poll();
+    }
+
+    private class DefaultEventPollerOperation implements EventPollerOperation {
+        private final FileDescriptor fileDescriptor;
+        private final Duration timeout;
+
+        public DefaultEventPollerOperation(FileDescriptor fileDescriptor, Duration timeout) {
+            this.fileDescriptor = fileDescriptor;
+            this.timeout = timeout;
+        }
+
+        @Override
+        public Poll poll() {
+            var poll = new Poll(fileDescriptor.fd());
+            return pollingOperations.poll(poll, (int) timeout.toMillis());
+        }
+    }
+
+    @FunctionalInterface
+    interface EventReaderOperation {
+        int read(MemorySegment buffer);
+    }
+
+    private class DefaultEventReaderOperation implements EventReaderOperation {
+        private final FileDescriptor fileDescriptor;
+
+        public DefaultEventReaderOperation(FileDescriptor fileDescriptor) {
+            this.fileDescriptor = fileDescriptor;
+        }
+
+        @Override
+        public int read(MemorySegment buffer) {
+            return fileOperations.read(fileDescriptor.fd(), buffer, (int) buffer.byteSize());
         }
     }
 }
