@@ -9,5 +9,6 @@ plugins {
 dependencies {
     withVersionCatalog {
         testImplementation(libs.assertj)
+        testFixturesImplementation(libs.assertj)
     }
 }

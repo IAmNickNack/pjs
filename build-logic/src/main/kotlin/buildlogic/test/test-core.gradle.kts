@@ -5,6 +5,7 @@ import buildlogic.withVersionCatalog
 plugins {
     id("buildlogic.java-core")
     jacoco
+    `java-test-fixtures`
 }
 
 dependencies {
@@ -12,6 +13,9 @@ dependencies {
         testImplementation(platform(libs.junit.bom))
         testImplementation("org.junit.jupiter:junit-jupiter-engine")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+        testFixturesImplementation(platform(libs.junit.bom))
+        testFixturesImplementation("org.junit.jupiter:junit-jupiter-engine")
     }
 }
 

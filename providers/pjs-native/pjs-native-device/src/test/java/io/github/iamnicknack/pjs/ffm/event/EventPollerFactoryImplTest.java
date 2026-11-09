@@ -1,7 +1,6 @@
 package io.github.iamnicknack.pjs.ffm.event;
 
-import io.github.iamnicknack.pjs.ffm.device.context.FileDescriptor;
-import io.github.iamnicknack.pjs.ffm.device.context.FileOperations;
+import io.github.iamnicknack.pjs.ffm.device.context.AbstractFileOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.PollingOperations;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.LineEvent;
 import io.github.iamnicknack.pjs.ffm.device.context.gpio.Poll;
@@ -10,12 +9,10 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
 import java.lang.foreign.Arena;
-import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SegmentAllocator;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -82,7 +79,7 @@ class EventPollerFactoryImplTest {
     }
 
 
-    class LineEventsFileOperations extends FileOperations.AbstractFileOperations {
+    class LineEventsFileOperations extends AbstractFileOperations {
 
         private final LineEvent.Serializer serializer = new LineEvent.Serializer(segmentAllocator);
         private final LineEvent[] events;
@@ -92,12 +89,7 @@ class EventPollerFactoryImplTest {
         }
 
         @Override
-        public FileDescriptor createFileDescriptor(int fd) {
-            return new FileDescriptor(this, fd);
-        }
-
-        @Override
-        public <T> T read(int fd, int offset, int length, @NonNull BiFunction<MemorySegment, Integer, T> handler) {
+        public <T> T read(int fd, int offset, int length, @NonNull ReadSegmentHandler<T> handler) {
             var segment = segmentAllocator.allocate(length);
 
             for (int i = 0; i < events.length; i++) {
