@@ -28,7 +28,7 @@ public record Poll(
         int revents
 ) {
     public Poll(int fd) {
-        this(fd, Flags.POLLIN.value | Flags.POLLERR.value, 0);
+        this(fd, Flags.POLLIN.value | Flags.POLLPRI.value | Flags.POLLERR.value, 0);
     }
 
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
@@ -83,6 +83,7 @@ public record Poll(
 
     public enum Flags {
         POLLIN(0x0001),
+        POLLPRI(0x0002),
         POLLERR(0x0008);
 
         public final int value;
