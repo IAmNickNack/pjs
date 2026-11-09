@@ -3,6 +3,7 @@ plugins {
     id("buildlogic.test.test-java")
     id("buildlogic.java-library")
     id("buildlogic.maven-publish")
+    `java-test-fixtures`
 }
 
 dependencies {
@@ -10,7 +11,8 @@ dependencies {
     api(project(":providers:pjs-native:pjs-native-context"))
     api(libs.slf4j.api)
     testRuntimeOnly(libs.logback.classic)
-    testImplementation(libs.jimfs)
+
+    testFixturesImplementation(libs.jimfs)
 }
 
 tasks.withType<Test> {

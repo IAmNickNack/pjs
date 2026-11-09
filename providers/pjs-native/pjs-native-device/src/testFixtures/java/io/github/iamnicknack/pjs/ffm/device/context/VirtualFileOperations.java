@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 public class VirtualFileOperations implements FileOperations {
 
@@ -64,7 +63,7 @@ public class VirtualFileOperations implements FileOperations {
     }
 
     @Override
-    public <T> T read(int fd, int offset, int length, BiFunction<MemorySegment, Integer, T> handler) {
+    public <T> T read(int fd, int offset, int length, ReadSegmentHandler<T> handler) {
         if (fileDescriptorMap.containsKey(fd)) {
             var buffer = new byte[length];
             try (var stream = Files.newInputStream(fileDescriptorMap.get(fd).path)) {
@@ -75,6 +74,14 @@ public class VirtualFileOperations implements FileOperations {
             }
         }
         throw new RuntimeException("File descriptor not found");
+    }
+
+    @Override
+    public int read(int fd, MemorySegment buffer, int count) {
+        var data = new byte[count];
+        int read = read(fd, data, 0, count);
+        buffer.asByteBuffer().put(data, 0, read);
+        return read;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package io.github.iamnicknack.pjs.ffm.device.context;
 
 import java.lang.foreign.MemorySegment;
-import java.util.function.BiFunction;
 
 public class AbstractFileOperations implements FileOperations {
 
@@ -27,7 +26,12 @@ public class AbstractFileOperations implements FileOperations {
     }
 
     @Override
-    public <T> T read(int fd, int offset, int length, BiFunction<MemorySegment, Integer, T> handler) {
+    public <T> T read(int fd, int offset, int length, ReadSegmentHandler<T> handler) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int read(int fd, MemorySegment buffer, int count) {
         throw new UnsupportedOperationException();
     }
 

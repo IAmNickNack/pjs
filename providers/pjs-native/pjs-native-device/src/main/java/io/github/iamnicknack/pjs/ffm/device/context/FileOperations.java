@@ -1,7 +1,6 @@
 package io.github.iamnicknack.pjs.ffm.device.context;
 
 import java.lang.foreign.MemorySegment;
-import java.util.function.BiFunction;
 
 public interface FileOperations {
 
@@ -42,6 +41,15 @@ public interface FileOperations {
      */
     int read(int fd, byte[] buffer, int offset, int count);
 
+    /**
+     * Read from a file descriptor into a MemorySegment.
+     * @param fd the file descriptor to read from
+     * @param buffer the buffer to read into
+     * @param count the number of bytes to read
+     * @return the number of bytes read, or -1 on error
+     */
+    int read(int fd, MemorySegment buffer, int count);
+
     default int read(FileDescriptor fd, byte[] buffer, int offset, int count) {
         return read(fd.fd(), buffer, offset, count);
     }
@@ -55,9 +63,9 @@ public interface FileOperations {
      * @return the result of the handler
      * @param <T> the return type of the handler
      */
-    <T> T read(int fd, int offset, int length, BiFunction<MemorySegment, Integer, T> handler);
+    <T> T read(int fd, int offset, int length, ReadSegmentHandler<T> handler);
 
-    default <T> T read(FileDescriptor fd, int offset, int length, BiFunction<MemorySegment, Integer, T> handler) {
+    default <T> T read(FileDescriptor fd, int offset, int length, ReadSegmentHandler<T> handler) {
         return read(fd.fd(), offset, length, handler);
     }
 
@@ -117,59 +125,8 @@ public interface FileOperations {
         public static final int R_OK = 0x04;            // Test for read permission
     }
 
-    /**
-     * Default base implementation which allows specific operations to be overridden.
-     * This is primarily useful for tests.
-     */
-    abstract class AbstractFileOperations implements FileOperations {
-        @Override
-        public int open(String pathname, int flags) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public FileDescriptor openFd(String pathname, int flags) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public int close(int fd) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public int read(int fd, byte[] buffer, int offset, int count) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public <T> T read(int fd, int offset, int length, BiFunction<MemorySegment, Integer, T> handler) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public int write(int fd, byte[] buffer, int offset, int count) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public int access(String pathname, int mode) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean exists(String pathname) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public int isValid(int fd) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public FileDescriptor createFileDescriptor(int fd) {
-            throw new UnsupportedOperationException();
-        }
+    @FunctionalInterface
+    interface ReadSegmentHandler<T> {
+        T apply(MemorySegment buffer, int bytesRead);
     }
 }

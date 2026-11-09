@@ -8,7 +8,6 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SegmentAllocator;
 import java.lang.foreign.ValueLayout;
 import java.nio.file.Path;
-import java.util.function.BiFunction;
 
 public class FileOperationsImpl implements FileOperations, SysfsOperationsFactory {
 
@@ -101,10 +100,15 @@ public class FileOperationsImpl implements FileOperations, SysfsOperationsFactor
     }
 
     @Override
-    public <T> T read(int fd, int offset, int length, BiFunction<MemorySegment, Integer, T> handler) {
+    public <T> T read(int fd, int offset, int length, ReadSegmentHandler<T> handler) {
         var buf = segmentAllocator.allocate(ValueLayout.JAVA_BYTE, length);
         int bytesRead = (int) read.call(fd, buf, length);
         return handler.apply(buf, bytesRead);
+    }
+
+    @Override
+    public int read(int fd, MemorySegment buffer, int count) {
+        return (int) read.call(fd, buffer, count);
     }
 
     @Override
